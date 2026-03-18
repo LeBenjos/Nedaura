@@ -9,7 +9,6 @@ import { ViewId } from '../../../constants/experiences/ViewId';
 import DebugManager from '../../../managers/DebugManager';
 import ThreeCameraControllerManager from '../../../managers/threes/ThreeCameraControllerManager';
 import Renderer from '../../../renderers/threes/Renderer';
-import World2ThreeView from '../../../views/threes/worlds/World2ThreeView';
 import WorldThreeView from '../../../views/threes/worlds/WorldThreeView';
 import ThreeAppBase from './bases/ThreeAppBase';
 
@@ -71,14 +70,11 @@ class MainThreeApp extends ThreeAppBase {
     }
 
     protected override _declareViews(): void {
-        this._viewBuilder.set(ViewId.THREE_VIEW_WORLD_1, WorldThreeView);
-        this._viewBuilder.set(ViewId.THREE_VIEW_WORLD_2, World2ThreeView);
+        this._viewBuilder.set(ViewId.THREE_WORLD, WorldThreeView);
 
         if (DebugManager.isActive) {
             const viewsDebug = DebugManager.getGuiFolder(DebugGuiTitle.THREE_VIEWS)
             viewsDebug.add({ resetCurrentView: () => this._currentView.reset() }, 'resetCurrentView');
-            viewsDebug.add({ createWorld1: () => this.setCurrentView(ViewId.THREE_VIEW_WORLD_1) }, 'createWorld1');
-            viewsDebug.add({ createWorld2: () => this.setCurrentView(ViewId.THREE_VIEW_WORLD_2) }, 'createWorld2');
         }
     }
 

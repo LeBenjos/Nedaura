@@ -1,9 +1,9 @@
 import { ViewId } from '../../../constants/experiences/ViewId';
 import ThreeViewBase from '../bases/ThreeViewBase';
-import TemplateLoaderThreeActor from './components/TemplateLoaderThreeActor';
+import PlaneLoaderThreeActor from './components/PlaneLoaderThreeActor';
 
 export default class LoaderThreeView extends ThreeViewBase {
-    declare private _threeLoader: TemplateLoaderThreeActor;
+    declare private _plane: PlaneLoaderThreeActor;
 
     constructor() {
         super(ViewId.THREE_LOADER);
@@ -12,17 +12,17 @@ export default class LoaderThreeView extends ThreeViewBase {
 
     protected override _generateActors(): void {
         super._generateActors();
-        this._threeLoader = new TemplateLoaderThreeActor();
-        this._actors.push(this._threeLoader);
+        this._plane = new PlaneLoaderThreeActor();
+        this._actors.push(this._plane);
 
         for (const actor of this._actors) this.add(actor);
     }
 
     public readonly show = (): Promise<void> => {
-        return this._threeLoader.material.show();
+        return this._plane.material.show();
     };
 
     public readonly hide = (): Promise<void> => {
-        return this._threeLoader.material.hide();
+        return this._plane.material.hide();
     };
 }

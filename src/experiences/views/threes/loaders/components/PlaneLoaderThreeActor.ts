@@ -1,15 +1,15 @@
 import { Mesh, PlaneGeometry } from 'three';
-import LoaderMaterial from '../../../../materials/threes/loaders/LoaderMaterial';
+import PlaneLoaderMaterial from '../../../../materials/threes/loaders/PlaneLoaderMaterial';
 import ThreeActorBase from '../../worlds/components/actors/bases/ThreeActorBase';
 
-export default class TemplateLoaderThreeActor extends ThreeActorBase {
+export default class PlaneLoaderThreeActor extends ThreeActorBase {
     private static readonly _DEFAULT_SIZE_WIDTH: number = 2;
     private static readonly _DEFAULT_SIZE_HEIGHT: number = 2;
     private static readonly _DEFAULT_SEGMENTS_WIDTH: number = 1;
     private static readonly _DEFAULT_SEGMENTS_HEIGHT: number = 1;
 
     declare private _geometry: PlaneGeometry;
-    declare private _material: LoaderMaterial;
+    declare private _material: PlaneLoaderMaterial;
     declare private _mesh: Mesh;
 
     constructor() {
@@ -24,15 +24,15 @@ export default class TemplateLoaderThreeActor extends ThreeActorBase {
 
     private _generateGeometry(): void {
         this._geometry = new PlaneGeometry(
-            TemplateLoaderThreeActor._DEFAULT_SIZE_WIDTH,
-            TemplateLoaderThreeActor._DEFAULT_SIZE_HEIGHT,
-            TemplateLoaderThreeActor._DEFAULT_SEGMENTS_WIDTH,
-            TemplateLoaderThreeActor._DEFAULT_SEGMENTS_HEIGHT
+            PlaneLoaderThreeActor._DEFAULT_SIZE_WIDTH,
+            PlaneLoaderThreeActor._DEFAULT_SIZE_HEIGHT,
+            PlaneLoaderThreeActor._DEFAULT_SEGMENTS_WIDTH,
+            PlaneLoaderThreeActor._DEFAULT_SEGMENTS_HEIGHT
         );
     }
 
     private _generateMaterial(): void {
-        this._material = new LoaderMaterial();
+        this._material = new PlaneLoaderMaterial();
     }
 
     private _generateMesh(): void {
@@ -41,7 +41,7 @@ export default class TemplateLoaderThreeActor extends ThreeActorBase {
 
     //#region Getters
     //
-    public get material(): LoaderMaterial {
+    public get material(): PlaneLoaderMaterial {
         return this._material;
     }
     //
