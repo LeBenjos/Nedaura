@@ -39,6 +39,11 @@ export default class PlaneLoaderThreeActor extends ThreeActorBase {
         this._mesh = new Mesh(this._geometry, this._material);
     }
 
+    public override update(dt: number): void {
+        super.update(dt);
+        this._material.update(dt);
+    }
+
     //#region Getters
     //
     public get material(): PlaneLoaderMaterial {
