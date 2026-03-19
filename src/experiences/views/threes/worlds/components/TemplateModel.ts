@@ -1,8 +1,8 @@
 import { Vector3 } from 'three';
-import { AssetId } from '../../../../../constants/experiences/AssetId';
-import { DebugGuiTitle } from '../../../../../constants/experiences/DebugGuiTitle';
-import DebugManager from '../../../../../managers/DebugManager';
-import ThreeModelBase from './bases/ThreeModelBase';
+import { AssetId } from '../../../../constants/experiences/AssetId';
+import { DebugGuiTitle } from '../../../../constants/experiences/DebugGuiTitle';
+import DebugManager from '../../../../managers/DebugManager';
+import ThreeModelBase from '../../bases/components/ThreeModelBase';
 
 export default class TemplateModel extends ThreeModelBase {
     private static readonly _DEFAULT_POSITION: Vector3 = new Vector3(0, 1, 0);

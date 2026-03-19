@@ -1,6 +1,6 @@
 import { Object3D } from 'three';
 import { ViewId } from '../../../constants/experiences/ViewId';
-import ThreeActorBase from '../worlds/components/actors/bases/ThreeActorBase';
+import ThreeActorBase from './components/ThreeActorBase';
 
 export default abstract class ThreeViewBase extends Object3D {
     private readonly _id: ViewId;

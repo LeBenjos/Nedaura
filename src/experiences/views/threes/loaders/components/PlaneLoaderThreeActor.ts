@@ -1,6 +1,6 @@
 import { Mesh, PlaneGeometry } from 'three';
 import PlaneLoaderMaterial from '../../../../materials/threes/loaders/PlaneLoaderMaterial';
-import ThreeActorBase from '../../worlds/components/actors/bases/ThreeActorBase';
+import ThreeActorBase from '../../bases/components/ThreeActorBase';
 
 export default class PlaneLoaderThreeActor extends ThreeActorBase {
     private static readonly _DEFAULT_SIZE_WIDTH: number = 2;

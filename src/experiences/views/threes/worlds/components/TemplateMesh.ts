@@ -1,7 +1,7 @@
 import { Mesh, MeshStandardMaterial, RepeatWrapping, SphereGeometry, type MeshStandardMaterialParameters } from 'three';
-import { AssetId } from '../../../../../constants/experiences/AssetId';
-import ThreeAssetsManager from '../../../../../managers/threes/ThreeAssetsManager';
-import ThreeActorBase from './bases/ThreeActorBase';
+import { AssetId } from '../../../../constants/experiences/AssetId';
+import ThreeAssetsManager from '../../../../managers/threes/ThreeAssetsManager';
+import ThreeActorBase from '../../bases/components/ThreeActorBase';
 
 export default class TemplateMesh extends ThreeActorBase {
     private static readonly _DEFAULT_GEOMETRY_RADIUS = 1;

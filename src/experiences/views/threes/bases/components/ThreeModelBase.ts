@@ -1,8 +1,8 @@
 import { Mesh, Object3D, type Group } from 'three';
 import { SkeletonUtils } from 'three/examples/jsm/Addons.js';
-import type { AssetId } from '../../../../../../constants/experiences/AssetId';
-import type { Object3DId } from '../../../../../../constants/experiences/Object3dId';
-import ThreeAssetsManager from '../../../../../../managers/threes/ThreeAssetsManager';
+import type { AssetId } from '../../../../constants/experiences/AssetId';
+import type { Object3DId } from '../../../../constants/experiences/Object3dId';
+import ThreeAssetsManager from '../../../../managers/threes/ThreeAssetsManager';
 import ThreeActorBase from './ThreeActorBase';
 
 export interface ModelBaseParams {

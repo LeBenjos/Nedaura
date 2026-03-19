@@ -4,7 +4,7 @@ import { DebugGuiTitle } from '../../../../constants/experiences/DebugGuiTitle';
 import MainThreeApp from '../../../../engines/threes/app/MainThreeApp';
 import DebugManager from '../../../../managers/DebugManager';
 import ThreeAssetsManager from '../../../../managers/threes/ThreeAssetsManager';
-import ThreeActorBase from './actors/bases/ThreeActorBase';
+import ThreeActorBase from '../../bases/components/ThreeActorBase';
 
 interface EnvironmentMap {
     intensity?: number;
