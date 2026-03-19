@@ -18,6 +18,10 @@ export default class LoaderThreeView extends ThreeViewBase {
         for (const actor of this._actors) this.add(actor);
     }
 
+    public override update(dt: number): void {
+        for (const actor of this._actors) actor.update(dt);
+    }
+
     public readonly show = (): Promise<void> => {
         return this._plane.material.show();
     };
