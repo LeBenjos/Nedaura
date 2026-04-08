@@ -1,7 +1,7 @@
 {
     "name": "nedaura",
     "private": true,
-    "version": "1.5.2",
+    "version": "1.5.9",
     "type": "module",
     "scripts": {
         "dev": "vite",
@@ -13,31 +13,34 @@
         "format:check": "prettier --check ."
     },
     "devDependencies": {
-        "@eslint/js": "^9.39.2",
+        "@eslint/js": "^10.0.1",
         "@types/howler": "^2.2.12",
-        "@types/three": "^0.182.0",
+        "@types/three": "^0.183.1",
         "@vitejs/plugin-vue": "^6.0.5",
         "@vue/tsconfig": "^0.9.0",
-        "eslint": "^9.39.2",
+        "eslint": "^10.1.0",
         "eslint-config-prettier": "^10.1.8",
-        "eslint-plugin-prettier": "^5.5.4",
-        "prettier": "^3.7.4",
-        "sass-embedded": "^1.97.1",
+        "eslint-plugin-prettier": "^5.5.5",
+        "prettier": "^3.8.1",
+        "sass-embedded": "^1.98.0",
         "three-perf": "^1.0.11",
         "typescript": "~5.9.3",
-        "typescript-eslint": "^8.50.1",
-        "vite": "^7.3.0",
-        "vite-plugin-glsl": "^1.5.5",
-        "vue-tsc": "^3.2.5"
+        "typescript-eslint": "^8.57.1",
+        "vite": "^8.0.1",
+        "vite-plugin-glsl": "^1.5.6",
+        "vue-tsc": "^3.2.6"
     },
     "dependencies": {
         "@benjos/cookware": "^1.0.4",
         "@benjos/spices": "^1.0.1",
         "@dimforge/rapier3d": "^0.19.3",
+        "@types/stats.js": "^0.17.4",
         "gsap": "^3.14.2",
         "howler": "^2.2.4",
         "lil-gui": "^0.21.0",
-        "three": "^0.182.0",
+        "stats.js": "^0.17.0",
+        "three": "^0.183.2",
+        "three-custom-shader-material": "^6.4.0",
         "vue": "^3.5.30"
     }
 }

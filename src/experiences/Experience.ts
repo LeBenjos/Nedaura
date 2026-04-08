@@ -20,7 +20,7 @@ class Experience {
     }
 
     private readonly _onReady = async (): Promise<void> => {
-        await MainThreeApp.setCurrentView(ViewId.THREE_WORLD);
+        await MainThreeApp.setCurrentView(ViewId.THREE_WORLD_1);
     };
 }
 

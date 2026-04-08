@@ -8,7 +8,8 @@ import { DebugGuiTitle } from '../../../constants/experiences/DebugGuiTitle';
 import { ViewId } from '../../../constants/experiences/ViewId';
 import DebugManager from '../../../managers/DebugManager';
 import ThreeCameraControllerManager from '../../../managers/threes/ThreeCameraControllerManager';
-import Renderer from '../../../renderers/threes/Renderer';
+import MainThreeWebGLRenderer from '../../../renderers/threes/MainThreeWebGLRenderer';
+import World2ThreeView from '../../../views/threes/worlds/World2ThreeView';
 import WorldThreeView from '../../../views/threes/worlds/WorldThreeView';
 import ThreeAppBase from './bases/ThreeAppBase';
 
@@ -24,6 +25,7 @@ class MainThreeApp extends ThreeAppBase {
     ];
 
     declare private _debugWireframeMaterial: MeshStandardMaterial;
+    declare private _debugPreviousCameraId: CameraId;
 
     constructor() {
         super();
@@ -58,6 +60,7 @@ class MainThreeApp extends ThreeAppBase {
         this._cameraController = ThreeCameraControllerManager.get(CameraId.THREE_MAIN);
 
         if (DebugManager.isActive) {
+            this._debugPreviousCameraId = this._cameraController.cameraId;
             ThreeCameraControllerManager.add(new DebugThreeCameraController());
         }
 
@@ -65,16 +68,19 @@ class MainThreeApp extends ThreeAppBase {
     }
 
     protected override _generateRenderers(): void {
-        this._renderer = new Renderer(this._scene, this._cameraController.camera, { antialias: true });
+        this._renderer = new MainThreeWebGLRenderer(this._scene, this._cameraController.camera, { antialias: true });
         this._domElementContainer.appendChild(this._renderer.domElement);
     }
 
     protected override _declareViews(): void {
-        this._viewBuilder.set(ViewId.THREE_WORLD, WorldThreeView);
+        this._viewBuilder.set(ViewId.THREE_WORLD_1, WorldThreeView);
+        this._viewBuilder.set(ViewId.THREE_WORLD_2, World2ThreeView);
 
         if (DebugManager.isActive) {
             const viewsDebug = DebugManager.getGuiFolder(DebugGuiTitle.THREE_VIEWS)
             viewsDebug.add({ resetCurrentView: () => this._currentView.reset() }, 'resetCurrentView');
+            viewsDebug.add({ createWorld1: () => this.setCurrentView(ViewId.THREE_WORLD_1) }, 'createWorld1');
+            viewsDebug.add({ createWorld2: () => this.setCurrentView(ViewId.THREE_WORLD_2) }, 'createWorld2');
         }
     }
 
@@ -87,8 +93,9 @@ class MainThreeApp extends ThreeAppBase {
     private readonly _onKeyDown = (_e: KeyboardEvent): void => {
         if (DebugManager.isActive) {
             if (DomKeyboardManager.areAllKeysDown(MainThreeApp._TOGGLE_SWITCH_TO_DEBUG_CAMERA_KEYS)) {
+                if (this._cameraController.cameraId !== CameraId.THREE_DEBUG) this._debugPreviousCameraId = this._cameraController.cameraId;
                 ThreeCameraControllerManager.setActiveCamera(
-                    this._cameraController.cameraId === CameraId.THREE_MAIN ? CameraId.THREE_DEBUG : CameraId.THREE_MAIN
+                    this._cameraController.cameraId === CameraId.THREE_DEBUG ? this._debugPreviousCameraId : CameraId.THREE_DEBUG
                 );
             } else if (DomKeyboardManager.areAllKeysDown(MainThreeApp._TOGGLE_WIREFRAME_KEYS)) {
                 if (this._scene.overrideMaterial === null) {

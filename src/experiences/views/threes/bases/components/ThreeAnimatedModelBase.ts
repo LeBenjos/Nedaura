@@ -1,4 +1,4 @@
-import { AnimationAction, AnimationMixer } from 'three';
+import { AnimationMixer, type AnimationAction } from 'three';
 import type { AnimationId } from '../../../../constants/experiences/AnimationId';
 import type { AssetId } from '../../../../constants/experiences/AssetId';
 import ThreeAssetsManager from '../../../../managers/threes/ThreeAssetsManager';

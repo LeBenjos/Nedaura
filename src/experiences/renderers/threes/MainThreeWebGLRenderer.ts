@@ -1,41 +1,42 @@
 import {
     ACESFilmicToneMapping,
     AgXToneMapping,
-    Camera,
     CineonToneMapping,
     CustomToneMapping,
     LinearSRGBColorSpace,
     LinearToneMapping,
     NeutralToneMapping,
     NoToneMapping,
-    PCFSoftShadowMap,
+    PCFShadowMap,
     ReinhardToneMapping,
-    Scene,
     SRGBColorSpace,
+    type Camera,
     type ColorSpace,
+    type Scene,
     type ToneMapping,
-    type WebGLRendererParameters,
+    type WebGLRendererParameters
 } from 'three';
+import MainThreeEffectComposer from '../../composers/threes/MainThreeEffectComposer';
 import { DebugGuiTitle } from '../../constants/experiences/DebugGuiTitle';
 import DebugManager from '../../managers/DebugManager';
-import WebGLRendererBase from './bases/WebGLRendererBase';
+import ThreeWebGLRendererBase from './bases/ThreeWebGLRendererBase';
 
-export default class Renderer extends WebGLRendererBase {
+export default class MainThreeWebGLRenderer extends ThreeWebGLRendererBase {
     private static readonly _DEFAULT_TONE_MAPPING = CineonToneMapping;
     private static readonly _DEFAULT_OUTPUT_COLOR_SPACE = SRGBColorSpace;
-    private static readonly _DEFAULT_SHADOW_MAP_TYPE = PCFSoftShadowMap;
+    private static readonly _DEFAULT_SHADOW_MAP_TYPE = PCFShadowMap;
     private static readonly _DEFAULT_TONE_MAPPING_EXPOSURE = 1;
     private static readonly _DEFAULT_CLEAR_COLOR = 0xfafafa;
     private static readonly _DEFAULT_CLEAR_ALPHA = 0;
 
     constructor(scene: Scene, camera: Camera, parameters: WebGLRendererParameters = {}) {
         super(scene, camera, parameters);
-        this.toneMapping = Renderer._DEFAULT_TONE_MAPPING;
-        this.toneMappingExposure = Renderer._DEFAULT_TONE_MAPPING_EXPOSURE;
-        this.outputColorSpace = Renderer._DEFAULT_OUTPUT_COLOR_SPACE;
+        this.toneMapping = MainThreeWebGLRenderer._DEFAULT_TONE_MAPPING;
+        this.toneMappingExposure = MainThreeWebGLRenderer._DEFAULT_TONE_MAPPING_EXPOSURE;
+        this.outputColorSpace = MainThreeWebGLRenderer._DEFAULT_OUTPUT_COLOR_SPACE;
         this.shadowMap.enabled = true;
-        this.shadowMap.type = Renderer._DEFAULT_SHADOW_MAP_TYPE;
-        this.setClearColor(Renderer._DEFAULT_CLEAR_COLOR, Renderer._DEFAULT_CLEAR_ALPHA);
+        this.shadowMap.type = MainThreeWebGLRenderer._DEFAULT_SHADOW_MAP_TYPE;
+        this.setClearColor(MainThreeWebGLRenderer._DEFAULT_CLEAR_COLOR, MainThreeWebGLRenderer._DEFAULT_CLEAR_ALPHA);
 
         if (DebugManager.isActive) {
             const rendererFolder = DebugManager.getGuiFolder(DebugGuiTitle.THREE_RENDERER)
@@ -59,13 +60,22 @@ export default class Renderer extends WebGLRendererBase {
                 .onChange((value: ColorSpace) => {
                     this.outputColorSpace = value;
                 });
+            const postProcProxy = { active: this._isPostProcessingActive };
+            rendererFolder
+                .add(postProcProxy, 'active')
+                .name('post-processing')
+                .onChange((value: boolean) => this.setIsPostProcessingActive(value));
         }
+    }
+
+    protected override _generateComposers(): void {
+        this._composer = new MainThreeEffectComposer(this, this._scene, this._camera);
     }
 
     public override update(dt: number): void {
         const isDebug = DebugManager.isActive;
-        if (isDebug) DebugManager.beginThreePerf();
+        if (isDebug) DebugManager.beginPerf();
         super.update(dt);
-        if (isDebug) DebugManager.endThreePerf();
+        if (isDebug) DebugManager.endPerf();
     }
 }

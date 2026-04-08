@@ -4,7 +4,7 @@ import LoaderThreeCameraController from '../../../cameras/threes/LoaderThreeCame
 import { CameraId } from '../../../constants/experiences/CameraId';
 import LoaderManager from '../../../managers/LoaderManager';
 import ThreeCameraControllerManager from '../../../managers/threes/ThreeCameraControllerManager';
-import LoaderRenderer from '../../../renderers/threes/LoaderRenderer';
+import LoaderThreeWebGLRenderer from '../../../renderers/threes/LoaderThreeWebGLRenderer';
 import LoaderThreeView from '../../../views/threes/loaders/LoaderThreeView';
 import ThreeAppBase from './bases/ThreeAppBase';
 
@@ -27,7 +27,7 @@ class LoaderThreeApp extends ThreeAppBase {
     }
 
     protected override _generateRenderers(): void {
-        this._renderer = new LoaderRenderer(
+        this._renderer = new LoaderThreeWebGLRenderer(
             this._scene,
             ThreeCameraControllerManager.get(CameraId.THREE_LOADER).camera
         );

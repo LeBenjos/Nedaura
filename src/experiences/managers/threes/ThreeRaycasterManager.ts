@@ -1,5 +1,5 @@
 import { DomPointerManager } from '@benjos/cookware';
-import { Object3D, Raycaster, Vector2, type Intersection, type Object3DEventMap } from 'three';
+import { Raycaster, Vector2, type Intersection, type Object3D, type Object3DEventMap } from 'three';
 import MainThreeApp from '../../engines/threes/app/MainThreeApp';
 
 class ThreeRaycasterManager {

@@ -1,16 +1,16 @@
 import { DomResizeManager, TickerManager } from '@benjos/cookware';
-import { Scene } from 'three';
-import ThreeCameraControllerBase from '../../../../cameras/threes/bases/ThreeCameraControllerBase';
-import { ViewId } from '../../../../constants/experiences/ViewId';
+import type { Scene } from 'three';
+import type ThreeCameraControllerBase from '../../../../cameras/threes/bases/ThreeCameraControllerBase';
+import type { ViewId } from '../../../../constants/experiences/ViewId';
 import LoaderManager from '../../../../managers/LoaderManager';
-import WebGLRendererBase from '../../../../renderers/threes/bases/WebGLRendererBase';
-import ThreeViewBase from '../../../../views/threes/bases/ThreeViewBase';
+import type ThreeWebGLRendererBase from '../../../../renderers/threes/bases/ThreeWebGLRendererBase';
+import type ThreeViewBase from '../../../../views/threes/bases/ThreeViewBase';
 
 export default abstract class ThreeAppBase {
     declare protected _domElementContainer: HTMLElement;
     declare protected _scene: Scene;
     declare protected _cameraController: ThreeCameraControllerBase;
-    declare protected _renderer: WebGLRendererBase;
+    declare protected _renderer: ThreeWebGLRendererBase;
     protected readonly _views: ThreeViewBase[];
     protected readonly _viewBuilder: Map<ViewId, new () => ThreeViewBase>;
     declare protected _currentView: ThreeViewBase;
@@ -117,7 +117,7 @@ export default abstract class ThreeAppBase {
     public get scene(): Scene {
         return this._scene;
     }
-    public get renderer(): WebGLRendererBase {
+    public get renderer(): ThreeWebGLRendererBase {
         return this._renderer;
     }
     public get cameraController(): ThreeCameraControllerBase {

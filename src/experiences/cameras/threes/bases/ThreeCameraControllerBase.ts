@@ -1,8 +1,8 @@
 import { DomResizeManager } from '@benjos/cookware';
-import { Object3D, OrthographicCamera, PerspectiveCamera, Scene } from 'three';
+import { Object3D, OrthographicCamera, PerspectiveCamera, type Scene } from 'three';
 import type { CameraId } from '../../../constants/experiences/CameraId';
 import MainThreeApp from '../../../engines/threes/app/MainThreeApp';
-import { ThreeCameraOptions, ThreeCameraType, ThreeControls } from '../../../types/cameraTypes';
+import { ThreeCameraType, type ThreeCameraOptions, type ThreeControls } from '../../../types/cameraTypes';
 
 export default abstract class ThreeCameraControllerBase<T extends ThreeControls = ThreeControls> extends Object3D {
     private static readonly _DEFAULT_CAMERA_OPTIONS: ThreeCameraOptions = {

@@ -1,8 +1,9 @@
 import { DomKeyboardManager } from '@benjos/cookware';
 import { KeyboardConstant } from '@benjos/spices';
 import GUI from 'lil-gui';
+import Stats from 'stats.js';
 import { ThreePerf } from 'three-perf';
-import { DebugGuiTitle } from '../constants/experiences/DebugGuiTitle';
+import type { DebugGuiTitle } from '../constants/experiences/DebugGuiTitle';
 import MainThreeApp from '../engines/threes/app/MainThreeApp';
 
 class DebugManager {
@@ -16,8 +17,10 @@ class DebugManager {
         KeyboardConstant.CODES.KEY_H,
     ];
 
+    private _isDebugVisible: boolean = true;
     declare private _gui: GUI;
     declare private _threePerf: ThreePerf;
+    declare private _stats: Stats;
 
     public init(): void {
         if (this.isActive) {
@@ -46,6 +49,12 @@ class DebugManager {
         });
     };
 
+    private _initStats = (): void => {
+        this._stats = new Stats();
+        this._stats.showPanel(0);
+        document.body.appendChild(this._stats.dom);
+    };
+
     private _addGuiFolder(title: DebugGuiTitle): GUI {
         return this._gui.addFolder(title);
     }
@@ -56,19 +65,24 @@ class DebugManager {
         return gui;
     }
 
-    public beginThreePerf(): void {
+    public beginPerf(): void {
         if (!this._threePerf) this._initThreePerf();
+        if (!this._stats) this._initStats();
+        this._stats.begin();
         this._threePerf.begin();
     }
 
-    public endThreePerf(): void {
+    public endPerf(): void {
+        this._stats.end();
         this._threePerf.end();
     }
 
     private readonly _onKeyDown = (_e: KeyboardEvent): void => {
         if (DomKeyboardManager.areAllKeysDown(DebugManager._TOGGLE_HIDDEN_KEYS)) {
-            this._gui.show(this._gui._hidden);
-            this._threePerf.visible = !this._threePerf.visible;
+            this._isDebugVisible = !this._isDebugVisible;
+            this._gui.show(this._isDebugVisible);
+            if (this._threePerf) this._threePerf.visible = this._isDebugVisible;
+            if (this._stats) this._stats.dom.style.display = this._isDebugVisible ? 'block' : 'none';
         }
     };
 

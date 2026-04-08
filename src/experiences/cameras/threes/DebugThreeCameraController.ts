@@ -5,7 +5,7 @@ import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import { CameraId } from '../../constants/experiences/CameraId';
 import MainThreeApp from '../../engines/threes/app/MainThreeApp';
 import ThreeRaycasterManager from '../../managers/threes/ThreeRaycasterManager';
-import { ThreeCameraOptions, ThreeCameraType } from '../../types/cameraTypes';
+import { ThreeCameraType, type ThreeCameraOptions } from '../../types/cameraTypes';
 import ThreeCameraControllerBase from './bases/ThreeCameraControllerBase';
 
 export default class DebugThreeCameraController extends ThreeCameraControllerBase<OrbitControls> {

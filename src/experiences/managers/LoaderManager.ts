@@ -11,7 +11,7 @@ class LoaderManager {
     private _elapsed = 0;
     private _hasAssetsToLoad = false;
     private _assetsFinished = false;
-    private _transitionResolve: (() => void) | null = null;
+    private _transitionResolves: (() => void)[] = [];
     private _showTransition: (() => Promise<void>) | null = null;
     private _hideTransition: (() => Promise<void>) | null = null;
 
@@ -85,7 +85,8 @@ class LoaderManager {
             this._progress = 1;
             this.onProgress.execute();
             TickerManager.remove(this._onTransitionTick);
-            if (this._transitionResolve) this._transitionResolve();
+            this._transitionResolves.forEach((resolve) => resolve());
+            this._transitionResolves.length = 0;
         }
     };
 
@@ -110,11 +111,9 @@ class LoaderManager {
             }
 
             await new Promise<void>((resolve) => {
-                this._transitionResolve = resolve;
+                this._transitionResolves.push(resolve);
                 TickerManager.add(this._onTransitionTick);
             });
-
-            this._transitionResolve = null;
         }
 
         if (onReady) await onReady();

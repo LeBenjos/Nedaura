@@ -1,6 +1,7 @@
 const ThreeViewId = {
     THREE_LOADER: 'THREE_LOADER',
-    THREE_WORLD: 'THREE_WORLD',
+    THREE_WORLD_1: 'THREE_WORLD_1',
+    THREE_WORLD_2: 'THREE_WORLD_2',
 } as const;
 
 export const ViewId = {

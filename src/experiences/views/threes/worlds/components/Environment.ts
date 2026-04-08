@@ -1,4 +1,4 @@
-import { DataTexture, DirectionalLight, Vector3 } from 'three';
+import { DirectionalLight, Vector3, type DataTexture } from 'three';
 import { AssetId } from '../../../../constants/experiences/AssetId';
 import { DebugGuiTitle } from '../../../../constants/experiences/DebugGuiTitle';
 import MainThreeApp from '../../../../engines/threes/app/MainThreeApp';

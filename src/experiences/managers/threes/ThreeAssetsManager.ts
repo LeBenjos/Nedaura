@@ -1,16 +1,16 @@
 import { Action, AssetUtils } from '@benjos/cookware';
 import {
-    DataTexture,
     EquirectangularRefractionMapping,
     LinearSRGBColorSpace,
     RepeatWrapping,
-    Texture,
     TextureLoader,
     type ColorSpace,
+    type DataTexture,
     type Mapping,
+    type Texture,
     type Wrapping,
 } from 'three';
-import { DRACOLoader, Font, FontLoader, GLTFLoader, HDRLoader, type GLTF } from 'three/examples/jsm/Addons.js';
+import { DRACOLoader, FontLoader, GLTFLoader, HDRLoader, type Font, type GLTF } from 'three/examples/jsm/Addons.js';
 import type { AssetId } from '../../constants/experiences/AssetId';
 import { AssetType } from '../../types/assetTypes';
 
