@@ -4,6 +4,7 @@ import InitCommand from './commands/InitCommand';
 import { ViewId } from './constants/experiences/ViewId';
 import MainThree from './engines/threes/MainThree';
 import MainThreeApp from './engines/threes/app/MainThreeApp';
+import MainMediapipe from './engines/mediapipe/MainMediapipe';
 import LoaderManager from './managers/LoaderManager';
 
 class Experience {
@@ -15,6 +16,7 @@ class Experience {
 
         InitCommand.init();
         MainThree.init();
+        MainMediapipe.init();
 
         await LoaderManager.loadAssetsWithTransition(this._onReady);
     }
