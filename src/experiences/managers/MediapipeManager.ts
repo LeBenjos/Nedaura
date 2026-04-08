@@ -1,7 +1,5 @@
 import type { HandLandmarkerResult } from "@mediapipe/tasks-vision";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
 type MediapipePoint3 = { x: number; y: number; z: number };
 type HandSide = 'Left' | 'Right' | 'Unknown';
 
@@ -13,6 +11,8 @@ export interface MediapipeHandSnapshot {
     worldLandmarks?: Array<MediapipePoint3>;
     worldWrist?: MediapipePoint3;
     worldIndexTip?: MediapipePoint3;
+    fist?: MediapipePoint3;
+    isFist?: boolean;
 }
 
 export interface MediapipeHandsSnapshot {
@@ -92,6 +92,8 @@ class MediapipeManager {
                 worldLandmarks,
                 worldWrist,
                 worldIndexTip,
+                isFist: this._isFist(landmarks),
+                fist: this._getFistPosition(landmarks),
             };
 
             if      (side === 'Left')            snapshot.left  = hand;
@@ -101,6 +103,34 @@ class MediapipeManager {
         }
 
         return snapshot;
+    }
+
+    private _getFistPosition(landmarks: MediapipePoint3[]): MediapipePoint3 {
+        const wrist = landmarks[0];
+        const middleMcp = landmarks[9];
+        
+        if (!wrist || !middleMcp) return { x: 0, y: 0, z: 0 };
+
+        return {
+            x: (wrist.x + middleMcp.x) / 2,
+            y: (wrist.y + middleMcp.y) / 2,
+            z: (wrist.z + middleMcp.z) / 2,
+        };
+    }
+
+    private _isFist(landmarks: MediapipePoint3[]): boolean {
+        const wrist = landmarks[0];
+
+        const dist = (a: MediapipePoint3, b: MediapipePoint3) =>
+            Math.hypot(a.x - b.x, a.y - b.y);
+
+        const fingers = [8, 12, 16, 20];
+
+        const foldedFingers = fingers.filter(tip => {
+            return dist(landmarks[tip], wrist) < 0.25;
+        });
+
+        return foldedFingers.length >= 4;
     }
 
     public get hands(): MediapipeHandsSnapshot  { return this._hands; }

@@ -28,6 +28,5 @@ export default class TemplateModel extends ThreeModelBase {
 
     public update(dt: number): void {
         super.update(dt);
-        this.rotation.y += dt * TemplateModel._ROTATION_Y;
     }
 }

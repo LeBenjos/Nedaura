@@ -48,7 +48,6 @@ export default class WindLines extends ThreeActorBase {
                 sizeAttenuation: 1,
                 resolution: new Vector2(window.innerWidth, window.innerHeight),
                 lineWidth: 0.2 + Math.random() * 0.3,
-                depthTest: false,
                 transparent: true,
                 blending: NormalBlending,
                 useAlphaMap: 1,
@@ -77,13 +76,13 @@ export default class WindLines extends ThreeActorBase {
             });
         }
 
-        // Poll (inside update loop) — best when you already have a tick
-        const tip = MediapipeManager.leftHand?.indexTip;
+        // Poll (inside update loop)
+        const tip = MediapipeManager.rightHand?.indexTip;
         if (tip) this._target3D.set((tip.x - 0.5) * -10, (0.5 - tip.y) * 10, -tip.z * 10);
 
-        // Subscribe (event-driven) — best for one-shot reactions
+        // Subscribe MediapipeManager updates
         window.addEventListener('hand:update', (e) => {
-            const tip = e.detail.left?.indexTip;
+            const tip = e.detail.right?.indexTip;
             if (tip) this._target3D.set((tip.x - 0.5) * -10, (0.5 - tip.y) * 10, -tip.z * 10);
         });
     }

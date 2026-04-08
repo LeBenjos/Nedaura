@@ -24,6 +24,7 @@ export default class WorldThreeView extends ThreeViewBase {
 
         this._actors.push(new Environment());
         this._actors.push(new WindLines());
+        this._actors.push(new TemplateModel());
 
         for (const actor of this._actors) this.add(actor);
     }
