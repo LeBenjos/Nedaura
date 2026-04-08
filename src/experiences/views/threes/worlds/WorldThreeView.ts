@@ -7,6 +7,7 @@ import Environment from './components/Environment';
 import TemplateFont from './components/TemplateFont';
 import TemplateMesh from './components/TemplateMesh';
 import TemplateModel from './components/TemplateModel';
+import WindLines from './components/WindLines';
 
 export default class WorldThreeView extends ThreeViewBase {
     constructor() {
@@ -22,9 +23,7 @@ export default class WorldThreeView extends ThreeViewBase {
         }
 
         this._actors.push(new Environment());
-        this._actors.push(new TemplateMesh());
-        this._actors.push(new TemplateModel());
-        this._actors.push(new TemplateFont());
+        this._actors.push(new WindLines());
 
         for (const actor of this._actors) this.add(actor);
     }
