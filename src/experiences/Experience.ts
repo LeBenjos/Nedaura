@@ -4,8 +4,8 @@ import InitCommand from './commands/InitCommand';
 import { ViewId } from './constants/experiences/ViewId';
 import MainThree from './engines/threes/MainThree';
 import MainThreeApp from './engines/threes/app/MainThreeApp';
-import LoaderManager from './managers/LoaderManager';
 import MainVue from './engines/vues/MainVue';
+import LoaderManager from './managers/LoaderManager';
 
 class Experience {
     private _isInitialized = false;
@@ -22,7 +22,7 @@ class Experience {
     }
 
     private readonly _onReady = async (): Promise<void> => {
-        await MainThreeApp.setCurrentView(ViewId.THREE_WORLD_1);
+        await MainThreeApp.setCurrentView(ViewId.THREE_WORLD);
     };
 }
 
