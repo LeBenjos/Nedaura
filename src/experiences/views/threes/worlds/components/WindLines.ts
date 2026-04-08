@@ -1,6 +1,7 @@
 import { MathUtils, Mesh, NormalBlending, Vector2, Vector3, Texture, CanvasTexture } from 'three';
 import ThreeActorBase from '../../bases/components/ThreeActorBase';
 import { MeshLineGeometry, MeshLineMaterial } from 'meshline'
+import MediapipeManager from '../../../../managers/MediapipeManager';
 
 // create type for _trails
 type Trail = {
@@ -15,8 +16,8 @@ type Trail = {
 }
 
 export default class WindLines extends ThreeActorBase {
-    private static readonly _DEFAULT_GEOMETRY_NUM_TRAILS = 6;
-    private static readonly _DEFAULT_GEOMETRY_TRAIL_LEN = 180;
+    private static readonly _DEFAULT_GEOMETRY_NUM_TRAILS = 16;
+    private static readonly _DEFAULT_GEOMETRY_TRAIL_LEN = 100;
     private static readonly _DEFAULT_MATERIAL_TRAILS_COLORS = [
         "#f2f2f2",
         "#ececec",
@@ -26,6 +27,7 @@ export default class WindLines extends ThreeActorBase {
 
     private _trails: Trail[];
     private _time: number;
+    private _target3D: Vector3 = new Vector3();
 
     constructor() {
         super();
@@ -66,7 +68,7 @@ export default class WindLines extends ThreeActorBase {
                 points,
                 offset: new Vector3(
                     (Math.random() - 0.5) * 0.6,
-                    0.5 + Math.random(),
+                    0.1 + Math.random() * 0.5,
                     (Math.random() - 0.5) * 0.6
                 ),
                 phase: Math.random() * Math.PI * 2,
@@ -74,6 +76,16 @@ export default class WindLines extends ThreeActorBase {
                 smoothedTarget: new Vector3(),
             });
         }
+
+        // Poll (inside update loop) — best when you already have a tick
+        const tip = MediapipeManager.leftHand?.indexTip;
+        if (tip) this._target3D.set((tip.x - 0.5) * -10, (0.5 - tip.y) * 10, -tip.z * 10);
+
+        // Subscribe (event-driven) — best for one-shot reactions
+        window.addEventListener('hand:update', (e) => {
+            const tip = e.detail.left?.indexTip;
+            if (tip) this._target3D.set((tip.x - 0.5) * -10, (0.5 - tip.y) * 10, -tip.z * 10);
+        });
     }
     
     private _createAlphaTexture(): Texture {
@@ -95,7 +107,6 @@ export default class WindLines extends ThreeActorBase {
         return texture;
     }
 
-
     public override reset(): void {
     }
 
@@ -103,6 +114,7 @@ export default class WindLines extends ThreeActorBase {
         super.update(dt);
         this._time += dt;
         this._trails.forEach((tr) => {
+            tr.smoothedTarget.lerp(this._target3D, 0.07);
 
             tr.points.unshift(this._getWavePoint(tr, this._time));
             if (tr.points.length > WindLines._DEFAULT_GEOMETRY_TRAIL_LEN) tr.points.pop();

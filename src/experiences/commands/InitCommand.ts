@@ -5,6 +5,7 @@ import LoaderManager from '../managers/LoaderManager';
 import ThreeAssetsManager from '../managers/threes/ThreeAssetsManager';
 import ThreeCameraControllerManager from '../managers/threes/ThreeCameraControllerManager';
 import ThreeRaycasterManager from '../managers/threes/ThreeRaycasterManager';
+import MediapipeManager from '../managers/MediapipeManager';
 
 class InitCommand {
     public init(): void {
@@ -33,6 +34,7 @@ class InitCommand {
         DebugManager.init();
         ThreeRaycasterManager.init();
         LoaderManager.init();
+        MediapipeManager.init();
     }
 
     private _initCommonAssets(): void {

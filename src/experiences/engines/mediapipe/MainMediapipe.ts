@@ -3,6 +3,7 @@ import {
     FilesetResolver,
     DrawingUtils
 } from "@mediapipe/tasks-vision";
+import MediapipeManager from "../../managers/MediapipeManager";
 
 class MainMediapipe {
     declare private handLandmarker: HandLandmarker;
@@ -107,7 +108,8 @@ class MainMediapipe {
         let startTimeMs = performance.now();
         if (this.lastVideoTime !== this.video.currentTime) {
             this.lastVideoTime = this.video.currentTime;
-            this.results = await this.handLandmarker.detectForVideo(this.video, startTimeMs);
+            this.results = this.handLandmarker.detectForVideo(this.video, startTimeMs);
+            MediapipeManager.update(this.results, startTimeMs);  // store + dispatch
         }
 
         if (!this.canvasCtx) return;
