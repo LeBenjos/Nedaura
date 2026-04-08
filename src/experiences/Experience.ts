@@ -5,6 +5,7 @@ import { ViewId } from './constants/experiences/ViewId';
 import MainThree from './engines/threes/MainThree';
 import MainThreeApp from './engines/threes/app/MainThreeApp';
 import LoaderManager from './managers/LoaderManager';
+import MainVue from './engines/vues/MainVue';
 
 class Experience {
     private _isInitialized = false;
@@ -14,6 +15,7 @@ class Experience {
         this._isInitialized = true;
 
         InitCommand.init();
+        MainVue.init();
         MainThree.init();
 
         await LoaderManager.loadAssetsWithTransition(this._onReady);

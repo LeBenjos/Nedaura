@@ -1,15 +1,13 @@
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref } from 'vue';
 import LoaderManager from '../../managers/LoaderManager';
+import LoadingProgress from './components/LoadingProgress.vue';
+import LoadingBar from './components/LoadingBar.vue';
 
 const isVisible = ref(false);
 const isEnded = ref(false);
 const loadingNumber = ref(0);
 const barScaleX = ref(0);
-
-const barStyle = computed(() =>
-    isEnded.value ? undefined : { transform: `translateY(-50%) scaleX(${barScaleX.value})` }
-);
 
 const onShow = (): void => {
     loadingNumber.value = 0;
@@ -46,10 +44,7 @@ onUnmounted(() => {
 
 <template>
     <div id="loading-screen" class="html-view loading-screen" :class="{ show: isVisible }">
-        <div class="loading-progress">
-            <span class="loading-number">{{ loadingNumber }}</span>
-            <span>%</span>
-        </div>
-        <div class="loading-bar" :class="{ ended: isEnded }" :style="barStyle"></div>
+        <LoadingProgress :value="loadingNumber" />
+        <LoadingBar :scale-x="barScaleX" :ended="isEnded" />
     </div>
 </template>
