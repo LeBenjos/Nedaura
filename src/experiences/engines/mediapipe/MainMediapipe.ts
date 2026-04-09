@@ -7,10 +7,10 @@ import MediapipeManager from "../../managers/MediapipeManager";
 
 class MainMediapipe {
     declare private handLandmarker: HandLandmarker;
-    declare private enableWebcamButton: HTMLButtonElement;
+    declare private enableWebcamButton?: HTMLButtonElement;
     declare private video: HTMLVideoElement;
-    declare private canvasElement: HTMLCanvasElement;
-    declare private webcamRunning: Boolean;
+    declare private canvasElement?: HTMLCanvasElement;
+    declare private webcamRunning: boolean;
     declare private runningMode: string;
     declare private canvasCtx: CanvasRenderingContext2D | null;
 
@@ -21,6 +21,27 @@ class MainMediapipe {
         this.webcamRunning = false;
         this.runningMode = "VIDEO";
         this.lastVideoTime = -1;
+        this.canvasCtx = null;
+    }
+
+    private _getOrCreateVideoElement(): HTMLVideoElement {
+        const existing = document.getElementById("webcam") as HTMLVideoElement | null;
+        if (existing) return existing;
+
+        const video = document.createElement('video');
+        video.id = 'webcam';
+        video.autoplay = true;
+        video.playsInline = true;
+        video.muted = true;
+        video.style.display = 'none';
+        document.body.appendChild(video);
+        return video;
+    }
+
+    private _refreshCanvasRefs(): void {
+        const canvas = document.getElementById("output_canvas") as HTMLCanvasElement | null;
+        this.canvasElement = canvas ?? undefined;
+        this.canvasCtx = this.canvasElement?.getContext("2d") ?? null;
     }
 
     public async init() {
@@ -50,12 +71,10 @@ class MainMediapipe {
     }
 
     private initCamera() {
-        this.video = document.getElementById("webcam") as HTMLVideoElement;
-        const btnVideo = document.getElementById("webcamButton");
-        this.canvasElement = document.getElementById(
-            "output_canvas"
-        ) as HTMLCanvasElement;
-        this.canvasCtx = this.canvasElement.getContext("2d");
+        // In non-debug mode, the DOM elements for the preview can be missing.
+        this.video = this._getOrCreateVideoElement();
+        this.enableWebcamButton = document.getElementById("webcamButton") as HTMLButtonElement | null ?? undefined;
+        this._refreshCanvasRefs();
 
         // Check if webcam access is supported.
         const hasGetUserMedia = () => !!navigator.mediaDevices?.getUserMedia;
@@ -63,8 +82,11 @@ class MainMediapipe {
         // If webcam supported, add event listener to button for when user
         // wants to activate it.
         if (hasGetUserMedia()) {
-            this.enableWebcamButton = btnVideo as HTMLButtonElement;
-            this.enableWebcamButton.addEventListener("click", this.enableCam);
+            if (this.enableWebcamButton) {
+                this.enableWebcamButton.addEventListener("click", this.enableCam);
+            } else {
+                console.warn('webcamButton element not found; webcam cannot be toggled.');
+            }
         } else {
             console.warn("getUserMedia() is not supported by your browser");
         }
@@ -77,11 +99,7 @@ class MainMediapipe {
             return;
         }
 
-        if (this.webcamRunning === true) {
-            this.webcamRunning = false;
-        } else {
-            this.webcamRunning = true;
-        }
+        this.webcamRunning = !this.webcamRunning;
 
         const constraints = {
             video: true
@@ -90,13 +108,20 @@ class MainMediapipe {
         // Activate the webcam stream.
         navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
             this.video.srcObject = stream;
-            this.video.addEventListener("loadeddata", this.predictWebcam);
+            this.video.addEventListener("loadeddata", this.predictWebcam, { once: true });
         });
     };
 
     predictWebcam = async () => {
-        this.canvasElement.width = this.video.videoWidth;
-        this.canvasElement.height = this.video.videoHeight;
+        // Canvas is optional. If it appears later (debug), hook it up lazily.
+        if (!this.canvasElement && !this.canvasCtx) {
+            this._refreshCanvasRefs();
+        }
+
+        if (this.canvasElement) {
+            this.canvasElement.width = this.video.videoWidth;
+            this.canvasElement.height = this.video.videoHeight;
+        }
 
         // Now let's start detecting the stream.
         if (this.runningMode === "IMAGE") {
@@ -110,19 +135,21 @@ class MainMediapipe {
             MediapipeManager.update(this.results, startTimeMs);  // store + dispatch
         }
 
-        if (!this.canvasCtx) return;
-        this.canvasCtx.save();
-        this.canvasCtx.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
-        
-        // We draw the landmars on top of the video
-        if (this.results.landmarks) {
-            const drawingUtils = new DrawingUtils(this.canvasCtx);
-            for (const landmarks of this.results.landmarks) {
-                drawingUtils.drawConnectors(landmarks, HandLandmarker.HAND_CONNECTIONS, { color: "#00FF00", lineWidth: 5 });
-                drawingUtils.drawLandmarks(landmarks, { color: "#FF0000", lineWidth: 1 });
+        // Draw landmarks only when debug canvas is present.
+        if (this.canvasCtx && this.canvasElement) {
+            this.canvasCtx.save();
+            this.canvasCtx.clearRect(0, 0, this.canvasElement.width, this.canvasElement.height);
+            
+            // We draw the landmars on top of the video
+            if (this.results.landmarks) {
+                const drawingUtils = new DrawingUtils(this.canvasCtx);
+                for (const landmarks of this.results.landmarks) {
+                    drawingUtils.drawConnectors(landmarks, HandLandmarker.HAND_CONNECTIONS, { color: "#00FF00", lineWidth: 5 });
+                    drawingUtils.drawLandmarks(landmarks, { color: "#FF0000", lineWidth: 1 });
+                }
             }
+            this.canvasCtx.restore();
         }
-        this.canvasCtx.restore();
 
         // Call this function again to keep predicting when the browser is ready.
         if (this.webcamRunning === true) {

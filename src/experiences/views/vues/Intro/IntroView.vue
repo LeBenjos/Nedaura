@@ -50,7 +50,7 @@ const onClick = (): void => {
     cursor: pointer;
 
     display: flex;
-    padding: 16px 32px;
+    padding: 8px 32px;
     justify-content: center;
     align-items: center;
     gap: 10px;
@@ -70,7 +70,7 @@ const onClick = (): void => {
     p {
         color: #FFF;
         text-align: center;
-        font-size: 32px;
+        font-size: 16px;
         line-height: 36px;
         position: relative;
         z-index: 1;
