@@ -42,6 +42,9 @@ export default class WindLines extends ThreeActorBase {
         smoothing: 0.07,
         numTrails: WindLines._NUM_TRAILS,
         lineWidth: 0.35,
+        trailSpread: 0.3,
+        amplitudeXY: 0.2,
+        amplitudeZ: 0.1,
         color0: WindLines._TRAIL_COLORS[0],
         color1: WindLines._TRAIL_COLORS[1],
         color2: WindLines._TRAIL_COLORS[2],
@@ -79,6 +82,10 @@ export default class WindLines extends ThreeActorBase {
             .add(this._settings, 'lineWidth', 0.01, 2, 0.01)
             .name('lineWidth')
             .onChange(() => this._applyLineWidth());
+
+        folder.add(this._settings, 'trailSpread', 0, 1, 0.01).name('trailSpread');
+        folder.add(this._settings, 'amplitudeXY', 0, 1, 0.01).name('amplitudeXY');
+        folder.add(this._settings, 'amplitudeZ', 0, 1, 0.01).name('amplitudeZ');
 
         folder.addColor(this._settings, 'color0').name('color0').onChange(() => this._applyColors());
         folder.addColor(this._settings, 'color1').name('color1').onChange(() => this._applyColors());
@@ -159,9 +166,9 @@ export default class WindLines extends ThreeActorBase {
             material: mat,
             points,
             offset: new Vector3(
-                (Math.random() - 0.5) * 0.6,
-                0.1 + Math.random() * 0.5,
-                (Math.random() - 0.5) * 0.6,
+                (Math.random() - 0.5) * this._settings.trailSpread,
+                (Math.random() - 0.5) * this._settings.trailSpread,
+                (Math.random() - 0.5) * this._settings.trailSpread,
             ),
             phase: Math.random() * Math.PI * 2,
             speed: 0.8 + Math.random() * 0.6,
@@ -243,10 +250,12 @@ export default class WindLines extends ThreeActorBase {
 
     private _getWavePoint(tr: Trail, t: number): Vector3 {
         const idx = tr.points.length;
+        const { amplitudeXY: aXY, amplitudeZ: aZ } = this._settings;
+
         const wave = new Vector3(
-            Math.sin(t * tr.speed         + tr.phase + idx * 0.20) * 0.5,
-            Math.cos(t * tr.speed * 1.3   + tr.phase + idx * 0.15) * 0.5,
-            Math.sin(t * tr.speed * 0.7   + tr.phase + idx * 0.10) * 0.3,
+            Math.sin(t * tr.speed         + tr.phase + idx * 0.20) * aXY,
+            Math.cos(t * tr.speed * 1.3   + tr.phase + idx * 0.15) * aXY,
+            Math.sin(t * tr.speed * 0.7   + tr.phase + idx * 0.10) * aZ,
         );
         return new Vector3().copy(tr.smoothedTarget).add(tr.offset).add(wave);
     }
