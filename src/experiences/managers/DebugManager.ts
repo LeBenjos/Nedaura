@@ -3,7 +3,7 @@ import { KeyboardConstant } from '@benjos/spices';
 import GUI from 'lil-gui';
 import Stats from 'stats.js';
 import { ThreePerf } from 'three-perf';
-import type { DebugGuiTitle } from '../constants/experiences/DebugGuiTitle';
+import { DebugGuiTitle } from '../constants/experiences/DebugGuiTitle';
 import MainThreeApp from '../engines/threes/app/MainThreeApp';
 
 class DebugManager {
@@ -44,8 +44,17 @@ class DebugManager {
         });
         this._gui.close();
         this._injectShortcutsHeader();
+        this._preRegisterFolders();
         DomKeyboardManager.onKeyDown.remove(this._onKeyDown);
         DomKeyboardManager.onKeyDown.add(this._onKeyDown);
+    }
+
+    // Pre-create folders in the order declared in DebugGuiTitle so that
+    // `getGuiFolder` returns them later without relying on construction order.
+    private _preRegisterFolders(): void {
+        for (const title of Object.values(DebugGuiTitle)) {
+            this._addGuiFolder(title);
+        }
     }
 
     private _injectShortcutsHeader(): void {

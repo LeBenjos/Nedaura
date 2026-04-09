@@ -5,6 +5,7 @@ import ThreeEffectComposerBase from '../../../composers/threes/bases/ThreeEffect
 export default abstract class ThreeWebGLRendererBase extends WebGLRenderer {
     protected _composer?: ThreeEffectComposerBase;
     protected _isPostProcessingActive: boolean = false;
+    protected _downscale: number = 1;
     protected readonly _scene: Scene;
     protected _camera: Camera;
 
@@ -31,11 +32,22 @@ export default abstract class ThreeWebGLRendererBase extends WebGLRenderer {
 
     public setIsPostProcessingActive(enabled: boolean): void {
         this._isPostProcessingActive = enabled && !!this._composer;
+        this.resize();
+    }
+
+    public setDownscale(factor: number): void {
+        this._downscale = Math.max(1, factor);
+        this.resize();
     }
 
     public resize(): void {
+        const useDownscale = this._isPostProcessingActive && this._downscale > 1;
+        const pixelRatio = useDownscale
+            ? DomResizeManager.pixelRatio / this._downscale
+            : DomResizeManager.pixelRatio;
+        this.domElement.style.imageRendering = useDownscale ? 'pixelated' : '';
         this.setSize(DomResizeManager.width, DomResizeManager.height);
-        this.setPixelRatio(DomResizeManager.pixelRatio);
+        this.setPixelRatio(pixelRatio);
         if (this._composer) this._composer.resize();
     }
 
@@ -54,6 +66,9 @@ export default abstract class ThreeWebGLRendererBase extends WebGLRenderer {
     }
     public get isPostProcessingActive(): boolean {
         return this._isPostProcessingActive;
+    }
+    public get downscale(): number {
+        return this._downscale;
     }
     //
     //#endregion

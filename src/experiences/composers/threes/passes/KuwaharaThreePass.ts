@@ -1,0 +1,50 @@
+import { Vector2 } from 'three';
+import { DebugGuiTitle } from '../../../constants/experiences/DebugGuiTitle';
+import MainThreeApp from '../../../engines/threes/app/MainThreeApp';
+import DebugManager from '../../../managers/DebugManager';
+import KuwaharaPassFragmentShader from '../../../shaders/threes/composers/kuwahara/KuwaharaPassFragmentShader.glsl';
+import KuwaharaPassVertexShader from '../../../shaders/threes/composers/kuwahara/KuwaharaPassVertexShader.glsl';
+import ThreePassBase from '../bases/passes/ThreePassBase';
+
+export default class KuwaharaThreePass extends ThreePassBase {
+    private static readonly _FOLDER_TITLE: string = 'Kuwahara';
+    private static readonly _DEFAULT_DOWNSCALE: number = 1;
+    private static readonly _MIN_DOWNSCALE: number = 1;
+    private static readonly _MAX_DOWNSCALE: number = 8;
+
+    constructor() {
+        super({
+            uniforms: {
+                tDiffuse: { value: null },
+                uTexelSize: { value: new Vector2(1 / window.innerWidth, 1 / window.innerHeight) },
+            },
+            vertexShader: KuwaharaPassVertexShader,
+            fragmentShader: KuwaharaPassFragmentShader,
+        });
+
+        if (DebugManager.isActive) this._initDebug();
+    }
+
+    public override setSize(width: number, height: number): void {
+        super.setSize(width, height);
+        (this.uniforms.uTexelSize.value as Vector2).set(1 / width, 1 / height);
+    }
+
+    private _initDebug(): void {
+        const composersFolder = DebugManager.getGuiFolder(DebugGuiTitle.THREE_COMPOSERS);
+        const folder = composersFolder.addFolder(KuwaharaThreePass._FOLDER_TITLE);
+        folder.add(this, 'enabled').name('enabled');
+
+        const downscaleProxy = { value: KuwaharaThreePass._DEFAULT_DOWNSCALE };
+        folder
+            .add(
+                downscaleProxy,
+                'value',
+                KuwaharaThreePass._MIN_DOWNSCALE,
+                KuwaharaThreePass._MAX_DOWNSCALE,
+                1,
+            )
+            .name('downscale')
+            .onChange((value: number) => MainThreeApp.renderer.setDownscale(value));
+    }
+}
