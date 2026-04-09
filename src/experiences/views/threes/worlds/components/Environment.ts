@@ -1,4 +1,4 @@
-import { DirectionalLight, DirectionalLightHelper, MathUtils, Spherical, Vector3, type DataTexture } from 'three';
+import { DirectionalLight, DirectionalLightHelper, FogExp2, MathUtils, Spherical, Vector3, type DataTexture } from 'three';
 import { AssetId } from '../../../../constants/experiences/AssetId';
 import { DebugGuiTitle } from '../../../../constants/experiences/DebugGuiTitle';
 import MainThreeApp from '../../../../engines/threes/app/MainThreeApp';
@@ -20,6 +20,8 @@ export default class Environment extends ThreeActorBase {
     private static readonly _DEFAULT_SUN_SHADOW_MAP_SIZE: number = 1024;
     private static readonly _DEFAULT_SUN_SHADOW_NORMAL_BIAS: number = 0.05;
     private static readonly _DEFAULT_SUN_POSITION: Vector3 = new Vector3(0, 2, 1);
+    private static readonly _DEFAULT_FOG_COLOR: number = 0xd8a878;
+    private static readonly _DEFAULT_FOG_DENSITY: number = 0.015;
 
     declare private _environmentMap: EnvironmentMap;
     declare private _sunLight: DirectionalLight;
@@ -30,6 +32,7 @@ export default class Environment extends ThreeActorBase {
 
         this._generateEnvironmentMap();
         this._generateSunLight();
+        this._generateFog();
     }
 
     public init(): void {
@@ -124,6 +127,23 @@ export default class Environment extends ThreeActorBase {
             sunLightFolder.add(sphericalProxy, 'thetaDeg', -180, 180, 0.1).name('azimuth (theta°)').onChange(applySpherical);
 
             sunLightFolder.addColor(this._sunLight, 'color').name('color');
+        }
+    }
+
+    private _generateFog(): void {
+        const fog = new FogExp2(Environment._DEFAULT_FOG_COLOR, Environment._DEFAULT_FOG_DENSITY);
+        MainThreeApp.scene.fog = fog;
+
+        if (DebugManager.isActive) {
+            const viewsDebug = DebugManager.getGuiFolder(DebugGuiTitle.THREE_VIEWS);
+            const fogFolder = viewsDebug.addFolder('Fog');
+
+            const fogProxy = { enabled: true };
+            fogFolder.add(fogProxy, 'enabled').name('enabled').onChange((enabled: boolean) => {
+                MainThreeApp.scene.fog = enabled ? fog : null;
+            });
+            fogFolder.addColor(fog, 'color').name('color');
+            fogFolder.add(fog, 'density', 0, 0.2, 0.0001).name('density');
         }
     }
 
