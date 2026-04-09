@@ -12,8 +12,8 @@ dist
 dist-ssr
 *.local
 
-assets_source/*
-!assets_source/.gitkeep
+# assets_source/*
+# !assets_source/.gitkeep
 improvements.md
 
 # Editor directories and files
