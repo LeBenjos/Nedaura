@@ -14,9 +14,6 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
     private static readonly _DEFAULT_CONTAINER_POSITION: Vector3 = new Vector3(0, 1.5, 3);
 
     private static readonly _DEFAULT_TARGET: Vector3 = new Vector3(0, 1, 0);
-
-    private static readonly _MAX_POLAR_ANGLE: number = Math.PI / 2;
-    private static readonly _MIN_POLAR_ANGLE: number = Math.PI / 2;
     private static readonly _MIN_RADIUS: number = 1;
     private static readonly _MAX_RADIUS: number = 10;
 
@@ -30,7 +27,6 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
     private readonly _tmpPos: Vector3 = new Vector3();
 
     private _lastX: number | null = null;
-    private _lastY: number | null = null;
     private _lastZ: number | null = null;
 
     constructor() {
@@ -46,36 +42,25 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
             const isFist = e.detail.left?.isFist;
             if (!isFist || !fist) {
                 this._lastX = null;
-                this._lastY = null;
                 this._lastZ = null;
                 return;
             }
 
             const x = fist.x;
-            const y = fist.y;
             const z = fist.z;
 
-            if (this._lastX === null || this._lastY === null || this._lastZ === null) {
+            if (this._lastX === null || this._lastZ === null) {
                 this._lastX = x;
-                this._lastY = y;
                 this._lastZ = z;
                 return;
             }
 
-            if (this._lastX !== null && this._lastY !== null && this._lastZ !== null) {
+            if (this._lastX !== null && this._lastZ !== null) {
                 const dx = x - this._lastX;
-                const dy = y - this._lastY;
                 const dz = z - this._lastZ;
 
                 this._sphericalTarget.theta -= dx * MainThreeCameraController._ROTATE_SPEED;
-                this._sphericalTarget.phi += dy * MainThreeCameraController._ROTATE_SPEED;
                 this._sphericalTarget.radius += dz * MainThreeCameraController._ZOOM_SPEED;
-
-                this._sphericalTarget.phi = MathUtils.clamp(
-                    this._sphericalTarget.phi,
-                    MainThreeCameraController._MIN_POLAR_ANGLE,
-                    MainThreeCameraController._MAX_POLAR_ANGLE
-                );
 
                 this._sphericalTarget.radius = MathUtils.clamp(
                     this._sphericalTarget.radius,
@@ -85,7 +70,6 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
             }
 
             this._lastX = x;
-            this._lastY = y;
             this._lastZ = z;
         });
     }
