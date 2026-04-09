@@ -1,4 +1,4 @@
-import { DomKeyboardManager } from '@benjos/cookware';
+import { Action, DomKeyboardManager } from '@benjos/cookware';
 import { KeyboardConstant } from '@benjos/spices';
 import GUI from 'lil-gui';
 import Stats from 'stats.js';
@@ -16,11 +16,19 @@ class DebugManager {
         KeyboardConstant.CODES.SHIFT_LEFT,
         KeyboardConstant.CODES.KEY_H,
     ];
+    private static readonly _SHORTCUTS: { keys: string[]; label: string }[] = [
+        { keys: ['Shift', 'H'], label: 'Toggle debug visibility' },
+        { keys: ['Shift', 'C'], label: 'Toggle debug camera mode' },
+        { keys: ['Shift', 'W'], label: 'Toggle wireframe' },
+        { keys: ['Ctrl', 'Click'], label: 'Center camera on object' },
+    ];
 
     private _isDebugVisible: boolean = true;
     declare private _gui: GUI;
     declare private _threePerf: ThreePerf;
     declare private _stats: Stats;
+
+    public readonly onVisibilityChange = new Action();
 
     public init(): void {
         if (this.isActive) {
@@ -35,8 +43,48 @@ class DebugManager {
             closeFolders: true,
         });
         this._gui.close();
+        this._injectShortcutsHeader();
         DomKeyboardManager.onKeyDown.remove(this._onKeyDown);
         DomKeyboardManager.onKeyDown.add(this._onKeyDown);
+    }
+
+    private _injectShortcutsHeader(): void {
+        const container = document.createElement('div');
+        container.style.cssText =
+            'padding:8px 12px;font-size:11px;line-height:1.5;color:#ccc;border-bottom:1px solid #444;';
+        container.style.display = this._gui._closed ? 'none' : 'block';
+        this._gui.onOpenClose((gui) => {
+            if (gui !== this._gui) return;
+            container.style.display = gui._closed ? 'none' : 'block';
+        });
+
+        const title = document.createElement('div');
+        title.textContent = 'Shortcuts';
+        title.style.cssText = 'font-weight:600;color:#fff;margin-bottom:4px;';
+        container.appendChild(title);
+
+        for (const shortcut of DebugManager._SHORTCUTS) {
+            const row = document.createElement('div');
+            row.style.cssText = 'display:flex;justify-content:space-between;gap:8px;';
+
+            const keys = document.createElement('span');
+            keys.textContent = shortcut.keys.join(' + ');
+            keys.style.cssText =
+                'font-family:monospace;background:#2c2c2c;padding:1px 6px;border-radius:3px;color:#fff;';
+
+            const label = document.createElement('span');
+            label.textContent = shortcut.label;
+            label.style.cssText = 'flex:1;text-align:right;';
+
+            row.appendChild(keys);
+            row.appendChild(label);
+            container.appendChild(row);
+        }
+
+        const children = this._gui.domElement.children;
+        const titleBar = children[0];
+        if (titleBar) this._gui.domElement.insertBefore(container, titleBar.nextSibling);
+        else this._gui.domElement.prepend(container);
     }
 
     private _initThreePerf = (): void => {
@@ -83,6 +131,7 @@ class DebugManager {
             this._gui.show(this._isDebugVisible);
             if (this._threePerf) this._threePerf.visible = this._isDebugVisible;
             if (this._stats) this._stats.dom.style.display = this._isDebugVisible ? 'block' : 'none';
+            this.onVisibilityChange.execute();
         }
     };
 
@@ -90,6 +139,9 @@ class DebugManager {
     //
     public get isActive(): boolean {
         return window.location.hash === DebugManager._IS_ACTIVE_STRING;
+    }
+    public get isVisible(): boolean {
+        return this._isDebugVisible;
     }
     public get gui(): GUI {
         return this._gui;
