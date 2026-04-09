@@ -2,6 +2,7 @@ import { ViewId } from '../../../constants/experiences/ViewId';
 import ThreeViewBase from '../bases/ThreeViewBase';
 import Dunes from './components/Dunes';
 import Environment from './components/Environment';
+import Sky from './components/Sky';
 
 export default class WorldThreeView extends ThreeViewBase {
     constructor() {
@@ -16,6 +17,7 @@ export default class WorldThreeView extends ThreeViewBase {
         // this._actors.push(new TemplateModel());
         // this._actors.push(new TemplateFont());
 
+        this._actors.push(new Sky());
         this._actors.push(new Dunes());
 
         for (const actor of this._actors) this.add(actor);
