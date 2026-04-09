@@ -3,6 +3,7 @@ import ThreeViewBase from '../bases/ThreeViewBase';
 import Dunes from './components/Dunes';
 import Environment from './components/Environment';
 import Sky from './components/Sky';
+import WindLines from './components/WindLines';
 
 export default class WorldThreeView extends ThreeViewBase {
     constructor() {
@@ -19,6 +20,7 @@ export default class WorldThreeView extends ThreeViewBase {
 
         this._actors.push(new Sky());
         this._actors.push(new Dunes());
+        this._actors.push(new WindLines());
 
         for (const actor of this._actors) this.add(actor);
     }

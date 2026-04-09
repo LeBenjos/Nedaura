@@ -8,6 +8,22 @@ $viewTransition: 0.5s;
     overscroll-behavior: none;
 }
 
+// reset margins and paddings
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+ul,
+ol,
+li {
+    margin: 0;
+    padding: 0;
+}
+
 body {
     position: relative;
     width: 100dvw;
@@ -15,6 +31,7 @@ body {
     margin: 0;
     padding: 0;
     overflow: hidden;
+    font-family: "Montserrat Alternates", sans-serif;
 
     > #app,
     > #root {
@@ -56,4 +73,38 @@ body {
     #three-perf-ui {
         z-index: 999999;
     }
+}
+
+
+
+/* GLOBALS ANIMATIONS */
+.fill-scale {
+    position: relative;
+    overflow: hidden;
+}
+
+/* couche de remplissage */
+.fill-scale::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: var(--fill-color, rgba(255, 255, 255, 0.3));
+
+    transform: scale(0);
+    transform-origin: center;
+    transition: transform var(--fill-duration, 0.25s) ease-out;
+
+    z-index: 0;
+}
+
+/* 👉 déclenchement au hover */
+.fill-scale:hover::before {
+    transform: scale(1);
+}
+
+/* contenu au-dessus */
+.fill-scale > * {
+    position: relative;
+    z-index: 1;
 }
