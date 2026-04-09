@@ -56,7 +56,7 @@ const onHandUpdate = (e: Event): void => {
     const right = snapshot.right;
     if (right) {
         rightPoint.visible = true;
-        const p = right.isFist && right.fist ? right.fist : right.indexTip;
+        const p = right.indexTip;
         rightTarget.x = p.x;
         rightTarget.y = p.y;
     } else {
@@ -80,6 +80,7 @@ onMounted(() => {
     window.addEventListener('hashchange', onHashChange);
     window.addEventListener('hand:update', onHandUpdate as EventListener);
     rafId = window.requestAnimationFrame(tick);
+    console.log("MediapipeView mounted, event listeners added, tick started");
 });
 
 onBeforeUnmount(() => {

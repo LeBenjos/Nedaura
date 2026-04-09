@@ -71,25 +71,27 @@ class MainMediapipe {
     }
 
     private initCamera() {
-        // In non-debug mode, the DOM elements for the preview can be missing.
         this.video = this._getOrCreateVideoElement();
-        this.enableWebcamButton = document.getElementById("webcamButton") as HTMLButtonElement | null ?? undefined;
         this._refreshCanvasRefs();
 
-        // Check if webcam access is supported.
         const hasGetUserMedia = () => !!navigator.mediaDevices?.getUserMedia;
-
-        // If webcam supported, add event listener to button for when user
-        // wants to activate it.
-        if (hasGetUserMedia()) {
-            if (this.enableWebcamButton) {
-                this.enableWebcamButton.addEventListener("click", this.enableCam);
-            } else {
-                console.warn('webcamButton element not found; webcam cannot be toggled.');
-            }
-        } else {
+        if (!hasGetUserMedia()) {
             console.warn("getUserMedia() is not supported by your browser");
+            return;
         }
+
+        const tryBindButton = () => {
+            const btn = document.getElementById("webcamButton") as HTMLButtonElement | null;
+            if (btn) {
+                this.enableWebcamButton = btn;
+                btn.addEventListener("click", this.enableCam);
+            } else {
+                // Retry on next frame until the Vue component renders
+                requestAnimationFrame(tryBindButton);
+            }
+        };
+
+        tryBindButton();
     }
 
     enableCam = (event: Event) => {
