@@ -43,21 +43,19 @@ class DebugManager {
             closeFolders: true,
         });
         this._gui.close();
-        this._injectShortcutsHeader();
+        this._injectHeader();
         this._preRegisterFolders();
         DomKeyboardManager.onKeyDown.remove(this._onKeyDown);
         DomKeyboardManager.onKeyDown.add(this._onKeyDown);
     }
 
-    // Pre-create folders in the order declared in DebugGuiTitle so that
-    // `getGuiFolder` returns them later without relying on construction order.
     private _preRegisterFolders(): void {
         for (const title of Object.values(DebugGuiTitle)) {
             this._addGuiFolder(title);
         }
     }
 
-    private _injectShortcutsHeader(): void {
+    private _injectHeader(): void {
         const container = document.createElement('div');
         container.style.cssText =
             'padding:8px 12px;font-size:11px;line-height:1.5;color:#ccc;border-bottom:1px solid #444;';
@@ -90,10 +88,69 @@ class DebugManager {
             container.appendChild(row);
         }
 
-        const children = this._gui.domElement.children;
-        const titleBar = children[0];
+        container.appendChild(this._buildExportButton());
+
+        const titleBar = this._gui.domElement.children[0];
         if (titleBar) this._gui.domElement.insertBefore(container, titleBar.nextSibling);
         else this._gui.domElement.prepend(container);
+    }
+
+    private _buildExportButton(): HTMLButtonElement {
+        const button = document.createElement('button');
+        const defaultLabel = 'Export settings (copy JSON)';
+        button.textContent = defaultLabel;
+        button.style.cssText =
+            'width:100%;margin-top:8px;padding:6px 8px;font-size:11px;font-weight:600;color:#fff;' +
+            'background:#2c5aa0;border:none;border-radius:3px;cursor:pointer;font-family:inherit;';
+        button.onmouseenter = () => (button.style.background = '#3a72c9');
+        button.onmouseleave = () => (button.style.background = '#2c5aa0');
+
+        let resetTimeout: number | undefined;
+        const flash = (label: string, color: string): void => {
+            button.textContent = label;
+            button.style.background = color;
+            if (resetTimeout) window.clearTimeout(resetTimeout);
+            resetTimeout = window.setTimeout(() => {
+                button.textContent = defaultLabel;
+                button.style.background = '#2c5aa0';
+            }, 1500);
+        };
+
+        button.onclick = async () => {
+            const payload = JSON.stringify(this._gui.save(), null, 2);
+            const ok = await DebugManager._copyToClipboard(payload);
+            if (ok) {
+                flash('Copied! Send it to the dev', '#2e7d32');
+            } else {
+                flash('Copy failed — check console', '#b71c1c');
+                console.warn('[DebugManager] Export payload:\n' + payload);
+            }
+        };
+
+        return button;
+    }
+
+    private static async _copyToClipboard(text: string): Promise<boolean> {
+        try {
+            if (navigator.clipboard?.writeText) {
+                await navigator.clipboard.writeText(text);
+                return true;
+            }
+        } catch {
+            //
+        }
+        try {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.cssText = 'position:fixed;top:-1000px;left:-1000px;opacity:0;';
+            document.body.appendChild(textarea);
+            textarea.select();
+            const ok = document.execCommand('copy');
+            document.body.removeChild(textarea);
+            return ok;
+        } catch {
+            return false;
+        }
     }
 
     private _initThreePerf = (): void => {
