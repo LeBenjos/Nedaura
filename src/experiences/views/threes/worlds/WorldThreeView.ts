@@ -1,9 +1,8 @@
-import { DebugGuiTitle } from '../../../constants/experiences/DebugGuiTitle';
 import { ViewId } from '../../../constants/experiences/ViewId';
-import MainThreeApp from '../../../engines/threes/app/MainThreeApp';
-import DebugManager from '../../../managers/DebugManager';
 import ThreeViewBase from '../bases/ThreeViewBase';
+import Dunes from './components/Dunes';
 import Environment from './components/Environment';
+import Sky from './components/Sky';
 
 export default class WorldThreeView extends ThreeViewBase {
     constructor() {
@@ -13,15 +12,13 @@ export default class WorldThreeView extends ThreeViewBase {
     protected override _generateActors(): void {
         super._generateActors();
 
-        if (DebugManager.isActive) {
-            const viewsDebug = DebugManager.getGuiFolder(DebugGuiTitle.THREE_VIEWS)
-            viewsDebug.add({ switchToWorldThreeView: () => MainThreeApp.setCurrentView(ViewId.THREE_WORLD) }, 'switchToWorldThreeView').name('SWITCH WORLD_1_VIEW');
-        }
-
         this._actors.push(new Environment());
         // this._actors.push(new TemplateMesh());
         // this._actors.push(new TemplateModel());
         // this._actors.push(new TemplateFont());
+
+        this._actors.push(new Sky());
+        this._actors.push(new Dunes());
 
         for (const actor of this._actors) this.add(actor);
     }

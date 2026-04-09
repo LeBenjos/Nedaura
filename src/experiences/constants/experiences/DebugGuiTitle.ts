@@ -1,5 +1,6 @@
 export const DebugGuiTitle = {
     THREE_RENDERER: 'Three Renderer',
+    THREE_COMPOSERS: 'Three Composers',
     THREE_VIEWS: 'Three Views',
 } as const;
 

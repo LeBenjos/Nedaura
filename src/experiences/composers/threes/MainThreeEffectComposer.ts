@@ -1,6 +1,6 @@
 import type { Camera, Scene, WebGLRenderer } from "three";
 import ThreeEffectComposerBase from "./bases/ThreeEffectComposerBase";
-import TemplateThreePass from "./passes/TemplateThreePass";
+import KuwaharaThreePass from "./passes/KuwaharaThreePass";
 
 export default class MainThreeEffectComposer extends ThreeEffectComposerBase {
     constructor(renderer: WebGLRenderer, scene: Scene, camera: Camera) {
@@ -9,7 +9,7 @@ export default class MainThreeEffectComposer extends ThreeEffectComposerBase {
 
     protected override _addPasses(): void {
         super._addPasses();
-        this._addPass(new TemplateThreePass());
+        this._addPass(new KuwaharaThreePass());
     }
 
     public override update(dt: number): void {

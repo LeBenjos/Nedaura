@@ -28,7 +28,7 @@ export default abstract class ThreeEffectComposerBase extends EffectComposer {
 
     public resize(): void {
         this.setSize(DomResizeManager.width, DomResizeManager.height);
-        this.setPixelRatio(DomResizeManager.pixelRatio);
+        this.setPixelRatio(this.renderer.getPixelRatio());
     }
 
     private _createRenderPass(scene: Scene, camera: Camera): void {
