@@ -79,10 +79,8 @@ class MainMediapipe {
 
         if (this.webcamRunning === true) {
             this.webcamRunning = false;
-            this.enableWebcamButton.innerText = "ENABLE PREDICTIONS";
         } else {
             this.webcamRunning = true;
-            this.enableWebcamButton.innerText = "DISABLE PREDICTIONS";
         }
 
         const constraints = {

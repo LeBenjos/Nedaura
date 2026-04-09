@@ -1,6 +1,6 @@
 import { DomKeyboardManager, DomUtils } from '@benjos/cookware';
 import { KeyboardConstant } from '@benjos/spices';
-import { MeshStandardMaterial, Scene } from 'three';
+import { Color, MeshStandardMaterial, Scene } from 'three';
 import DebugThreeCameraController from '../../../cameras/threes/DebugThreeCameraController';
 import MainThreeCameraController from '../../../cameras/threes/MainThreeCameraController';
 import { CameraId } from '../../../constants/experiences/CameraId';
@@ -46,6 +46,7 @@ class MainThreeApp extends ThreeAppBase {
 
     protected override _generateScenes(): void {
         this._scene = new Scene();
+        this._scene.background = new Color("#A2C0FD");
 
         if (DebugManager.isActive) {
             this._debugWireframeMaterial = new MeshStandardMaterial({

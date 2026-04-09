@@ -90,17 +90,12 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <button id="webcamButton" class="mdc-button mdc-button--raised">
-        <span class="mdc-button__ripple"></span>
-        <span class="mdc-button__label">ENABLE WEBCAM</span>
-    </button>
-
     <div class="hand-overlay">
         <div v-show="leftPoint.visible" class="left-hand dot" :class="{ 'dot--grab': leftIsFist }" :style="leftStyle"></div>
         <div v-show="rightPoint.visible" class="right-hand dot" :style="rightStyle"></div>
     </div>
 
-    <div v-if="isDebug" class="webcam-container">
+    <div class="webcam-container" :class="{ 'debug': isDebug }">
         <video id="webcam" class="webcam" autoplay playsinline></video>
         <canvas class="output_canvas" id="output_canvas"></canvas>
     </div>
@@ -115,6 +110,10 @@ onBeforeUnmount(() => {
     width: 320px;
     aspect-ratio: 4 / 3;
     overflow: hidden;
+
+    &:not(.debug) {
+        visibility: hidden;
+    }
 }
 
 /* VIDEO + CANVAS SUPERPOSÉS */
@@ -160,12 +159,11 @@ onBeforeUnmount(() => {
     width: 78px;
     height: 78px;
     filter: blur(1px) drop-shadow(0 0 6px #FFF);
-
     border: 1px solid #FFF;
     border-radius: 50%;
     transform: translate(-50%, -50%);
     pointer-events: none;
-    overflow: hidden; /* important */
+    overflow: hidden;
 }
 
 /* the filling layer */
