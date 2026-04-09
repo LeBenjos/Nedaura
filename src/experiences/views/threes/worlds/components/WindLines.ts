@@ -27,7 +27,7 @@ export default class WindLines extends ThreeActorBase {
     private static readonly _TRAIL_COLORS = ['#f2f2f2', '#ececec', '#e0e0e0', '#dadada'];
 
     // How far in front of the camera the hand plane sits (world units)
-    private static readonly _HAND_DEPTH   = 5;
+    private static readonly _HAND_DEPTH   = 0;
     // How wide/tall the hand area spans in world units (tune to match your scene scale)
     private static readonly _HAND_SPREAD  = 4;
 
