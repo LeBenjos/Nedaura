@@ -23,6 +23,10 @@ import { Object3DId } from '../../../../constants/experiences/Object3dId';
 import * as THREE from 'three';
 import { HitMaskPainter } from './Statue';
 import type { Controller } from 'lil-gui';
+import ThreeRaycasterManager from '../../../../managers/threes/ThreeRaycasterManager';
+import MainThreeApp from '../../../../engines/threes/app/MainThreeApp';
+import { Object3DId } from '../../../../constants/experiences/Object3dId';
+import * as THREE from 'three';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
