@@ -1,4 +1,4 @@
-import { MathUtils, Vector3 } from "three";
+import { Color, MathUtils, Vector3 } from "three";
 import { Sky as ThreeSky } from "three/examples/jsm/objects/Sky.js";
 import { DebugGuiTitle } from "../../../../constants/experiences/DebugGuiTitle";
 import DebugManager from "../../../../managers/DebugManager";
@@ -12,6 +12,7 @@ export default class Sky extends ThreeActorBase {
     private static readonly _DEFAULT_MIE_DIRECTIONAL_G: number = 0.8;
     private static readonly _DEFAULT_SUN_ELEVATION_DEG: number = 30;
     private static readonly _DEFAULT_SUN_AZIMUTH_DEG: number = 180;
+    private static readonly _DEFAULT_TINT_COLOR: string = "#ffffff";
 
     declare private _sky: ThreeSky;
 
@@ -25,7 +26,19 @@ export default class Sky extends ThreeActorBase {
         this._sky = new ThreeSky();
         this._sky.scale.setScalar(Sky._SCALE);
 
-        const uniforms = this._sky.material.uniforms;
+        const material = this._sky.material;
+        const uniforms = material.uniforms;
+
+        const tintColor = new Color(Sky._DEFAULT_TINT_COLOR);
+        uniforms.tintColor = { value: new Vector3(tintColor.r, tintColor.g, tintColor.b) };
+
+        material.fragmentShader = material.fragmentShader.replace(
+            'gl_FragColor = vec4( texColor, 1.0 );',
+            'gl_FragColor = vec4( texColor * tintColor, 1.0 );'
+        );
+        material.fragmentShader = 'uniform vec3 tintColor;\n' + material.fragmentShader;
+        material.needsUpdate = true;
+
         uniforms.turbidity.value = Sky._DEFAULT_TURBIDITY;
         uniforms.rayleigh.value = Sky._DEFAULT_RAYLEIGH;
         uniforms.mieCoefficient.value = Sky._DEFAULT_MIE_COEFFICIENT;
@@ -53,6 +66,12 @@ export default class Sky extends ThreeActorBase {
             });
             skyFolder.add(sunProxy, 'azimuth', -180, 180, 0.1).name('sun azimuth').onChange(() => {
                 this._updateSunPosition(sunProxy.elevation, sunProxy.azimuth);
+            });
+
+            const tintProxy = { color: Sky._DEFAULT_TINT_COLOR };
+            skyFolder.addColor(tintProxy, 'color').name('tint color').onChange(() => {
+                tintColor.set(tintProxy.color);
+                uniforms.tintColor.value.set(tintColor.r, tintColor.g, tintColor.b);
             });
         }
     }
