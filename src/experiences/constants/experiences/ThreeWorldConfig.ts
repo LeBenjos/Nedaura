@@ -1,13 +1,6 @@
 import type { ColorSpace, ToneMapping } from 'three';
 
 export interface ThreeWorldConfig {
-    camera: {
-        fov: number;
-        target: [number, number, number];
-        radius: number;
-        phiDeg: number;
-        thetaDeg: number;
-    };
     kuwahara: {
         enabled: boolean;
         downscale: number;
@@ -20,6 +13,8 @@ export interface ThreeWorldConfig {
         toneMapping: ToneMapping;
         outputColorSpace: ColorSpace;
         toneMappingExposure: number;
+        clearColor: string;
+        clearAlpha: number;
     };
     environment: {
         mapIntensity: number;
@@ -27,8 +22,8 @@ export interface ThreeWorldConfig {
         sunLightColor: string;
         sunLightIntensity: number;
         sunShadowCameraFar: number;
-        sunShadowCameraNear: number;
-        sunShadowCameraSize: number;
+        sunShadowMapSize: number;
+        sunShadowNormalBias: number;
         sunPosition: [number, number, number];
         fogEnabled: boolean;
         fogColor: string;
@@ -71,17 +66,6 @@ export interface ThreeWorldConfig {
 }
 
 export const THREE_WORLD_CONFIG: ThreeWorldConfig = {
-    "camera": {
-        "fov": 38,
-        "target": [
-            0,
-            1.05,
-            0
-        ],
-        "radius": 4,
-        "phiDeg": 91.01,
-        "thetaDeg": 0
-    },
     "kuwahara": {
         "enabled": true,
         "downscale": 3
@@ -93,42 +77,44 @@ export const THREE_WORLD_CONFIG: ThreeWorldConfig = {
         "postProcessing": true,
         "toneMapping": 5,
         "outputColorSpace": "srgb",
-        "toneMappingExposure": 1
+        "toneMappingExposure": 1,
+        "clearColor": "#fafafa",
+        "clearAlpha": 0
     },
     "environment": {
         "mapIntensity": 1,
         "hdrId": "THREE_HDR_3",
-        "sunLightColor": "#ffd4b8",
-        "sunLightIntensity": 2.797,
-        "sunShadowCameraFar": 10,
-        "sunShadowCameraNear": 1,
-        "sunShadowCameraSize": 20,
+        "sunLightColor": "#ffffff",
+        "sunLightIntensity": 1,
+        "sunShadowCameraFar": 15,
+        "sunShadowMapSize": 1024,
+        "sunShadowNormalBias": 0.05,
         "sunPosition": [
-            -3.2564509231010397,
-            3.650811383103761,
-            -1.0330070815025356
+            0,
+            2,
+            1
         ],
         "fogEnabled": true,
-        "fogColor": "#c287ab",
-        "fogDensity": 0.0364
+        "fogColor": "#d8a878",
+        "fogDensity": 0.015
     },
     "sky": {
-        "turbidity": 0,
-        "rayleigh": 4,
-        "mieCoefficient": 0.0906,
-        "mieDirectionalG": 0.841,
-        "sunElevationDeg": 14.1,
+        "turbidity": 10,
+        "rayleigh": 2,
+        "mieCoefficient": 0.005,
+        "mieDirectionalG": 0.8,
+        "sunElevationDeg": 30,
         "sunAzimuthDeg": 180,
-        "tintColor": "#ae959e"
+        "tintColor": "#ffffff"
     },
     "dunes": {
-        "textureRepeat": 127.2,
-        "textureRotation": 58.6,
-        "color": "#8e1c26",
-        "roughness": 0.702,
-        "metalness": 1,
-        "normalScaleX": 2.998,
-        "normalScaleY": -2.046
+        "textureRepeat": 50,
+        "textureRotation": 0,
+        "color": "#8c2120",
+        "roughness": 1,
+        "metalness": 0,
+        "normalScaleX": 1,
+        "normalScaleY": 1
     },
     "windLines": {
         "enabled": true,
@@ -141,9 +127,9 @@ export const THREE_WORLD_CONFIG: ThreeWorldConfig = {
         "trailSpread": 0.3,
         "amplitudeXY": 0.2,
         "amplitudeZ": 0.1,
-        "color0": "#ffffff",
-        "color1": "#ffffff",
-        "color2": "#ffffff",
-        "color3": "#ffffff"
+        "color0": "#f2f2f2",
+        "color1": "#ececec",
+        "color2": "#e0e0e0",
+        "color3": "#dadada"
     }
 } as const;
