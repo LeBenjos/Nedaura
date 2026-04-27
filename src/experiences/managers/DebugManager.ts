@@ -24,6 +24,7 @@ class DebugManager {
     ];
 
     private _isDebugVisible: boolean = true;
+    private _configGetters = new Map<string, () => unknown>();
     declare private _gui: GUI;
     declare private _threePerf: ThreePerf;
     declare private _stats: Stats;
@@ -117,7 +118,7 @@ class DebugManager {
         };
 
         button.onclick = async () => {
-            const payload = JSON.stringify(this._gui.save(), null, 2);
+            const payload = JSON.stringify(this._exportSceneConfig(), null, 2);
             const ok = await DebugManager._copyToClipboard(payload);
             if (ok) {
                 flash('Copied! Send it to the dev', '#2e7d32');
@@ -128,6 +129,24 @@ class DebugManager {
         };
 
         return button;
+    }
+
+    public registerConfigGetter(path: string, getter: () => unknown): void {
+        this._configGetters.set(path, getter);
+    }
+
+    private _exportSceneConfig(): Record<string, unknown> {
+        const result: Record<string, unknown> = {};
+        for (const [path, getter] of this._configGetters) {
+            const parts = path.split('.');
+            let obj = result;
+            for (let i = 0; i < parts.length - 1; i++) {
+                obj[parts[i]] ??= {};
+                obj = obj[parts[i]] as Record<string, unknown>;
+            }
+            obj[parts[parts.length - 1]] = getter();
+        }
+        return result;
     }
 
     private static async _copyToClipboard(text: string): Promise<boolean> {
