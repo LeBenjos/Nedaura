@@ -16,6 +16,7 @@
         "@eslint/js": "^10.0.1",
         "@types/howler": "^2.2.12",
         "@types/three": "^0.183.1",
+        "@vitejs/plugin-basic-ssl": "^2.3.0",
         "@vitejs/plugin-vue": "^6.0.5",
         "@vue/tsconfig": "^0.9.0",
         "eslint": "^10.1.0",
