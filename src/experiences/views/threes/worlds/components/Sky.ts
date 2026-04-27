@@ -1,18 +1,12 @@
 import { Color, MathUtils, Vector3 } from "three";
 import { Sky as ThreeSky } from "three/examples/jsm/objects/Sky.js";
 import { DebugGuiTitle } from "../../../../constants/experiences/DebugGuiTitle";
+import { THREE_WORLD_CONFIG } from "../../../../constants/experiences/ThreeWorldConfig";
 import DebugManager from "../../../../managers/DebugManager";
 import ThreeActorBase from "../../bases/components/ThreeActorBase";
 
 export default class Sky extends ThreeActorBase {
     private static readonly _SCALE: number = 1000;
-    private static readonly _DEFAULT_TURBIDITY: number = 10;
-    private static readonly _DEFAULT_RAYLEIGH: number = 2;
-    private static readonly _DEFAULT_MIE_COEFFICIENT: number = 0.005;
-    private static readonly _DEFAULT_MIE_DIRECTIONAL_G: number = 0.8;
-    private static readonly _DEFAULT_SUN_ELEVATION_DEG: number = 30;
-    private static readonly _DEFAULT_SUN_AZIMUTH_DEG: number = 180;
-    private static readonly _DEFAULT_TINT_COLOR: string = "#ffffff";
 
     declare private _sky: ThreeSky;
 
@@ -29,7 +23,7 @@ export default class Sky extends ThreeActorBase {
         const material = this._sky.material;
         const uniforms = material.uniforms;
 
-        const tintColor = new Color(Sky._DEFAULT_TINT_COLOR);
+        const tintColor = new Color(THREE_WORLD_CONFIG.sky.tintColor);
         uniforms.tintColor = { value: new Vector3(tintColor.r, tintColor.g, tintColor.b) };
 
         material.fragmentShader = material.fragmentShader.replace(
@@ -39,12 +33,12 @@ export default class Sky extends ThreeActorBase {
         material.fragmentShader = 'uniform vec3 tintColor;\n' + material.fragmentShader;
         material.needsUpdate = true;
 
-        uniforms.turbidity.value = Sky._DEFAULT_TURBIDITY;
-        uniforms.rayleigh.value = Sky._DEFAULT_RAYLEIGH;
-        uniforms.mieCoefficient.value = Sky._DEFAULT_MIE_COEFFICIENT;
-        uniforms.mieDirectionalG.value = Sky._DEFAULT_MIE_DIRECTIONAL_G;
+        uniforms.turbidity.value = THREE_WORLD_CONFIG.sky.turbidity;
+        uniforms.rayleigh.value = THREE_WORLD_CONFIG.sky.rayleigh;
+        uniforms.mieCoefficient.value = THREE_WORLD_CONFIG.sky.mieCoefficient;
+        uniforms.mieDirectionalG.value = THREE_WORLD_CONFIG.sky.mieDirectionalG;
 
-        this._updateSunPosition(Sky._DEFAULT_SUN_ELEVATION_DEG, Sky._DEFAULT_SUN_AZIMUTH_DEG);
+        this._updateSunPosition(THREE_WORLD_CONFIG.sky.sunElevationDeg, THREE_WORLD_CONFIG.sky.sunAzimuthDeg);
 
         this.add(this._sky);
 
@@ -58,8 +52,8 @@ export default class Sky extends ThreeActorBase {
             skyFolder.add(uniforms.mieDirectionalG, 'value', 0, 1, 0.001).name('mie directional g');
 
             const sunProxy = {
-                elevation: Sky._DEFAULT_SUN_ELEVATION_DEG,
-                azimuth: Sky._DEFAULT_SUN_AZIMUTH_DEG,
+                elevation: THREE_WORLD_CONFIG.sky.sunElevationDeg,
+                azimuth: THREE_WORLD_CONFIG.sky.sunAzimuthDeg,
             };
             skyFolder.add(sunProxy, 'elevation', -10, 90, 0.1).name('sun elevation').onChange(() => {
                 this._updateSunPosition(sunProxy.elevation, sunProxy.azimuth);
@@ -68,11 +62,19 @@ export default class Sky extends ThreeActorBase {
                 this._updateSunPosition(sunProxy.elevation, sunProxy.azimuth);
             });
 
-            const tintProxy = { color: Sky._DEFAULT_TINT_COLOR };
+            const tintProxy = { color: THREE_WORLD_CONFIG.sky.tintColor };
             skyFolder.addColor(tintProxy, 'color').name('tint color').onChange(() => {
                 tintColor.set(tintProxy.color);
                 uniforms.tintColor.value.set(tintColor.r, tintColor.g, tintColor.b);
             });
+
+            DebugManager.registerConfigGetter('sky.turbidity', () => uniforms.turbidity.value);
+            DebugManager.registerConfigGetter('sky.rayleigh', () => uniforms.rayleigh.value);
+            DebugManager.registerConfigGetter('sky.mieCoefficient', () => uniforms.mieCoefficient.value);
+            DebugManager.registerConfigGetter('sky.mieDirectionalG', () => uniforms.mieDirectionalG.value);
+            DebugManager.registerConfigGetter('sky.sunElevationDeg', () => sunProxy.elevation);
+            DebugManager.registerConfigGetter('sky.sunAzimuthDeg', () => sunProxy.azimuth);
+            DebugManager.registerConfigGetter('sky.tintColor', () => tintProxy.color);
         }
     }
 

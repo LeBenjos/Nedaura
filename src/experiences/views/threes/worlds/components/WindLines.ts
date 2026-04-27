@@ -7,6 +7,7 @@ import { CameraId } from '../../../../constants/experiences/CameraId';
 import ThreeCameraControllerBase from '../../../../cameras/threes/bases/ThreeCameraControllerBase';
 import DebugManager from '../../../../managers/DebugManager';
 import { DebugGuiTitle } from '../../../../constants/experiences/DebugGuiTitle';
+import { THREE_WORLD_CONFIG } from '../../../../constants/experiences/ThreeWorldConfig';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -26,7 +27,6 @@ type Trail = {
 export default class WindLines extends ThreeActorBase {
     private static readonly _NUM_TRAILS   = 6;
     private static readonly _TRAIL_LEN    = 200;
-    private static readonly _TRAIL_COLORS = ['#f2f2f2', '#ececec', '#e0e0e0', '#dadada'];
 
     private static readonly _DEBUG_INIT_KEY: string = '__windLinesDebugInit';
 
@@ -35,21 +35,7 @@ export default class WindLines extends ThreeActorBase {
     private _target3D: Vector3 = new Vector3();
     private _cameraController: ThreeCameraControllerBase;
 
-    private readonly _settings = {
-        enabled: true,
-        handDepth: 0,
-        handSpread: 4,
-        smoothing: 0.07,
-        numTrails: WindLines._NUM_TRAILS,
-        lineWidth: 0.35,
-        trailSpread: 0.3,
-        amplitudeXY: 0.2,
-        amplitudeZ: 0.1,
-        color0: WindLines._TRAIL_COLORS[0],
-        color1: WindLines._TRAIL_COLORS[1],
-        color2: WindLines._TRAIL_COLORS[2],
-        color3: WindLines._TRAIL_COLORS[3],
-    };
+    private readonly _settings = { ...THREE_WORLD_CONFIG.windLines };
 
     // Reusable vectors — allocated once, never inside the hot path
     private readonly _right   = new Vector3();
@@ -104,10 +90,14 @@ export default class WindLines extends ThreeActorBase {
             } else {
                 const toAdd = value - this._trails.length;
                 for (let i = 0; i < toAdd; i++) {
-                    this.generateMesh(i);     
+                    this.generateMesh(i);
                 }
             }
         });
+
+        for (const key of Object.keys(THREE_WORLD_CONFIG.windLines) as (keyof typeof THREE_WORLD_CONFIG.windLines)[]) {
+            DebugManager.registerConfigGetter(`windLines.${key}`, () => this._settings[key]);
+        }
     }
 
     private _getTrailColor(index: number): string {
