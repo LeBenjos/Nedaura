@@ -25,6 +25,8 @@ import ThreeWebGLRendererBase from './bases/ThreeWebGLRendererBase';
 
 export default class MainThreeWebGLRenderer extends ThreeWebGLRendererBase {
     private static readonly _DEFAULT_SHADOW_MAP_TYPE = PCFShadowMap;
+    private static readonly _CLEAR_COLOR: string = '#fafafa';
+    private static readonly _CLEAR_ALPHA: number = 0;
 
     constructor(scene: Scene, camera: Camera, parameters: WebGLRendererParameters = {}) {
         super(scene, camera, parameters);
@@ -33,7 +35,7 @@ export default class MainThreeWebGLRenderer extends ThreeWebGLRendererBase {
         this.outputColorSpace = THREE_WORLD_CONFIG.renderer.outputColorSpace;
         this.shadowMap.enabled = true;
         this.shadowMap.type = MainThreeWebGLRenderer._DEFAULT_SHADOW_MAP_TYPE;
-        this.setClearColor(new Color(THREE_WORLD_CONFIG.renderer.clearColor), THREE_WORLD_CONFIG.renderer.clearAlpha);
+        this.setClearColor(new Color(MainThreeWebGLRenderer._CLEAR_COLOR), MainThreeWebGLRenderer._CLEAR_ALPHA);
 
         if (DebugManager.isActive) {
             const rendererFolder = DebugManager.getGuiFolder(DebugGuiTitle.THREE_RENDERER)
@@ -68,12 +70,6 @@ export default class MainThreeWebGLRenderer extends ThreeWebGLRendererBase {
             DebugManager.registerConfigGetter('renderer.toneMapping', () => this.toneMapping);
             DebugManager.registerConfigGetter('renderer.outputColorSpace', () => this.outputColorSpace);
             DebugManager.registerConfigGetter('renderer.toneMappingExposure', () => this.toneMappingExposure);
-            const clearColor = new Color();
-            DebugManager.registerConfigGetter('renderer.clearColor', () => {
-                this.getClearColor(clearColor);
-                return '#' + clearColor.getHexString();
-            });
-            DebugManager.registerConfigGetter('renderer.clearAlpha', () => this.getClearAlpha());
         }
     }
 

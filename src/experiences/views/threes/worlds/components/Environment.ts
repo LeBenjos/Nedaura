@@ -14,6 +14,9 @@ interface EnvironmentMap {
 }
 
 export default class Environment extends ThreeActorBase {
+    private static readonly _SUN_SHADOW_MAP_SIZE: number = 1024;
+    private static readonly _SUN_SHADOW_NORMAL_BIAS: number = 0.05;
+
     declare private _environmentMap: EnvironmentMap;
     declare private _sunLight: DirectionalLight;
     private _sunLightHelper?: DirectionalLightHelper;
@@ -91,10 +94,10 @@ export default class Environment extends ThreeActorBase {
         this._sunLight.shadow.camera.bottom = -shadowCamSize;
 
         this._sunLight.shadow.mapSize.set(
-            THREE_WORLD_CONFIG.environment.sunShadowMapSize,
-            THREE_WORLD_CONFIG.environment.sunShadowMapSize
+            Environment._SUN_SHADOW_MAP_SIZE,
+            Environment._SUN_SHADOW_MAP_SIZE
         );
-        this._sunLight.shadow.normalBias = THREE_WORLD_CONFIG.environment.sunShadowNormalBias;
+        this._sunLight.shadow.normalBias = Environment._SUN_SHADOW_NORMAL_BIAS;
         this._sunLight.position.set(...THREE_WORLD_CONFIG.environment.sunPosition);
         this.add(this._sunLight);
 
@@ -154,8 +157,6 @@ export default class Environment extends ThreeActorBase {
             DebugManager.registerConfigGetter('environment.sunShadowCameraFar', () => this._sunLight.shadow.camera.far);
             DebugManager.registerConfigGetter('environment.sunShadowCameraNear', () => this._sunLight.shadow.camera.near);
             DebugManager.registerConfigGetter('environment.sunShadowCameraSize', () => shadowProxy.size);
-            DebugManager.registerConfigGetter('environment.sunShadowMapSize', () => this._sunLight.shadow.mapSize.x);
-            DebugManager.registerConfigGetter('environment.sunShadowNormalBias', () => this._sunLight.shadow.normalBias);
             DebugManager.registerConfigGetter('environment.sunPosition', () => [
                 this._sunLight.position.x,
                 this._sunLight.position.y,
