@@ -46,24 +46,24 @@ export default class Sky extends ThreeActorBase {
             const viewsDebug = DebugManager.getGuiFolder(DebugGuiTitle.THREE_VIEWS);
             const skyFolder = viewsDebug.addFolder('Sky');
 
-            skyFolder.add(uniforms.turbidity, 'value', 0, 20, 0.1).name('turbidity');
-            skyFolder.add(uniforms.rayleigh, 'value', 0, 4, 0.001).name('rayleigh');
-            skyFolder.add(uniforms.mieCoefficient, 'value', 0, 0.1, 0.0001).name('mie coefficient');
-            skyFolder.add(uniforms.mieDirectionalG, 'value', 0, 1, 0.001).name('mie directional g');
+            const turbidityCtrl = skyFolder.add(uniforms.turbidity, 'value', 0, 20, 0.1).name('turbidity');
+            const rayleighCtrl = skyFolder.add(uniforms.rayleigh, 'value', 0, 4, 0.001).name('rayleigh');
+            const mieCoefCtrl = skyFolder.add(uniforms.mieCoefficient, 'value', 0, 0.1, 0.0001).name('mie coefficient');
+            const mieGCtrl = skyFolder.add(uniforms.mieDirectionalG, 'value', 0, 1, 0.001).name('mie directional g');
 
             const sunProxy = {
                 elevation: THREE_WORLD_CONFIG.sky.sunElevationDeg,
                 azimuth: THREE_WORLD_CONFIG.sky.sunAzimuthDeg,
             };
-            skyFolder.add(sunProxy, 'elevation', -10, 90, 0.1).name('sun elevation').onChange(() => {
+            const elevationCtrl = skyFolder.add(sunProxy, 'elevation', -10, 90, 0.1).name('sun elevation').onChange(() => {
                 this._updateSunPosition(sunProxy.elevation, sunProxy.azimuth);
             });
-            skyFolder.add(sunProxy, 'azimuth', -180, 180, 0.1).name('sun azimuth').onChange(() => {
+            const azimuthCtrl = skyFolder.add(sunProxy, 'azimuth', -180, 180, 0.1).name('sun azimuth').onChange(() => {
                 this._updateSunPosition(sunProxy.elevation, sunProxy.azimuth);
             });
 
             const tintProxy = { color: THREE_WORLD_CONFIG.sky.tintColor };
-            skyFolder.addColor(tintProxy, 'color').name('tint color').onChange(() => {
+            const tintCtrl = skyFolder.addColor(tintProxy, 'color').name('tint color').onChange(() => {
                 tintColor.set(tintProxy.color);
                 uniforms.tintColor.value.set(tintColor.r, tintColor.g, tintColor.b);
             });
@@ -75,6 +75,14 @@ export default class Sky extends ThreeActorBase {
             DebugManager.registerConfigGetter('sky.sunElevationDeg', () => sunProxy.elevation);
             DebugManager.registerConfigGetter('sky.sunAzimuthDeg', () => sunProxy.azimuth);
             DebugManager.registerConfigGetter('sky.tintColor', () => tintProxy.color);
+
+            DebugManager.registerConfigSetter('sky.turbidity', (v) => turbidityCtrl.setValue(v));
+            DebugManager.registerConfigSetter('sky.rayleigh', (v) => rayleighCtrl.setValue(v));
+            DebugManager.registerConfigSetter('sky.mieCoefficient', (v) => mieCoefCtrl.setValue(v));
+            DebugManager.registerConfigSetter('sky.mieDirectionalG', (v) => mieGCtrl.setValue(v));
+            DebugManager.registerConfigSetter('sky.sunElevationDeg', (v) => elevationCtrl.setValue(v));
+            DebugManager.registerConfigSetter('sky.sunAzimuthDeg', (v) => azimuthCtrl.setValue(v));
+            DebugManager.registerConfigSetter('sky.tintColor', (v) => tintCtrl.setValue(v));
         }
     }
 

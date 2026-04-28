@@ -72,9 +72,10 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
     private _setupDebugGui(): void {
         const folder = DebugManager.getGuiFolder(DebugGuiTitle.THREE_CAMERAS).addFolder('Main Camera');
 
+        let fovCtrl: ReturnType<typeof folder.add> | undefined;
         if (this._camera instanceof PerspectiveCamera) {
             const perspective = this._camera;
-            folder.add(perspective, 'fov', 1, 179, 0.1).name('fov').onChange(() => {
+            fovCtrl = folder.add(perspective, 'fov', 1, 179, 0.1).name('fov').onChange(() => {
                 perspective.updateProjectionMatrix();
             });
         }
@@ -94,17 +95,17 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
             this._sphericalTarget.theta = MathUtils.degToRad(sphericalProxy.thetaDeg);
         };
         const positionFolder = folder.addFolder('Position');
-        positionFolder
+        const radiusCtrl = positionFolder
             .add(sphericalProxy, 'radius', MainThreeCameraController._MIN_RADIUS, MainThreeCameraController._MAX_RADIUS, 0.001)
             .name('distance')
             .onChange(applySpherical);
-        positionFolder.add(sphericalProxy, 'phiDeg', 0.01, 179.99, 0.1).name('elevation (phi°)').onChange(applySpherical);
-        positionFolder.add(sphericalProxy, 'thetaDeg', -180, 180, 0.1).name('azimuth (theta°)').onChange(applySpherical);
+        const phiCtrl = positionFolder.add(sphericalProxy, 'phiDeg', 0.01, 179.99, 0.1).name('elevation (phi°)').onChange(applySpherical);
+        const thetaCtrl = positionFolder.add(sphericalProxy, 'thetaDeg', -180, 180, 0.1).name('azimuth (theta°)').onChange(applySpherical);
 
         const targetFolder = folder.addFolder('Target');
-        targetFolder.add(this._target, 'x', -10, 10, 0.01).name('x');
-        targetFolder.add(this._target, 'y', -10, 10, 0.01).name('y');
-        targetFolder.add(this._target, 'z', -10, 10, 0.01).name('z');
+        const targetXCtrl = targetFolder.add(this._target, 'x', -10, 10, 0.01).name('x');
+        const targetYCtrl = targetFolder.add(this._target, 'y', -10, 10, 0.01).name('y');
+        const targetZCtrl = targetFolder.add(this._target, 'z', -10, 10, 0.01).name('z');
 
         DebugManager.registerConfigGetter('camera.fov', () => (
             this._camera instanceof PerspectiveCamera ? this._camera.fov : THREE_WORLD_CONFIG.camera.fov
@@ -113,6 +114,17 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
         DebugManager.registerConfigGetter('camera.radius', () => this._sphericalTarget.radius);
         DebugManager.registerConfigGetter('camera.phiDeg', () => MathUtils.radToDeg(this._sphericalTarget.phi));
         DebugManager.registerConfigGetter('camera.thetaDeg', () => MathUtils.radToDeg(this._sphericalTarget.theta));
+
+        if (fovCtrl) DebugManager.registerConfigSetter('camera.fov', (v) => fovCtrl!.setValue(v));
+        DebugManager.registerConfigSetter('camera.target', (v) => {
+            const [x, y, z] = v as [number, number, number];
+            targetXCtrl.setValue(x);
+            targetYCtrl.setValue(y);
+            targetZCtrl.setValue(z);
+        });
+        DebugManager.registerConfigSetter('camera.radius', (v) => radiusCtrl.setValue(v));
+        DebugManager.registerConfigSetter('camera.phiDeg', (v) => phiCtrl.setValue(v));
+        DebugManager.registerConfigSetter('camera.thetaDeg', (v) => thetaCtrl.setValue(v));
     }
 
     public override update(dt: number): void {

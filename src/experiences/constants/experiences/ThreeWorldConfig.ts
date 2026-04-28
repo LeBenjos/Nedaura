@@ -106,18 +106,18 @@ export const THREE_WORLD_CONFIG: ThreeWorldConfig = {
         "fogDensity": 0.0364
     },
     "sky": {
-        "turbidity": 0.4,
-        "rayleigh": 1.151,
-        "mieCoefficient": 0.0942,
-        "mieDirectionalG": 1,
-        "sunElevationDeg": 15.9,
+        "turbidity": 0,
+        "rayleigh": 4,
+        "mieCoefficient": 0.0906,
+        "mieDirectionalG": 0.841,
+        "sunElevationDeg": 14.1,
         "sunAzimuthDeg": 180,
-        "tintColor": "#ffb0af"
+        "tintColor": "#ae959e"
     },
     "dunes": {
         "textureRepeat": 127.2,
         "textureRotation": 58.6,
-        "color": "#bd5d65",
+        "color": "#8e1c26",
         "roughness": 0.702,
         "metalness": 1,
         "normalScaleX": 2.998,

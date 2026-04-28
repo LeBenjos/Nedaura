@@ -4,6 +4,7 @@ import GUI from 'lil-gui';
 import Stats from 'stats.js';
 import { ThreePerf } from 'three-perf';
 import { DebugGuiTitle } from '../constants/experiences/DebugGuiTitle';
+import { THREE_WORLD_PRESETS, type ThreeWorldPresetId } from '../constants/experiences/ThreeWorldPresets';
 import MainThreeApp from '../engines/threes/app/MainThreeApp';
 
 class DebugManager {
@@ -25,6 +26,7 @@ class DebugManager {
 
     private _isDebugVisible: boolean = true;
     private _configGetters = new Map<string, () => unknown>();
+    private _configSetters = new Map<string, (value: unknown) => void>();
     declare private _gui: GUI;
     declare private _threePerf: ThreePerf;
     declare private _stats: Stats;
@@ -90,6 +92,7 @@ class DebugManager {
         }
 
         container.appendChild(this._buildExportButton());
+        container.appendChild(this._buildPresetButtons());
 
         const titleBar = this._gui.domElement.children[0];
         if (titleBar) this._gui.domElement.insertBefore(container, titleBar.nextSibling);
@@ -118,7 +121,8 @@ class DebugManager {
         };
 
         button.onclick = async () => {
-            const payload = JSON.stringify(this._exportSceneConfig(), null, 2);
+            const json = JSON.stringify(this._exportSceneConfig(), null, 2);
+            const payload = '```json\n' + json + '\n```';
             const ok = await DebugManager._copyToClipboard(payload);
             if (ok) {
                 flash('Copied! Send it to the dev', '#2e7d32');
@@ -133,6 +137,44 @@ class DebugManager {
 
     public registerConfigGetter(path: string, getter: () => unknown): void {
         this._configGetters.set(path, getter);
+    }
+
+    public registerConfigSetter(path: string, setter: (value: unknown) => void): void {
+        this._configSetters.set(path, setter);
+    }
+
+    private static readonly _PRESET_IDS: readonly ThreeWorldPresetId[] = ['base', 'wind', 'rain', 'sun'];
+
+    private _buildPresetButtons(): HTMLDivElement {
+        const wrap = document.createElement('div');
+        wrap.style.cssText = 'display:flex;gap:4px;margin-top:8px;';
+        for (const id of DebugManager._PRESET_IDS) {
+            const btn = document.createElement('button');
+            btn.textContent = id.charAt(0).toUpperCase() + id.slice(1);
+            btn.style.cssText =
+                'flex:1;padding:6px 4px;font-size:11px;font-weight:600;color:#fff;' +
+                'background:#5a5a5a;border:none;border-radius:3px;cursor:pointer;font-family:inherit;';
+            btn.onmouseenter = () => (btn.style.background = '#777');
+            btn.onmouseleave = () => (btn.style.background = '#5a5a5a');
+            btn.onclick = () => this._applyPreset(id);
+            wrap.appendChild(btn);
+        }
+        return wrap;
+    }
+
+    private _applyPreset(id: ThreeWorldPresetId): void {
+        const preset = THREE_WORLD_PRESETS[id];
+        if (!preset) {
+            console.warn(`[DebugManager] Unknown preset "${id}"`);
+            return;
+        }
+        for (const [section, fields] of Object.entries(preset)) {
+            if (!fields || typeof fields !== 'object') continue;
+            for (const [key, value] of Object.entries(fields as Record<string, unknown>)) {
+                const setter = this._configSetters.get(`${section}.${key}`);
+                if (setter) setter(value);
+            }
+        }
     }
 
     private _exportSceneConfig(): Record<string, unknown> {

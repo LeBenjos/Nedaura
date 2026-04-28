@@ -22,6 +22,7 @@ import MainThreeApp from '../../../../engines/threes/app/MainThreeApp';
 import { Object3DId } from '../../../../constants/experiences/Object3dId';
 import * as THREE from 'three';
 import { HitMaskPainter } from './Statue';
+import type { Controller } from 'lil-gui';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -75,26 +76,28 @@ export default class WindLines extends ThreeActorBase {
         if (anyFolder[WindLines._DEBUG_INIT_KEY]) return;
         anyFolder[WindLines._DEBUG_INIT_KEY] = true;
 
-        folder.add(this._settings, 'enabled').name('enabled');
-        folder.add(this._settings, 'handDepth', -10, 10, 0.01).name('handDepth');
-        folder.add(this._settings, 'handSpread', 0, 10, 0.01).name('handSpread');
-        folder.add(this._settings, 'smoothing', 0.01, 0.5, 0.01).name('smoothing');
+        const controllers: Partial<Record<keyof typeof THREE_WORLD_CONFIG.windLines, Controller>> = {};
 
-        folder
+        controllers.enabled = folder.add(this._settings, 'enabled').name('enabled');
+        controllers.handDepth = folder.add(this._settings, 'handDepth', -10, 10, 0.01).name('handDepth');
+        controllers.handSpread = folder.add(this._settings, 'handSpread', 0, 10, 0.01).name('handSpread');
+        controllers.smoothing = folder.add(this._settings, 'smoothing', 0.01, 0.5, 0.01).name('smoothing');
+
+        controllers.lineWidth = folder
             .add(this._settings, 'lineWidth', 0.01, 2, 0.01)
             .name('lineWidth')
             .onChange(() => this._applyLineWidth());
 
-        folder.add(this._settings, 'trailSpread', 0, 1, 0.01).name('trailSpread');
-        folder.add(this._settings, 'amplitudeXY', 0, 1, 0.01).name('amplitudeXY');
-        folder.add(this._settings, 'amplitudeZ', 0, 1, 0.01).name('amplitudeZ');
+        controllers.trailSpread = folder.add(this._settings, 'trailSpread', 0, 1, 0.01).name('trailSpread');
+        controllers.amplitudeXY = folder.add(this._settings, 'amplitudeXY', 0, 1, 0.01).name('amplitudeXY');
+        controllers.amplitudeZ = folder.add(this._settings, 'amplitudeZ', 0, 1, 0.01).name('amplitudeZ');
 
-        folder.addColor(this._settings, 'color0').name('color0').onChange(() => this._applyColors());
-        folder.addColor(this._settings, 'color1').name('color1').onChange(() => this._applyColors());
-        folder.addColor(this._settings, 'color2').name('color2').onChange(() => this._applyColors());
-        folder.addColor(this._settings, 'color3').name('color3').onChange(() => this._applyColors());
+        controllers.color0 = folder.addColor(this._settings, 'color0').name('color0').onChange(() => this._applyColors());
+        controllers.color1 = folder.addColor(this._settings, 'color1').name('color1').onChange(() => this._applyColors());
+        controllers.color2 = folder.addColor(this._settings, 'color2').name('color2').onChange(() => this._applyColors());
+        controllers.color3 = folder.addColor(this._settings, 'color3').name('color3').onChange(() => this._applyColors());
 
-        folder.add(this._settings, 'numTrails', 1, 10, 1).name('numTrails').onChange((value: number) => {
+        controllers.numTrails = folder.add(this._settings, 'numTrails', 1, 10, 1).name('numTrails').onChange((value: number) => {
             this._settings.numTrails = value;
             if (this._trails.length > value) {
                 const toRemove = this._trails.splice(value);
@@ -113,6 +116,10 @@ export default class WindLines extends ThreeActorBase {
 
         for (const key of Object.keys(THREE_WORLD_CONFIG.windLines) as (keyof typeof THREE_WORLD_CONFIG.windLines)[]) {
             DebugManager.registerConfigGetter(`windLines.${key}`, () => this._settings[key]);
+            const ctrl = controllers[key];
+            if (ctrl) {
+                DebugManager.registerConfigSetter(`windLines.${key}`, (v) => ctrl.setValue(v));
+            }
         }
     }
 

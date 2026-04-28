@@ -60,10 +60,10 @@ export default class Environment extends ThreeActorBase {
                 'Wooden Studio': AssetId.THREE_HDR_2,
                 'Pink Sunrise': AssetId.THREE_HDR_3,
             };
-            environmentFolder.add(this._environmentMap, 'intensity', 0, 100, 0.001).onChange(() => {
+            const intensityCtrl = environmentFolder.add(this._environmentMap, 'intensity', 0, 100, 0.001).onChange(() => {
                 MainThreeApp.scene.environmentIntensity = this._environmentMap.intensity!;
             });
-            environmentFolder
+            const hdrCtrl = environmentFolder
                 .add(this._environmentMap, 'hdrId', hdrOptions)
                 .name('hdr')
                 .onChange((id: AssetId) => {
@@ -75,6 +75,12 @@ export default class Environment extends ThreeActorBase {
 
             DebugManager.registerConfigGetter('environment.mapIntensity', () => this._environmentMap.intensity);
             DebugManager.registerConfigGetter('environment.hdrId', () => this._environmentMap.hdrId);
+
+            DebugManager.registerConfigSetter('environment.mapIntensity', (v) => intensityCtrl.setValue(v));
+            DebugManager.registerConfigSetter('environment.hdrId', (v) => {
+                const id = typeof v === 'string' ? AssetId[v as keyof typeof AssetId] : v;
+                hdrCtrl.setValue(id);
+            });
         }
     };
 
@@ -113,7 +119,7 @@ export default class Environment extends ThreeActorBase {
 
             const viewsDebug = DebugManager.getGuiFolder(DebugGuiTitle.THREE_VIEWS)
             const sunLightFolder = viewsDebug.addFolder('Sun Light');
-            sunLightFolder.add(this._sunLight, 'intensity', 0, 100, 0.001).name('intensity');
+            const sunIntensityCtrl = sunLightFolder.add(this._sunLight, 'intensity', 0, 100, 0.001).name('intensity');
 
             const spherical = new Spherical().setFromVector3(this._sunLight.position);
             const sphericalProxy = {
@@ -127,11 +133,11 @@ export default class Environment extends ThreeActorBase {
                 spherical.theta = MathUtils.degToRad(sphericalProxy.thetaDeg);
                 this._sunLight.position.setFromSpherical(spherical);
             };
-            sunLightFolder.add(sphericalProxy, 'radius', 0.1, 200, 0.001).name('distance').onChange(applySpherical);
-            sunLightFolder.add(sphericalProxy, 'phiDeg', 0, 180, 0.1).name('elevation (phi°)').onChange(applySpherical);
-            sunLightFolder.add(sphericalProxy, 'thetaDeg', -180, 180, 0.1).name('azimuth (theta°)').onChange(applySpherical);
+            const sphRadiusCtrl = sunLightFolder.add(sphericalProxy, 'radius', 0.1, 200, 0.001).name('distance').onChange(applySpherical);
+            const sphPhiCtrl = sunLightFolder.add(sphericalProxy, 'phiDeg', 0, 180, 0.1).name('elevation (phi°)').onChange(applySpherical);
+            const sphThetaCtrl = sunLightFolder.add(sphericalProxy, 'thetaDeg', -180, 180, 0.1).name('azimuth (theta°)').onChange(applySpherical);
 
-            sunLightFolder.addColor(this._sunLight, 'color').name('color');
+            const sunColorCtrl = sunLightFolder.addColor(this._sunLight, 'color').name('color');
 
             const shadowCam = this._sunLight.shadow.camera;
             const shadowProxy = {
@@ -148,9 +154,9 @@ export default class Environment extends ThreeActorBase {
                 shadowCam.bottom = -shadowProxy.size;
                 shadowCam.updateProjectionMatrix();
             };
-            sunLightFolder.add(shadowProxy, 'near', 0.01, 10, 0.01).name('shadow near').onChange(updateShadowFrustum);
-            sunLightFolder.add(shadowProxy, 'far', 1, 500, 0.1).name('shadow far').onChange(updateShadowFrustum);
-            sunLightFolder.add(shadowProxy, 'size', 1, 100, 0.1).name('shadow size').onChange(updateShadowFrustum);
+            const shadowNearCtrl = sunLightFolder.add(shadowProxy, 'near', 0.01, 10, 0.01).name('shadow near').onChange(updateShadowFrustum);
+            const shadowFarCtrl = sunLightFolder.add(shadowProxy, 'far', 1, 500, 0.1).name('shadow far').onChange(updateShadowFrustum);
+            const shadowSizeCtrl = sunLightFolder.add(shadowProxy, 'size', 1, 100, 0.1).name('shadow size').onChange(updateShadowFrustum);
 
             DebugManager.registerConfigGetter('environment.sunLightColor', () => '#' + this._sunLight.color.getHexString());
             DebugManager.registerConfigGetter('environment.sunLightIntensity', () => this._sunLight.intensity);
@@ -162,6 +168,23 @@ export default class Environment extends ThreeActorBase {
                 this._sunLight.position.y,
                 this._sunLight.position.z,
             ]);
+
+            DebugManager.registerConfigSetter('environment.sunLightColor', (v) => {
+                this._sunLight.color.set(v as string);
+                sunColorCtrl.updateDisplay();
+            });
+            DebugManager.registerConfigSetter('environment.sunLightIntensity', (v) => sunIntensityCtrl.setValue(v));
+            DebugManager.registerConfigSetter('environment.sunShadowCameraFar', (v) => shadowFarCtrl.setValue(v));
+            DebugManager.registerConfigSetter('environment.sunShadowCameraNear', (v) => shadowNearCtrl.setValue(v));
+            DebugManager.registerConfigSetter('environment.sunShadowCameraSize', (v) => shadowSizeCtrl.setValue(v));
+            DebugManager.registerConfigSetter('environment.sunPosition', (v) => {
+                const [x, y, z] = v as [number, number, number];
+                this._sunLight.position.set(x, y, z);
+                spherical.setFromVector3(this._sunLight.position);
+                sphRadiusCtrl.setValue(spherical.radius);
+                sphPhiCtrl.setValue(MathUtils.radToDeg(spherical.phi));
+                sphThetaCtrl.setValue(MathUtils.radToDeg(spherical.theta));
+            });
         }
     }
 
@@ -174,15 +197,22 @@ export default class Environment extends ThreeActorBase {
             const fogFolder = viewsDebug.addFolder('Fog');
 
             const fogProxy = { enabled: THREE_WORLD_CONFIG.environment.fogEnabled };
-            fogFolder.add(fogProxy, 'enabled').name('enabled').onChange((enabled: boolean) => {
+            const fogEnabledCtrl = fogFolder.add(fogProxy, 'enabled').name('enabled').onChange((enabled: boolean) => {
                 MainThreeApp.scene.fog = enabled ? fog : null;
             });
-            fogFolder.addColor(fog, 'color').name('color');
-            fogFolder.add(fog, 'density', 0, 0.2, 0.0001).name('density');
+            const fogColorCtrl = fogFolder.addColor(fog, 'color').name('color');
+            const fogDensityCtrl = fogFolder.add(fog, 'density', 0, 0.2, 0.0001).name('density');
 
             DebugManager.registerConfigGetter('environment.fogEnabled', () => fogProxy.enabled);
             DebugManager.registerConfigGetter('environment.fogColor', () => '#' + fog.color.getHexString());
             DebugManager.registerConfigGetter('environment.fogDensity', () => fog.density);
+
+            DebugManager.registerConfigSetter('environment.fogEnabled', (v) => fogEnabledCtrl.setValue(v));
+            DebugManager.registerConfigSetter('environment.fogColor', (v) => {
+                fog.color.set(v as string);
+                fogColorCtrl.updateDisplay();
+            });
+            DebugManager.registerConfigSetter('environment.fogDensity', (v) => fogDensityCtrl.setValue(v));
         }
     }
 

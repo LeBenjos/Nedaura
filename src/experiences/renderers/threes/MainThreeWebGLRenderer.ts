@@ -39,7 +39,7 @@ export default class MainThreeWebGLRenderer extends ThreeWebGLRendererBase {
 
         if (DebugManager.isActive) {
             const rendererFolder = DebugManager.getGuiFolder(DebugGuiTitle.THREE_RENDERER)
-            rendererFolder
+            const toneMappingCtrl = rendererFolder
                 .add(this, 'toneMapping', {
                     NoToneMapping,
                     LinearToneMapping,
@@ -53,15 +53,15 @@ export default class MainThreeWebGLRenderer extends ThreeWebGLRendererBase {
                 .onChange((value: ToneMapping) => {
                     this.toneMapping = value;
                 });
-            rendererFolder.add(this, 'toneMappingExposure', 0, 10, 0.001);
-            rendererFolder
+            const exposureCtrl = rendererFolder.add(this, 'toneMappingExposure', 0, 10, 0.001);
+            const colorSpaceCtrl = rendererFolder
                 .add(this, 'outputColorSpace', { SRGBColorSpace, LinearSRGBColorSpace })
                 .onChange((value: ColorSpace) => {
                     this.outputColorSpace = value;
                 });
             const postProcProxy = { active: THREE_WORLD_CONFIG.renderer.postProcessing };
             this.setIsPostProcessingActive(THREE_WORLD_CONFIG.renderer.postProcessing);
-            rendererFolder
+            const postProcCtrl = rendererFolder
                 .add(postProcProxy, 'active')
                 .name('post-processing')
                 .onChange((value: boolean) => this.setIsPostProcessingActive(value));
@@ -70,6 +70,11 @@ export default class MainThreeWebGLRenderer extends ThreeWebGLRendererBase {
             DebugManager.registerConfigGetter('renderer.toneMapping', () => this.toneMapping);
             DebugManager.registerConfigGetter('renderer.outputColorSpace', () => this.outputColorSpace);
             DebugManager.registerConfigGetter('renderer.toneMappingExposure', () => this.toneMappingExposure);
+
+            DebugManager.registerConfigSetter('renderer.postProcessing', (v) => postProcCtrl.setValue(v));
+            DebugManager.registerConfigSetter('renderer.toneMapping', (v) => toneMappingCtrl.setValue(v));
+            DebugManager.registerConfigSetter('renderer.outputColorSpace', (v) => colorSpaceCtrl.setValue(v));
+            DebugManager.registerConfigSetter('renderer.toneMappingExposure', (v) => exposureCtrl.setValue(v));
         }
     }
 

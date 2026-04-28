@@ -46,23 +46,25 @@ export default class Dunes extends ThreeModelBase {
                     const viewsDebug = DebugManager.getGuiFolder(DebugGuiTitle.THREE_VIEWS);
                     const dunesFolder = viewsDebug.addFolder('Dunes');
 
-                    dunesFolder.addColor(child.material, 'color').name('color');
-                    dunesFolder.add(child.material, 'roughness', 0, 1, 0.001).name('roughness');
-                    dunesFolder.add(child.material, 'metalness', 0, 1, 0.001).name('metalness');
+                    const colorCtrl = dunesFolder.addColor(child.material, 'color').name('color');
+                    const roughnessCtrl = dunesFolder.add(child.material, 'roughness', 0, 1, 0.001).name('roughness');
+                    const metalnessCtrl = dunesFolder.add(child.material, 'metalness', 0, 1, 0.001).name('metalness');
 
+                    let normalScaleXCtrl: ReturnType<typeof dunesFolder.add> | undefined;
+                    let normalScaleYCtrl: ReturnType<typeof dunesFolder.add> | undefined;
                     if (child.material.normalScale) {
-                        dunesFolder.add(child.material.normalScale, 'x', -3, 3, 0.001).name('normal scale X');
-                        dunesFolder.add(child.material.normalScale, 'y', -3, 3, 0.001).name('normal scale Y');
+                        normalScaleXCtrl = dunesFolder.add(child.material.normalScale, 'x', -3, 3, 0.001).name('normal scale X');
+                        normalScaleYCtrl = dunesFolder.add(child.material.normalScale, 'y', -3, 3, 0.001).name('normal scale Y');
                     }
 
                     const repeatProxy = { value: THREE_WORLD_CONFIG.dunes.textureRepeat };
-                    dunesFolder.add(repeatProxy, 'value', 1, 200, 0.1).name('texture repeat').onChange((v: number) => {
+                    const repeatCtrl = dunesFolder.add(repeatProxy, 'value', 1, 200, 0.1).name('texture repeat').onChange((v: number) => {
                         child.material.normalMap?.repeat.set(v, v);
                         child.material.armMap?.repeat.set(v, v);
                     });
 
                     const rotationProxy = { value: THREE_WORLD_CONFIG.dunes.textureRotation };
-                    dunesFolder.add(rotationProxy, 'value', 0, 360, 0.1).name('texture rotation').onChange((v: number) => {
+                    const rotationCtrl = dunesFolder.add(rotationProxy, 'value', 0, 360, 0.1).name('texture rotation').onChange((v: number) => {
                         const rad = MathUtils.degToRad(v);
                         if (child.material.normalMap) child.material.normalMap.rotation = rad;
                         if (child.material.armMap) child.material.armMap.rotation = rad;
@@ -75,6 +77,17 @@ export default class Dunes extends ThreeModelBase {
                     DebugManager.registerConfigGetter('dunes.metalness', () => child.material.metalness);
                     DebugManager.registerConfigGetter('dunes.normalScaleX', () => child.material.normalScale?.x ?? 1);
                     DebugManager.registerConfigGetter('dunes.normalScaleY', () => child.material.normalScale?.y ?? 1);
+
+                    DebugManager.registerConfigSetter('dunes.textureRepeat', (v) => repeatCtrl.setValue(v));
+                    DebugManager.registerConfigSetter('dunes.textureRotation', (v) => rotationCtrl.setValue(v));
+                    DebugManager.registerConfigSetter('dunes.color', (v) => {
+                        child.material.color.set(v as string);
+                        colorCtrl.updateDisplay();
+                    });
+                    DebugManager.registerConfigSetter('dunes.roughness', (v) => roughnessCtrl.setValue(v));
+                    DebugManager.registerConfigSetter('dunes.metalness', (v) => metalnessCtrl.setValue(v));
+                    if (normalScaleXCtrl) DebugManager.registerConfigSetter('dunes.normalScaleX', (v) => normalScaleXCtrl!.setValue(v));
+                    if (normalScaleYCtrl) DebugManager.registerConfigSetter('dunes.normalScaleY', (v) => normalScaleYCtrl!.setValue(v));
                 }
             }
         }
