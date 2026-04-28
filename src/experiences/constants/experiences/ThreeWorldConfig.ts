@@ -1,6 +1,13 @@
 import type { ColorSpace, ToneMapping } from 'three';
 
 export interface ThreeWorldConfig {
+    camera: {
+        fov: number;
+        target: [number, number, number];
+        radius: number;
+        phiDeg: number;
+        thetaDeg: number;
+    };
     kuwahara: {
         enabled: boolean;
         downscale: number;
@@ -10,8 +17,6 @@ export interface ThreeWorldConfig {
         toneMapping: ToneMapping;
         outputColorSpace: ColorSpace;
         toneMappingExposure: number;
-        clearColor: string;
-        clearAlpha: number;
     };
     environment: {
         mapIntensity: number;
@@ -21,8 +26,6 @@ export interface ThreeWorldConfig {
         sunShadowCameraFar: number;
         sunShadowCameraNear: number;
         sunShadowCameraSize: number;
-        sunShadowMapSize: number;
-        sunShadowNormalBias: number;
         sunPosition: [number, number, number];
         fogEnabled: boolean;
         fogColor: string;
@@ -64,6 +67,17 @@ export interface ThreeWorldConfig {
 }
 
 export const THREE_WORLD_CONFIG: ThreeWorldConfig = {
+    "camera": {
+        "fov": 38,
+        "target": [
+            0,
+            1.05,
+            0
+        ],
+        "radius": 4,
+        "phiDeg": 91.01,
+        "thetaDeg": 0
+    },
     "kuwahara": {
         "enabled": true,
         "downscale": 1
@@ -72,9 +86,7 @@ export const THREE_WORLD_CONFIG: ThreeWorldConfig = {
         "postProcessing": false,
         "toneMapping": 5,
         "outputColorSpace": "srgb",
-        "toneMappingExposure": 1,
-        "clearColor": "#fafafa",
-        "clearAlpha": 0
+        "toneMappingExposure": 1
     },
     "environment": {
         "mapIntensity": 1,
@@ -84,8 +96,6 @@ export const THREE_WORLD_CONFIG: ThreeWorldConfig = {
         "sunShadowCameraFar": 10,
         "sunShadowCameraNear": 1,
         "sunShadowCameraSize": 20,
-        "sunShadowMapSize": 1024,
-        "sunShadowNormalBias": 0.05,
         "sunPosition": [
             -3.2564509231010397,
             3.650811383103761,

@@ -1,4 +1,15 @@
 {
+    "camera": {
+        "fov": 38,
+        "target": [
+            0,
+            1.05,
+            0
+        ],
+        "radius": 4,
+        "phiDeg": 91.01,
+        "thetaDeg": 0
+    },
     "kuwahara": {
         "enabled": true,
         "downscale": 1
@@ -7,9 +18,7 @@
         "postProcessing": false,
         "toneMapping": 5,
         "outputColorSpace": "srgb",
-        "toneMappingExposure": 1,
-        "clearColor": "#fafafa",
-        "clearAlpha": 0
+        "toneMappingExposure": 1
     },
     "environment": {
         "mapIntensity": 1,
@@ -19,8 +28,6 @@
         "sunShadowCameraFar": 10,
         "sunShadowCameraNear": 1,
         "sunShadowCameraSize": 20,
-        "sunShadowMapSize": 1024,
-        "sunShadowNormalBias": 0.05,
         "sunPosition": [
             -3.2564509231010397,
             3.650811383103761,
