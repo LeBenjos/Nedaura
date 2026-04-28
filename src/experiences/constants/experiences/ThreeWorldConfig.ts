@@ -12,6 +12,9 @@ export interface ThreeWorldConfig {
         enabled: boolean;
         downscale: number;
     };
+    smaa: {
+        enabled: boolean;
+    };
     renderer: {
         postProcessing: boolean;
         toneMapping: ToneMapping;
@@ -80,10 +83,13 @@ export const THREE_WORLD_CONFIG: ThreeWorldConfig = {
     },
     "kuwahara": {
         "enabled": true,
-        "downscale": 1
+        "downscale": 3
+    },
+    "smaa": {
+        "enabled": true
     },
     "renderer": {
-        "postProcessing": false,
+        "postProcessing": true,
         "toneMapping": 5,
         "outputColorSpace": "srgb",
         "toneMappingExposure": 1

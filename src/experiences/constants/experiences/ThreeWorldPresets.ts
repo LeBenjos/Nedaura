@@ -19,10 +19,13 @@ export const THREE_WORLD_PRESETS: Record<ThreeWorldPresetId, ThreeWorldConfig> =
         },
         "kuwahara": {
             "enabled": true,
-            "downscale": 1
+            "downscale": 3
+        },
+        "smaa": {
+            "enabled": true
         },
         "renderer": {
-            "postProcessing": false,
+            "postProcessing": true,
             "toneMapping": 5,
             "outputColorSpace": "srgb",
             "toneMappingExposure": 1
@@ -92,10 +95,13 @@ export const THREE_WORLD_PRESETS: Record<ThreeWorldPresetId, ThreeWorldConfig> =
         },
         "kuwahara": {
             "enabled": true,
-            "downscale": 1
+            "downscale": 3
+        },
+        "smaa": {
+            "enabled": true
         },
         "renderer": {
-            "postProcessing": false,
+            "postProcessing": true,
             "toneMapping": 5,
             "outputColorSpace": "srgb",
             "toneMappingExposure": 1
@@ -165,10 +171,13 @@ export const THREE_WORLD_PRESETS: Record<ThreeWorldPresetId, ThreeWorldConfig> =
         },
         "kuwahara": {
             "enabled": true,
-            "downscale": 1
+            "downscale": 3
+        },
+        "smaa": {
+            "enabled": true
         },
         "renderer": {
-            "postProcessing": false,
+            "postProcessing": true,
             "toneMapping": 5,
             "outputColorSpace": "srgb",
             "toneMappingExposure": 1
@@ -238,10 +247,13 @@ export const THREE_WORLD_PRESETS: Record<ThreeWorldPresetId, ThreeWorldConfig> =
         },
         "kuwahara": {
             "enabled": true,
-            "downscale": 1
+            "downscale": 3
+        },
+        "smaa": {
+            "enabled": true
         },
         "renderer": {
-            "postProcessing": false,
+            "postProcessing": true,
             "toneMapping": 5,
             "outputColorSpace": "srgb",
             "toneMappingExposure": 1
