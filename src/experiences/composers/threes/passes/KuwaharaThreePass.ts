@@ -34,10 +34,10 @@ export default class KuwaharaThreePass extends ThreePassBase {
         const composersFolder = DebugManager.getGuiFolder(DebugGuiTitle.THREE_COMPOSERS);
         const folder = composersFolder.addFolder(KuwaharaThreePass._FOLDER_TITLE);
         this.enabled = THREE_WORLD_CONFIG.kuwahara.enabled;
-        folder.add(this, 'enabled').name('enabled');
+        const enabledCtrl = folder.add(this, 'enabled').name('enabled');
 
         const downscaleProxy = { value: THREE_WORLD_CONFIG.kuwahara.downscale };
-        folder
+        const downscaleCtrl = folder
             .add(
                 downscaleProxy,
                 'value',
@@ -50,5 +50,8 @@ export default class KuwaharaThreePass extends ThreePassBase {
 
         DebugManager.registerConfigGetter('kuwahara.enabled', () => this.enabled);
         DebugManager.registerConfigGetter('kuwahara.downscale', () => downscaleProxy.value);
+
+        DebugManager.registerConfigSetter('kuwahara.enabled', (v) => enabledCtrl.setValue(v));
+        DebugManager.registerConfigSetter('kuwahara.downscale', (v) => downscaleCtrl.setValue(v));
     }
 }

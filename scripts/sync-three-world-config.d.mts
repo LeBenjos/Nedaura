@@ -1,1 +1,1 @@
-export declare function syncThreeWorldConfig(): void;
+export declare function syncThreeWorldPresets(): void;
