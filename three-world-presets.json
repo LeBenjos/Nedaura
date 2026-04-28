@@ -15,7 +15,6 @@
             },
             "kuwahara": {
                 "enabled": true,
-<<<<<<< HEAD
                 "downscale": 2
             },
             "smaa": {
@@ -23,12 +22,10 @@
             },
             "renderer": {
                 "postProcessing": true,
-=======
                 "downscale": 1
             },
             "renderer": {
                 "postProcessing": false,
->>>>>>> 3b9f4b6 (feat: preset for gui)
                 "toneMapping": 5,
                 "outputColorSpace": "srgb",
                 "toneMappingExposure": 1
