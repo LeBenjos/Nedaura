@@ -87,10 +87,12 @@ export default class WindLines extends ThreeActorBase {
         if (anyFolder[WindLines._DEBUG_INIT_KEY]) return;
         anyFolder[WindLines._DEBUG_INIT_KEY] = true;
 
-        folder.add(this._settings, 'enabled').name('enabled');
-        folder.add(this._settings, 'handDepth', -10, 10, 0.01).name('handDepth');
-        folder.add(this._settings, 'handSpread', 0, 10, 0.01).name('handSpread');
-        folder.add(this._settings, 'smoothing', 0.01, 0.5, 0.01).name('smoothing');
+        const controllers: Partial<Record<keyof typeof THREE_WORLD_CONFIG.windLines, Controller>> = {};
+
+        controllers.enabled = folder.add(this._settings, 'enabled').name('enabled');
+        controllers.handDepth = folder.add(this._settings, 'handDepth', -10, 10, 0.01).name('handDepth');
+        controllers.handSpread = folder.add(this._settings, 'handSpread', 0, 10, 0.01).name('handSpread');
+        controllers.smoothing = folder.add(this._settings, 'smoothing', 0.01, 0.5, 0.01).name('smoothing');
 
         folder.add(this._settings, 'enabled').name('enabled');
         folder.add(this._settings, 'handDepth', -10, 10, 0.01).name('handDepth');
