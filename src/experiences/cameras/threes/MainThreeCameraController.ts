@@ -24,7 +24,6 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
     private static readonly _MAX_RADIUS: number = 10;
 
     private static readonly _ROTATE_SPEED: number = 6;
-    private static readonly _ZOOM_SPEED: number = 8;
     private static readonly _DAMPING: number = 12;
 
     private readonly _target: Vector3 = new Vector3(...THREE_WORLD_CONFIG.camera.target);
@@ -33,7 +32,6 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
     private readonly _tmpPos: Vector3 = new Vector3();
 
     private _lastX: number | null = null;
-    private _lastZ: number | null = null;
 
     constructor() {
         super(CameraId.THREE_MAIN, MainThreeCameraController._buildCameraOptions());
@@ -46,41 +44,26 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
         this._spherical.copy(this._sphericalTarget);
         this._container.position.setFromSpherical(this._spherical).add(this._target);
 
-        // Camera movement Mediapipe    
+        // Camera movement Mediapipe
         window.addEventListener('hand:update', (e) => {
             const fist = e.detail.left?.fist;
             const isFist = e.detail.left?.isFist;
             if (!isFist || !fist) {
                 this._lastX = null;
-                this._lastZ = null;
                 return;
             }
 
             const x = fist.x;
-            const z = fist.z;
 
-            if (this._lastX === null || this._lastZ === null) {
+            if (this._lastX === null) {
                 this._lastX = x;
-                this._lastZ = z;
                 return;
             }
 
-            if (this._lastX !== null && this._lastZ !== null) {
-                const dx = x - this._lastX;
-                const dz = z - this._lastZ;
-
-                this._sphericalTarget.theta -= dx * MainThreeCameraController._ROTATE_SPEED;
-                this._sphericalTarget.radius += dz * MainThreeCameraController._ZOOM_SPEED;
-
-                this._sphericalTarget.radius = MathUtils.clamp(
-                    this._sphericalTarget.radius,
-                    MainThreeCameraController._MIN_RADIUS,
-                    MainThreeCameraController._MAX_RADIUS
-                );
-            }
+            const dx = x - this._lastX;
+            this._sphericalTarget.theta -= dx * MainThreeCameraController._ROTATE_SPEED;
 
             this._lastX = x;
-            this._lastZ = z;
         });
 
         if (DebugManager.isActive) this._setupDebugGui();
