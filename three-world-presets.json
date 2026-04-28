@@ -15,6 +15,7 @@
             },
             "kuwahara": {
                 "enabled": true,
+<<<<<<< HEAD
                 "downscale": 2
             },
             "smaa": {
@@ -22,6 +23,12 @@
             },
             "renderer": {
                 "postProcessing": true,
+=======
+                "downscale": 1
+            },
+            "renderer": {
+                "postProcessing": false,
+>>>>>>> 3b9f4b6 (feat: preset for gui)
                 "toneMapping": 5,
                 "outputColorSpace": "srgb",
                 "toneMappingExposure": 1
@@ -66,7 +73,10 @@
                 "handDepth": 0,
                 "handSpread": 8.9,
                 "smoothing": 0.41,
+<<<<<<< HEAD
                 "minHeight": 0,
+=======
+>>>>>>> 3b9f4b6 (feat: preset for gui)
                 "numTrails": 5,
                 "lineWidth": 0.35,
                 "trailSpread": 0.3,
@@ -92,6 +102,7 @@
             },
             "kuwahara": {
                 "enabled": true,
+<<<<<<< HEAD
                 "downscale": 2
             },
             "smaa": {
@@ -99,6 +110,12 @@
             },
             "renderer": {
                 "postProcessing": true,
+=======
+                "downscale": 1
+            },
+            "renderer": {
+                "postProcessing": false,
+>>>>>>> 3b9f4b6 (feat: preset for gui)
                 "toneMapping": 5,
                 "outputColorSpace": "srgb",
                 "toneMappingExposure": 1
@@ -143,7 +160,10 @@
                 "handDepth": 0,
                 "handSpread": 8.9,
                 "smoothing": 0.41,
+<<<<<<< HEAD
                 "minHeight": 0,
+=======
+>>>>>>> 3b9f4b6 (feat: preset for gui)
                 "numTrails": 5,
                 "lineWidth": 0.35,
                 "trailSpread": 0.3,
@@ -169,6 +189,7 @@
             },
             "kuwahara": {
                 "enabled": true,
+<<<<<<< HEAD
                 "downscale": 2
             },
             "smaa": {
@@ -176,6 +197,12 @@
             },
             "renderer": {
                 "postProcessing": true,
+=======
+                "downscale": 1
+            },
+            "renderer": {
+                "postProcessing": false,
+>>>>>>> 3b9f4b6 (feat: preset for gui)
                 "toneMapping": 5,
                 "outputColorSpace": "srgb",
                 "toneMappingExposure": 1
@@ -198,11 +225,19 @@
                 "fogDensity": 0.0364
             },
             "sky": {
+<<<<<<< HEAD
                 "turbidity": 0,
                 "rayleigh": 1.151,
                 "mieCoefficient": 0.0942,
                 "mieDirectionalG": 1,
                 "sunElevationDeg": 14.1,
+=======
+                "turbidity": 0.4,
+                "rayleigh": 1.151,
+                "mieCoefficient": 0.0942,
+                "mieDirectionalG": 1,
+                "sunElevationDeg": 15.9,
+>>>>>>> 3b9f4b6 (feat: preset for gui)
                 "sunAzimuthDeg": 180,
                 "tintColor": "#fe8ebf"
             },
@@ -220,7 +255,10 @@
                 "handDepth": 0,
                 "handSpread": 8.9,
                 "smoothing": 0.41,
+<<<<<<< HEAD
                 "minHeight": 0,
+=======
+>>>>>>> 3b9f4b6 (feat: preset for gui)
                 "numTrails": 5,
                 "lineWidth": 0.35,
                 "trailSpread": 0.3,
@@ -246,6 +284,7 @@
             },
             "kuwahara": {
                 "enabled": true,
+<<<<<<< HEAD
                 "downscale": 2
             },
             "smaa": {
@@ -253,6 +292,12 @@
             },
             "renderer": {
                 "postProcessing": true,
+=======
+                "downscale": 1
+            },
+            "renderer": {
+                "postProcessing": false,
+>>>>>>> 3b9f4b6 (feat: preset for gui)
                 "toneMapping": 5,
                 "outputColorSpace": "srgb",
                 "toneMappingExposure": 1
@@ -275,11 +320,19 @@
                 "fogDensity": 0.0364
             },
             "sky": {
+<<<<<<< HEAD
                 "turbidity": 0,
                 "rayleigh": 1.151,
                 "mieCoefficient": 0.0942,
                 "mieDirectionalG": 1,
                 "sunElevationDeg": 14.1,
+=======
+                "turbidity": 0.4,
+                "rayleigh": 1.151,
+                "mieCoefficient": 0.0942,
+                "mieDirectionalG": 1,
+                "sunElevationDeg": 15.9,
+>>>>>>> 3b9f4b6 (feat: preset for gui)
                 "sunAzimuthDeg": 180,
                 "tintColor": "#eecbff"
             },
@@ -297,7 +350,10 @@
                 "handDepth": 0,
                 "handSpread": 8.9,
                 "smoothing": 0.41,
+<<<<<<< HEAD
                 "minHeight": 0,
+=======
+>>>>>>> 3b9f4b6 (feat: preset for gui)
                 "numTrails": 5,
                 "lineWidth": 0.35,
                 "trailSpread": 0.3,
