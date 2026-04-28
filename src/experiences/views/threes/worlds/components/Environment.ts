@@ -81,7 +81,15 @@ export default class Environment extends ThreeActorBase {
             THREE_WORLD_CONFIG.environment.sunLightIntensity
         );
         this._sunLight.castShadow = true;
+
+        const shadowCamSize = THREE_WORLD_CONFIG.environment.sunShadowCameraSize;
+        this._sunLight.shadow.camera.near = THREE_WORLD_CONFIG.environment.sunShadowCameraNear;
         this._sunLight.shadow.camera.far = THREE_WORLD_CONFIG.environment.sunShadowCameraFar;
+        this._sunLight.shadow.camera.left = -shadowCamSize;
+        this._sunLight.shadow.camera.right = shadowCamSize;
+        this._sunLight.shadow.camera.top = shadowCamSize;
+        this._sunLight.shadow.camera.bottom = -shadowCamSize;
+
         this._sunLight.shadow.mapSize.set(
             THREE_WORLD_CONFIG.environment.sunShadowMapSize,
             THREE_WORLD_CONFIG.environment.sunShadowMapSize
@@ -122,9 +130,30 @@ export default class Environment extends ThreeActorBase {
 
             sunLightFolder.addColor(this._sunLight, 'color').name('color');
 
+            const shadowCam = this._sunLight.shadow.camera;
+            const shadowProxy = {
+                near: shadowCam.near,
+                far: shadowCam.far,
+                size: THREE_WORLD_CONFIG.environment.sunShadowCameraSize,
+            };
+            const updateShadowFrustum = (): void => {
+                shadowCam.near = shadowProxy.near;
+                shadowCam.far = shadowProxy.far;
+                shadowCam.left = -shadowProxy.size;
+                shadowCam.right = shadowProxy.size;
+                shadowCam.top = shadowProxy.size;
+                shadowCam.bottom = -shadowProxy.size;
+                shadowCam.updateProjectionMatrix();
+            };
+            sunLightFolder.add(shadowProxy, 'near', 0.01, 10, 0.01).name('shadow near').onChange(updateShadowFrustum);
+            sunLightFolder.add(shadowProxy, 'far', 1, 500, 0.1).name('shadow far').onChange(updateShadowFrustum);
+            sunLightFolder.add(shadowProxy, 'size', 1, 100, 0.1).name('shadow size').onChange(updateShadowFrustum);
+
             DebugManager.registerConfigGetter('environment.sunLightColor', () => '#' + this._sunLight.color.getHexString());
             DebugManager.registerConfigGetter('environment.sunLightIntensity', () => this._sunLight.intensity);
             DebugManager.registerConfigGetter('environment.sunShadowCameraFar', () => this._sunLight.shadow.camera.far);
+            DebugManager.registerConfigGetter('environment.sunShadowCameraNear', () => this._sunLight.shadow.camera.near);
+            DebugManager.registerConfigGetter('environment.sunShadowCameraSize', () => shadowProxy.size);
             DebugManager.registerConfigGetter('environment.sunShadowMapSize', () => this._sunLight.shadow.mapSize.x);
             DebugManager.registerConfigGetter('environment.sunShadowNormalBias', () => this._sunLight.shadow.normalBias);
             DebugManager.registerConfigGetter('environment.sunPosition', () => [
