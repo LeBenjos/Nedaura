@@ -25,6 +25,7 @@ import ThreeRaycasterManager from '../../../../managers/threes/ThreeRaycasterMan
 import MainThreeApp from '../../../../engines/threes/app/MainThreeApp';
 import { Object3DId } from '../../../../constants/experiences/Object3dId';
 import * as THREE from 'three';
+import { HitMaskPainter } from './Statue';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
