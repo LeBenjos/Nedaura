@@ -17,10 +17,6 @@ import ThreeCameraControllerBase from '../../../../cameras/threes/bases/ThreeCam
 import DebugManager from '../../../../managers/DebugManager';
 import { DebugGuiTitle } from '../../../../constants/experiences/DebugGuiTitle';
 import { THREE_WORLD_CONFIG } from '../../../../constants/experiences/ThreeWorldConfig';
-import ThreeRaycasterManager from '../../../../managers/threes/ThreeRaycasterManager';
-import MainThreeApp from '../../../../engines/threes/app/MainThreeApp';
-import { Object3DId } from '../../../../constants/experiences/Object3dId';
-import * as THREE from 'three';
 import { HitMaskPainter } from './Statue';
 import type { Controller } from 'lil-gui';
 import ThreeRaycasterManager from '../../../../managers/threes/ThreeRaycasterManager';
