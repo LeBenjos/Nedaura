@@ -4,8 +4,6 @@ import {
     Mesh,
     MeshStandardMaterial,
     NoColorSpace,
-    RepeatWrapping,
-    SRGBColorSpace,
     type WebGLProgramParametersWithUniforms,
 } from "three";
 import { AssetId } from "../../../../constants/experiences/AssetId";
@@ -99,35 +97,74 @@ export default class Statue extends ThreeModelBase {
                     continue;
                 }
 
+                // Assigne la normalMap de base pour que Three.js génère NORMALMAP_UV et tbn
                 material.normalMap = normalMap;
                 material.normalMap.colorSpace = NoColorSpace;
 
-                // Force les defines nécessaires — PAS de material.normalMap ici
                 material.defines = {
                     ...(material.defines ?? {}),
                     USE_UV: '',
-                    USE_NORMALMAP: '', // on active normal map
-                    TANGENTSPACE_NORMALMAP: '', // on précise normal map
+                    USE_TANGENT: '',
                 };
 
                 material.onBeforeCompile = (shader: WebGLProgramParametersWithUniforms) => {
-                    shader.uniforms.uHitMask = { value: this._hitMaskTexture };
-                    shader.uniforms.uBaseTexture = { value: textureMat };
-                    shader.uniforms.uErodedTexture = { value: textureErodedWindMat };
-                    shader.uniforms.uBaseNormal = { value: normalMap };
-                    shader.uniforms.uErodedNormal = { value: normalErodedWindMat };
+                    // Uniforms
+                    shader.uniforms.uHitMask            = { value: this._hitMaskTexture };
+                    shader.uniforms.uBaseTexture         = { value: textureMat };
+                    shader.uniforms.uErodedTexture       = { value: textureErodedWindMat };
+                    shader.uniforms.uBaseNormal          = { value: normalMap };
+                    shader.uniforms.uErodedNormal        = { value: normalErodedWindMat };
+                    shader.uniforms.uDisplacementStrength = { value: 0.05 };
 
                     this._activeShaders.add(shader);
 
-                    shader.fragmentShader = `
-                    uniform sampler2D uHitMask;
-                    uniform sampler2D uBaseTexture;
-                    uniform sampler2D uErodedTexture;
-                    uniform sampler2D uBaseNormal;
-                    uniform sampler2D uErodedNormal;
-                ` + shader.fragmentShader;
+                    // -------------------------
+                    // VERTEX SHADER — displacement GPU
+                    // -------------------------
+                    shader.vertexShader = `
+                        uniform sampler2D uHitMask;
+                        uniform float     uDisplacementStrength;
+                    ` + shader.vertexShader;
 
-                    // On mélange les textures de base et érodées selon le masque de hit
+                    shader.vertexShader = shader.vertexShader.replace(
+                        `#include <displacementmap_vertex>`,
+                        `
+                        #ifdef USE_DISPLACEMENTMAP
+                            transformed += normalize( objectNormal ) * ( texture2D( displacementMap, vDisplacementMapUv ).x * displacementScale + displacementBias );
+                        #endif
+
+                        // Displacement GPU selon le hitMask
+                        vec2  maskUv   = uv;
+                        float hitD     = texture2D( uHitMask, maskUv ).r;
+
+                        // Bruit organique Value Noise
+                        vec2  nUv      = maskUv * 6.0;
+                        vec2  nI       = floor( nUv );
+                        vec2  nF       = fract( nUv );
+                        vec2  nU       = nF * nF * ( 3.0 - 2.0 * nF );
+                        float na       = fract( sin( dot( nI,             vec2(127.1, 311.7) ) ) * 43758.5453 );
+                        float nb       = fract( sin( dot( nI + vec2(1,0), vec2(127.1, 311.7) ) ) * 43758.5453 );
+                        float nc       = fract( sin( dot( nI + vec2(0,1), vec2(127.1, 311.7) ) ) * 43758.5453 );
+                        float nd       = fract( sin( dot( nI + vec2(1,1), vec2(127.1, 311.7) ) ) * 43758.5453 );
+                        float noiseVal = mix( mix(na,nb,nU.x), mix(nc,nd,nU.x), nU.y );
+
+                        // Déplace le long de la normale, modulé par le mask et le bruit
+                        transformed   -= objectNormal * hitD * noiseVal * uDisplacementStrength;
+                        `
+                    );
+
+                    // -------------------------
+                    // FRAGMENT SHADER
+                    // -------------------------
+                    shader.fragmentShader = `
+                        uniform sampler2D uHitMask;
+                        uniform sampler2D uBaseTexture;
+                        uniform sampler2D uErodedTexture;
+                        uniform sampler2D uBaseNormal;
+                        uniform sampler2D uErodedNormal;
+                    ` + shader.fragmentShader;
+
+                    // Blend des textures diffuse
                     shader.fragmentShader = shader.fragmentShader.replace(
                         `#include <map_fragment>`,
                         `
@@ -141,14 +178,14 @@ export default class Statue extends ThreeModelBase {
                         vec4  baseColor   = texture2D( uBaseTexture,   vUv );
                         vec4  erodedColor = texture2D( uErodedTexture, vUv );
 
-                        erodedColor.rgb   = pow( erodedColor.rgb, vec3( 0.9 ) );
+                        erodedColor.rgb   = pow( erodedColor.rgb, vec3( 0.6 ) );
 
                         float mask        = clamp( hitStrength, 0.0, 1.0 );
                         diffuseColor     *= mix( baseColor, erodedColor, mask );
-                    `
+                        `
                     );
 
-                    // On fait la même pour les normales
+                    // Blend des normal maps
                     shader.fragmentShader = shader.fragmentShader.replace(
                         `#include <normal_fragment_maps>`,
                         `
@@ -161,7 +198,7 @@ export default class Statue extends ThreeModelBase {
                             vec3 blendedNormal = normalize( mix( normalBase, normalEroded, maskN ) );
                             normal             = normalize( tbn * blendedNormal );
                         #endif
-                    `
+                        `
                     );
                 };
 
@@ -172,12 +209,12 @@ export default class Statue extends ThreeModelBase {
 
     private _exposePainter(): void {
         const painter: HitMaskPainter = {
-            canvas: this._hitMaskCanvas,
-            ctx: this._hitMaskCtx,
+            canvas:  this._hitMaskCanvas,
+            ctx:     this._hitMaskCtx,
             texture: this._hitMaskTexture,
-            size: Statue._HIT_MASK_SIZE,
-            paint: (uvX, uvY, radius) => this._paint(uvX, uvY, radius),
-            reset: () => this.reset(),
+            size:    Statue._HIT_MASK_SIZE,
+            paint:   (uvX, uvY, radius) => this._paint(uvX, uvY, radius),
+            reset:   () => this.reset(),
         };
 
         this._model.userData.hitMaskPainter = painter;
@@ -187,16 +224,15 @@ export default class Statue extends ThreeModelBase {
     }
 
     private _paint(uvX: number, uvY: number, radius = 30): void {
-        const { _hitMaskCtx: ctx, _hitMaskCanvas: canvas } = this;
+        const { _hitMaskCtx: ctx } = this;
         const size = Statue._HIT_MASK_SIZE;
 
-        // Clamp en coordonnées canvas pour éviter de déborder
         const x = Math.max(0, Math.min(size, uvX * size));
         const y = Math.max(0, Math.min(size, (1 - uvY) * size));
         const clampedRadius = Math.max(1, radius);
 
         const grd = ctx.createRadialGradient(x, y, 0, x, y, clampedRadius);
-        grd.addColorStop(0, "rgba(255,255,255,0.9)");
+        grd.addColorStop(0, "rgba(255,255,255,0.12)");
         grd.addColorStop(1, "rgba(255,255,255,0.0)");
 
         ctx.fillStyle = grd;
@@ -204,7 +240,6 @@ export default class Statue extends ThreeModelBase {
         ctx.arc(x, y, clampedRadius, 0, Math.PI * 2);
         ctx.fill();
 
-        // On marque dirty mais on ne touche pas needsUpdate ici
         this._textureDirty = true;
     }
 
@@ -213,7 +248,6 @@ export default class Statue extends ThreeModelBase {
         this._hitMaskTexture.needsUpdate = true;
         this._textureDirty = false;
 
-        // Re-synchronise tous les shaders actifs avec la nouvelle texture
         for (const shader of this._activeShaders) {
             shader.uniforms.uHitMask.value = this._hitMaskTexture;
         }
@@ -222,7 +256,6 @@ export default class Statue extends ThreeModelBase {
     public override update(dt: number): void {
         super.update(dt);
 
-        // needsUpdate une seule fois par frame, même si plusieurs paint() ont eu lieu
         if (this._textureDirty) {
             this._hitMaskTexture.needsUpdate = true;
             this._textureDirty = false;
