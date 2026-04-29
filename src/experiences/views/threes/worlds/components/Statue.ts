@@ -203,21 +203,21 @@ export default class Statue extends ThreeModelBase {
                         #endif
                         `
                     );
-                };
 
-                material.needsUpdate = true;
+                    material.needsUpdate = true;
+                };
             }
         });
     }
 
     private _exposePainter(): void {
         const painter: HitMaskPainter = {
-            canvas:  this._hitMaskCanvas,
-            ctx:     this._hitMaskCtx,
+            canvas: this._hitMaskCanvas,
+            ctx: this._hitMaskCtx,
             texture: this._hitMaskTexture,
-            size:    Statue._HIT_MASK_SIZE,
-            paint:   (uvX, uvY, radius) => this._paint(uvX, uvY, radius),
-            reset:   () => this.reset(),
+            size: Statue._HIT_MASK_SIZE,
+            paint: (uvX, uvY, radius) => this._paint(uvX, uvY, radius),
+            reset: () => this.reset(),
         };
 
         this._model.userData.hitMaskPainter = painter;
