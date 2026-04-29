@@ -1,7 +1,11 @@
 import {
     CanvasTexture,
+    ClampToEdgeWrapping,
     Mesh,
     MeshStandardMaterial,
+    NoColorSpace,
+    RepeatWrapping,
+    SRGBColorSpace,
     type WebGLProgramParametersWithUniforms,
 } from "three";
 import { AssetId } from "../../../../constants/experiences/AssetId";
@@ -57,7 +61,20 @@ export default class Statue extends ThreeModelBase {
     }
 
     private _setupMaterials(): void {
-        const normalMat = ThreeAssetsManager.getTexture(AssetId.THREE_TEXTURE_TEMPLATE);
+        const normalMap = ThreeAssetsManager.getTexture(AssetId.THREE_TEXTURE_STATUE_BASE_NORMAL);
+        const textureMat = ThreeAssetsManager.getTexture(AssetId.THREE_TEXTURE_STATUE_BASE_TEXTURE);
+        const normalErodedWindMat = ThreeAssetsManager.getTexture(AssetId.THREE_TEXTURE_STATUE_ERODED_WIND_NORMAL);
+        const textureErodedWindMat = ThreeAssetsManager.getTexture(AssetId.THREE_TEXTURE_STATUE_ERODED_WIND_TEXTURE);
+
+        textureMat.wrapS = ClampToEdgeWrapping;
+        textureMat.wrapT = ClampToEdgeWrapping;
+        textureErodedWindMat.wrapS = ClampToEdgeWrapping;
+        textureErodedWindMat.wrapT = ClampToEdgeWrapping;
+
+        textureMat.flipY = false;
+        normalMap.flipY = false;
+        textureErodedWindMat.flipY = false;
+        normalErodedWindMat.flipY = false;
 
         this._model.traverse((child) => {
             if (!(child instanceof Mesh)) return;
@@ -78,41 +95,61 @@ export default class Statue extends ThreeModelBase {
                     continue;
                 }
 
+                material.normalMap = normalMap;
+                normalMap.colorSpace = NoColorSpace;
+                normalErodedWindMat.colorSpace = NoColorSpace;
+
                 material.onBeforeCompile = (shader: WebGLProgramParametersWithUniforms) => {
                     shader.uniforms.uHitMask = { value: this._hitMaskTexture };
-                    shader.uniforms.uTexture = { value: normalMat };
+                    shader.uniforms.uBaseTexture = { value: textureMat };
+                    shader.uniforms.uErodedTexture = { value: textureErodedWindMat };
 
                     this._activeShaders.add(shader);
 
+                    // Injecte les uniforms en tête du fragment shader
                     shader.fragmentShader = `
                         uniform sampler2D uHitMask;
-                        uniform sampler2D uTexture;
-                        ${shader.fragmentShader}
-                    `.replace(
-                        `#include <dithering_fragment>`,
-                        `
-                        float hitStrength = texture2D(uHitMask, vUv).r;
-                        vec4  overlayColor = texture2D(uTexture, vUv);
-                        gl_FragColor.rgb = mix(gl_FragColor.rgb, overlayColor.rgb, clamp(hitStrength, 0.0, 1.0));
-                        gl_FragColor.a   = mix(gl_FragColor.a,   overlayColor.a,   clamp(hitStrength, 0.0, 1.0));
-                        #include <dithering_fragment>
-                        `,
-                    );
-                };
+                        uniform sampler2D uBaseTexture;
+                        uniform sampler2D uErodedTexture;
+                    ` + shader.fragmentShader;
 
-                material.needsUpdate = true;
+                    shader.fragmentShader = shader.fragmentShader.replace(
+                        `#include <map_fragment>`,
+                        `
+                        #ifdef USE_MAP
+                            vec4 texelColor = texture2D( map, vMapUv );
+                        #else
+                            vec4 texelColor = vec4( 1.0 );
+                        #endif
+
+                        float hitStrength  = texture2D( uHitMask,      vUv ).r;
+                        vec4  baseColor    = texture2D( uBaseTexture,   vUv );
+                        vec4  erodedColor  = texture2D( uErodedTexture, vUv );
+
+                        // sRGB → linear
+                        //baseColor.rgb   = pow( baseColor.rgb,   vec3( 2.2 ) );
+                        erodedColor.rgb = pow( erodedColor.rgb, vec3( 0.5 ) );
+
+                        float mask     = clamp( hitStrength, 0.0, 1.0 );
+
+                        diffuseColor  *= mix( baseColor, erodedColor, mask );
+                        `
+                    );
+
+                    material.needsUpdate = true;
+                };
             }
         });
     }
 
     private _exposePainter(): void {
         const painter: HitMaskPainter = {
-            canvas:  this._hitMaskCanvas,
-            ctx:     this._hitMaskCtx,
+            canvas: this._hitMaskCanvas,
+            ctx: this._hitMaskCtx,
             texture: this._hitMaskTexture,
-            size:    Statue._HIT_MASK_SIZE,
-            paint:   (uvX, uvY, radius) => this._paint(uvX, uvY, radius),
-            reset:   () => this.reset(),
+            size: Statue._HIT_MASK_SIZE,
+            paint: (uvX, uvY, radius) => this._paint(uvX, uvY, radius),
+            reset: () => this.reset(),
         };
 
         this._model.userData.hitMaskPainter = painter;
