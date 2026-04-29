@@ -12,7 +12,7 @@ export default class MainThreeEffectComposer extends ThreeEffectComposerBase {
 
     protected override _addPasses(): void {
         super._addPasses();
-        this._addPass(new KuwaharaThreePass());
+        //this._addPass(new KuwaharaThreePass());
         this._addPass(new SmaaThreePass());
     }
 
