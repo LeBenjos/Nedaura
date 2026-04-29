@@ -20,6 +20,7 @@ import ThreeRaycasterManager from '../../../../managers/threes/ThreeRaycasterMan
 import MainThreeApp from '../../../../engines/threes/app/MainThreeApp';
 import { Object3DId } from '../../../../constants/experiences/Object3dId';
 import * as THREE from 'three';
+import { HitMaskPainter } from './Statue';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -251,9 +252,8 @@ export default class WindLines extends ThreeActorBase {
                 const hits = ThreeRaycasterManager.castFromCameraToNdc(ndcX, ndcY, [statueRoot]);
                 if (hits.length > 0) {
                     const hit = hits[0];
-                    console.log('Hit statue at', hit.point);
                     this._target3D.copy(hit.point);
-                    this._applyHitToStatue(statueRoot, hit);
+                    this._applyHitToStatue(hit.object, hit);
                     return;
                 }
             }
@@ -263,35 +263,25 @@ export default class WindLines extends ThreeActorBase {
         };
     };
 
-    private _applyHitToStatue(statueRoot: THREE.Object3D, hit: THREE.Intersection): void {
-        // Unlimited persistence: paint into the statue's hit-mask texture (created by Statue.ts).
-        let node: THREE.Object3D | null = statueRoot;
-        let painter:
-            | { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D; texture: THREE.Texture; size: number }
-            | undefined;
+    private _applyHitToStatue(hitNode: THREE.Object3D, hit: THREE.Intersection): void {
+        const painter = this._findHitMaskPainter(hitNode);
+        if (!painter) return;
 
-        while (node && !painter) {
-            painter = node.userData.hitMaskPainter;
+        // UV explicitement typé et validé
+        if (!hit.uv) return;
+        if (isNaN(hit.uv.x) || isNaN(hit.uv.y)) return;
+
+        // On délègue toute la logique de peinture au painter
+        painter.paint(hit.uv.x, hit.uv.y);
+    }
+
+    private _findHitMaskPainter(node: THREE.Object3D | null): HitMaskPainter | undefined {
+        while (node) {
+            const painter = node.userData.hitMaskPainter as HitMaskPainter | undefined;
+            if (painter) return painter;
             node = node.parent;
         }
-
-        if (!painter) return;
-        if (!hit.uv) return;
-
-        const { ctx, texture, size } = painter;
-        const x = hit.uv.x * size;
-        const y = (1 - hit.uv.y) * size;
-
-        const radius = 30;
-        const grd = ctx.createRadialGradient(x, y, 0, x, y, radius);
-        grd.addColorStop(0, 'rgba(255,255,255,0.9)');
-        grd.addColorStop(1, 'rgba(255,255,255,0.0)');
-        ctx.fillStyle = grd;
-        ctx.beginPath();
-        ctx.arc(x, y, radius, 0, Math.PI * 2);
-        ctx.fill();
-
-        texture.needsUpdate = true;
+        return undefined;
     }
 
     public update(dt: number): void {
