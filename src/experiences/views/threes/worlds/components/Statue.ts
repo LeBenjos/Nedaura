@@ -76,8 +76,16 @@ export default class Statue extends ThreeModelBase {
         textureErodedWindMat.flipY = false;
         normalErodedWindMat.flipY = false;
 
+        normalMap.colorSpace = NoColorSpace;
+        normalErodedWindMat.colorSpace = NoColorSpace;
+
         this._model.traverse((child) => {
             if (!(child instanceof Mesh)) return;
+
+            // Génère les tangentes si absentes (nécessaire pour tbn)
+            if (!child.geometry.attributes.tangent) {
+                child.geometry.computeTangents();
+            }
 
             const materials = Array.isArray(child.material)
                 ? child.material
@@ -85,34 +93,41 @@ export default class Statue extends ThreeModelBase {
 
             for (const material of materials) {
                 if (!(material instanceof MeshStandardMaterial)) continue;
-                // Force UV support so the shader has access to vUv.
-                material.defines = { ...(material.defines ?? {}), USE_UV: '' };
-                material.needsUpdate = true;
 
-                // Vérifie que le mesh a bien des UVs avant de patcher le shader
                 if (!child.geometry.attributes.uv) {
                     console.warn(`[Statue] Mesh "${child.name}" sans UVs, shader patch ignoré`);
                     continue;
                 }
 
                 material.normalMap = normalMap;
-                normalMap.colorSpace = NoColorSpace;
-                normalErodedWindMat.colorSpace = NoColorSpace;
+                material.normalMap.colorSpace = NoColorSpace;
+
+                // Force les defines nécessaires — PAS de material.normalMap ici
+                material.defines = {
+                    ...(material.defines ?? {}),
+                    USE_UV: '',
+                    USE_NORMALMAP: '', // on active normal map
+                    TANGENTSPACE_NORMALMAP: '', // on précise normal map
+                };
 
                 material.onBeforeCompile = (shader: WebGLProgramParametersWithUniforms) => {
                     shader.uniforms.uHitMask = { value: this._hitMaskTexture };
                     shader.uniforms.uBaseTexture = { value: textureMat };
                     shader.uniforms.uErodedTexture = { value: textureErodedWindMat };
+                    shader.uniforms.uBaseNormal = { value: normalMap };
+                    shader.uniforms.uErodedNormal = { value: normalErodedWindMat };
 
                     this._activeShaders.add(shader);
 
-                    // Injecte les uniforms en tête du fragment shader
                     shader.fragmentShader = `
-                        uniform sampler2D uHitMask;
-                        uniform sampler2D uBaseTexture;
-                        uniform sampler2D uErodedTexture;
-                    ` + shader.fragmentShader;
+                    uniform sampler2D uHitMask;
+                    uniform sampler2D uBaseTexture;
+                    uniform sampler2D uErodedTexture;
+                    uniform sampler2D uBaseNormal;
+                    uniform sampler2D uErodedNormal;
+                ` + shader.fragmentShader;
 
+                    // On mélange les textures de base et érodées selon le masque de hit
                     shader.fragmentShader = shader.fragmentShader.replace(
                         `#include <map_fragment>`,
                         `
@@ -122,22 +137,35 @@ export default class Statue extends ThreeModelBase {
                             vec4 texelColor = vec4( 1.0 );
                         #endif
 
-                        float hitStrength  = texture2D( uHitMask,      vUv ).r;
-                        vec4  baseColor    = texture2D( uBaseTexture,   vUv );
-                        vec4  erodedColor  = texture2D( uErodedTexture, vUv );
+                        float hitStrength = texture2D( uHitMask,      vUv ).r;
+                        vec4  baseColor   = texture2D( uBaseTexture,   vUv );
+                        vec4  erodedColor = texture2D( uErodedTexture, vUv );
 
-                        // sRGB → linear
-                        //baseColor.rgb   = pow( baseColor.rgb,   vec3( 2.2 ) );
-                        erodedColor.rgb = pow( erodedColor.rgb, vec3( 0.5 ) );
+                        erodedColor.rgb   = pow( erodedColor.rgb, vec3( 0.9 ) );
 
-                        float mask     = clamp( hitStrength, 0.0, 1.0 );
-
-                        diffuseColor  *= mix( baseColor, erodedColor, mask );
-                        `
+                        float mask        = clamp( hitStrength, 0.0, 1.0 );
+                        diffuseColor     *= mix( baseColor, erodedColor, mask );
+                    `
                     );
 
-                    material.needsUpdate = true;
+                    // On fait la même pour les normales
+                    shader.fragmentShader = shader.fragmentShader.replace(
+                        `#include <normal_fragment_maps>`,
+                        `
+                        #ifdef USE_NORMALMAP
+                            float maskN        = clamp( texture2D( uHitMask, vUv ).r, 0.0, 1.0 );
+
+                            vec3 normalBase    = texture2D( uBaseNormal,   vUv ).xyz * 2.0 - 1.0;
+                            vec3 normalEroded  = texture2D( uErodedNormal, vUv ).xyz * 2.0 - 1.0;
+
+                            vec3 blendedNormal = normalize( mix( normalBase, normalEroded, maskN ) );
+                            normal             = normalize( tbn * blendedNormal );
+                        #endif
+                    `
+                    );
                 };
+
+                material.needsUpdate = true;
             }
         });
     }
