@@ -1,6 +1,6 @@
 import { DomKeyboardManager, DomPointerManager } from '@benjos/cookware';
 import { KeyboardConstant } from '@benjos/spices';
-import { Vector3 } from 'three';
+import { Mesh, Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import { CameraId } from '../../constants/experiences/CameraId';
 import MainThreeApp from '../../engines/threes/app/MainThreeApp';
@@ -64,15 +64,22 @@ export default class DebugThreeCameraController extends ThreeCameraControllerBas
 
             // Sync all children that have a shader
             statue.traverse((child) => {
-                if (!(child)) return;
-                const shader = child.material.userData.shader;
-                if (!shader) return;
+                if (!(child instanceof Mesh)) return;
 
-                const arr = shader.uniforms.uHitPoints.value as Vector3[];
-                this._hitPoints.forEach((p, i) => {
-                    arr[i].copy(p); // mutate in-place, no allocation
-                });
-                shader.uniforms.uHitCount.value = this._hitPoints.length;
+                const materials = Array.isArray(child.material) ? child.material : [child.material];
+                for (const material of materials) {
+                    const shader = (material as any).userData?.shader;
+                    if (!shader) continue;
+
+                    const arr = shader.uniforms?.uHitPoints?.value as Vector3[] | undefined;
+                    if (arr) {
+                        this._hitPoints.forEach((p, i) => {
+                            if (arr[i]) arr[i].copy(p);
+                        });
+                    }
+
+                    if (shader.uniforms?.uHitCount) shader.uniforms.uHitCount.value = this._hitPoints.length;
+                }
             });
         }
     };
