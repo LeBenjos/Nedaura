@@ -10,6 +10,7 @@ type HandPointState = {
 };
 
 const isDebug = ref<boolean>(DebugManager.isActive);
+const isDebugVisible = ref<boolean>(DebugManager.isVisible);
 
 const leftPoint = reactive<HandPointState>({ visible: false, x: 0.5, y: 0.5 });
 const rightPoint = reactive<HandPointState>({ visible: false, x: 0.5, y: 0.5 });
@@ -36,6 +37,10 @@ const rightStyle = computed(() => ({
 
 const onHashChange = (): void => {
     isDebug.value = DebugManager.isActive;
+};
+
+const onDebugVisibilityChange = (): void => {
+    isDebugVisible.value = DebugManager.isVisible;
 };
 
 const onHandUpdate = (e: Event): void => {
@@ -79,6 +84,7 @@ const tick = (): void => {
 onMounted(() => {
     window.addEventListener('hashchange', onHashChange);
     window.addEventListener('hand:update', onHandUpdate as EventListener);
+    DebugManager.onVisibilityChange.add(onDebugVisibilityChange);
     rafId = window.requestAnimationFrame(tick);
     console.log("MediapipeView mounted, event listeners added, tick started");
 });
@@ -86,6 +92,7 @@ onMounted(() => {
 onBeforeUnmount(() => {
     window.removeEventListener('hashchange', onHashChange);
     window.removeEventListener('hand:update', onHandUpdate as EventListener);
+    DebugManager.onVisibilityChange.remove(onDebugVisibilityChange);
     if (rafId !== null) window.cancelAnimationFrame(rafId);
 });
 </script>
@@ -96,7 +103,7 @@ onBeforeUnmount(() => {
         <div v-show="rightPoint.visible" class="right-hand dot" :style="rightStyle"></div>
     </div>
 
-    <div class="webcam-container" :class="{ 'debug': isDebug }">
+    <div class="webcam-container" :class="{ 'debug': isDebug && isDebugVisible }">
         <video id="webcam" class="webcam" autoplay playsinline></video>
         <canvas class="output_canvas" id="output_canvas"></canvas>
     </div>
