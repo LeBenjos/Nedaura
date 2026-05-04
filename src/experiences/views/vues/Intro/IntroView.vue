@@ -3,7 +3,6 @@ import { useInterfaceManager } from '../hooks/useInterfaceManager';
 import { ref } from 'vue';
 import { TimelineExperienceState } from '../../../constants/experiences/TimelineExperienceState';
 import TimelineExperienceManager from '../../../managers/TimelineExperienceManager';
-import LogoNedaura from './LogoNedaura.vue';
 
 const isVisible = ref(true);
 const { unmount } = useInterfaceManager();
