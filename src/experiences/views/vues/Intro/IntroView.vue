@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import LogoNedaura from './LogoNedaura.vue';
 import { useInterfaceManager } from '../hooks/useInterfaceManager';
 import { ref } from 'vue';
 import { TimelineExperienceState } from '../../../constants/experiences/TimelineExperienceState';
 import TimelineExperienceManager from '../../../managers/TimelineExperienceManager';
+import LogoNedaura from './LogoNedaura.vue';
 
 const isVisible = ref(true);
 const { unmount } = useInterfaceManager();
@@ -12,6 +12,7 @@ const onClick = (): void => {
     isVisible.value = false;
     TimelineExperienceManager.setState(TimelineExperienceState.PATH_INTRO);
     unmount('intro');
+    TimelineExperienceManager.setState(TimelineExperienceState.PATH_INTRO);
 };
 </script>
 

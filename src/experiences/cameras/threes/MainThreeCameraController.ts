@@ -1,9 +1,13 @@
 import { Curve, MathUtils, PerspectiveCamera, Spherical, Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
+import { Curve, MathUtils, PerspectiveCamera, Spherical, Vector3 } from 'three';
+import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import { CameraId } from '../../constants/experiences/CameraId';
 import { DebugGuiTitle } from '../../constants/experiences/DebugGuiTitle';
 import { THREE_WORLD_CONFIG } from '../../constants/experiences/ThreeWorldConfig';
 import DebugManager from '../../managers/DebugManager';
+import { MediapipeHandsSnapshot } from '../../managers/MediapipeManager';
+import TimelineExperienceManager from '../../managers/TimelineExperienceManager';
 import { MediapipeHandsSnapshot } from '../../managers/MediapipeManager';
 import TimelineExperienceManager from '../../managers/TimelineExperienceManager';
 import { ThreeCameraType, type ThreeCameraOptions } from '../../types/cameraTypes';
@@ -44,7 +48,6 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
     private static readonly _DEFAULT_FRICTION: number = 3;
     private static readonly _VELOCITY_SMOOTHING: number = 0.4;
     private static readonly _IDLE_TRANSITION_DURATION_S: number = 1.5;
-    private static readonly _PATH_LOOK_AHEAD: number = 0.02;
 
     private readonly _target: Vector3 = new Vector3(...THREE_WORLD_CONFIG.camera.target);
     private readonly _spherical: Spherical = new Spherical();
@@ -60,8 +63,19 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
     private _angularVelocity: number = 0;
     private _pathState: PathState | null = null;
     private _idleTransition: IdleTransitionState | null = null;
+    private readonly _tmpToPos: Vector3 = new Vector3();
+    private readonly _tmpTangent: Vector3 = new Vector3();
+    private readonly _tmpLookAt: Vector3 = new Vector3();
+
+    private _friction: number = MainThreeCameraController._DEFAULT_FRICTION;
+    private _previousFistX: number | null = null;
+    private _previousEventTime: number = 0;
+    private _angularVelocity: number = 0;
+    private _pathState: PathState | null = null;
+    private _idleTransition: IdleTransitionState | null = null;
 
     constructor() {
+        super(CameraId.THREE_MAIN, MainThreeCameraController._MAIN_CAMERA_OPTIONS);
         super(CameraId.THREE_MAIN, MainThreeCameraController._MAIN_CAMERA_OPTIONS);
 
         this._sphericalTarget.set(
@@ -181,18 +195,8 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
         state.curve.getPointAt(state.t, this._tmpPos);
         this._container.position.copy(this._tmpPos);
 
-        // Sample further along the curve instead of using the local tangent:
-        // acts as a spatial low-pass filter, smoothing rotation through tight
-        // Catmull-Rom bends.
-        const lookT = state.t + MainThreeCameraController._PATH_LOOK_AHEAD;
-        if (lookT <= 1) {
-            state.curve.getPointAt(lookT, this._tmpLookAt);
-        } else {
-            // End of open curve: tangent extrapolation avoids a degenerate
-            // lookAt where target collapses onto the camera position.
-            state.curve.getTangentAt(state.t, this._tmpTangent);
-            this._tmpLookAt.copy(this._tmpPos).add(this._tmpTangent);
-        }
+        state.curve.getTangentAt(state.t, this._tmpTangent);
+        this._tmpLookAt.copy(this._tmpPos).add(this._tmpTangent);
         this._camera.lookAt(this._tmpLookAt);
     }
 
@@ -257,9 +261,12 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
         let fovCtrl: ReturnType<typeof folder.add> | undefined;
         if (this._camera instanceof PerspectiveCamera) {
             const perspective = this._camera;
-            fovCtrl = folder.add(perspective, 'fov', 1, 179, 0.1).name('fov').onChange(() => {
-                perspective.updateProjectionMatrix();
-            });
+            fovCtrl = folder
+                .add(perspective, 'fov', 1, 179, 0.1)
+                .name('fov')
+                .onChange(() => {
+                    perspective.updateProjectionMatrix();
+                });
         }
 
         const sphericalProxy = {
@@ -279,10 +286,17 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
         const positionFolder = folder.addFolder('Position');
         const radiusCtrl = positionFolder
             .add(sphericalProxy, 'radius', 1, 10, 0.001)
+            .add(sphericalProxy, 'radius', 1, 10, 0.001)
             .name('distance')
             .onChange(applySpherical);
-        const phiCtrl = positionFolder.add(sphericalProxy, 'phiDeg', 0.01, 179.99, 0.1).name('elevation (phi°)').onChange(applySpherical);
-        const thetaCtrl = positionFolder.add(sphericalProxy, 'thetaDeg', -180, 180, 0.1).name('azimuth (theta°)').onChange(applySpherical);
+        const phiCtrl = positionFolder
+            .add(sphericalProxy, 'phiDeg', 0.01, 179.99, 0.1)
+            .name('elevation (phi°)')
+            .onChange(applySpherical);
+        const thetaCtrl = positionFolder
+            .add(sphericalProxy, 'thetaDeg', -180, 180, 0.1)
+            .name('azimuth (theta°)')
+            .onChange(applySpherical);
 
         const targetFolder = folder.addFolder('Target');
         const targetXCtrl = targetFolder.add(this._target, 'x', -10, 10, 0.01).name('x');
@@ -298,7 +312,7 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
 
         DebugManager.registerConfigGetter('camera.fov', () => (
             this._camera instanceof PerspectiveCamera ? this._camera.fov : THREE_WORLD_CONFIG.camera.fov
-        ));
+        );
         DebugManager.registerConfigGetter('camera.target', () => [this._target.x, this._target.y, this._target.z]);
         DebugManager.registerConfigGetter('camera.radius', () => this._sphericalTarget.radius);
         DebugManager.registerConfigGetter('camera.phiDeg', () => MathUtils.radToDeg(this._sphericalTarget.phi));
