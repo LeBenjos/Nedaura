@@ -1,18 +1,18 @@
-import { CatmullRomCurve3, Line, Mesh, Vector3 } from "three";
-import type MainThreeCameraController from "../../../../cameras/threes/MainThreeCameraController";
-import { AssetId } from "../../../../constants/experiences/AssetId";
-import { CameraId } from "../../../../constants/experiences/CameraId";
-import { Object3DId } from "../../../../constants/experiences/Object3dId";
-import { TimelineExperienceState } from "../../../../constants/experiences/TimelineExperienceState";
-import DebugManager from "../../../../managers/DebugManager";
-import TimelineExperienceManager from "../../../../managers/TimelineExperienceManager";
-import ThreeCameraControllerManager from "../../../../managers/threes/ThreeCameraControllerManager";
-import ThreeModelBase from "../../bases/components/ThreeModelBase";
+import { CatmullRomCurve3, Line, Mesh, Vector3 } from 'three';
+import type MainThreeCameraController from '../../../../cameras/threes/MainThreeCameraController';
+import { AssetId } from '../../../../constants/experiences/AssetId';
+import { CameraId } from '../../../../constants/experiences/CameraId';
+import { Object3DId } from '../../../../constants/experiences/Object3dId';
+import { TimelineExperienceState } from '../../../../constants/experiences/TimelineExperienceState';
+import DebugManager from '../../../../managers/DebugManager';
+import TimelineExperienceManager from '../../../../managers/TimelineExperienceManager';
+import ThreeCameraControllerManager from '../../../../managers/threes/ThreeCameraControllerManager';
+import ThreeModelBase from '../../bases/components/ThreeModelBase';
 
 export default class CameraPath extends ThreeModelBase {
     private static readonly _DEDUPE_EPSILON = 1e-5;
     private static readonly _CLOSE_LOOP_EPSILON = 1e-2;
-    private static readonly _INTRO_DURATION_S = 20;
+    private static readonly _INTRO_DURATION_S = 5;
 
     declare private _curve: CatmullRomCurve3;
 
@@ -37,10 +37,8 @@ export default class CameraPath extends ThreeModelBase {
     }
 
     private _onEnterPathIntro = (): void => {
-        this._getCamera().playPath(
-            this._curve,
-            CameraPath._INTRO_DURATION_S,
-            () => TimelineExperienceManager.setState(TimelineExperienceState.IDLE),
+        this._getCamera().playPath(this._curve, CameraPath._INTRO_DURATION_S, () =>
+            TimelineExperienceManager.setState(TimelineExperienceState.IDLE)
         );
     };
 
@@ -81,7 +79,9 @@ export default class CameraPath extends ThreeModelBase {
 
     //#region Getters
     //
-    public get curve(): CatmullRomCurve3 { return this._curve; }
+    public get curve(): CatmullRomCurve3 {
+        return this._curve;
+    }
     //
     //#endregion
 }
