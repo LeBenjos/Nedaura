@@ -1,8 +1,8 @@
 import { Color, MathUtils, Mesh, RepeatWrapping } from "three";
 import { AssetId } from "../../../../constants/experiences/AssetId";
 import { DebugGuiTitle } from "../../../../constants/experiences/DebugGuiTitle";
-import { THREE_WORLD_CONFIG } from "../../../../constants/experiences/ThreeWorldConfig";
 import { Object3DId } from "../../../../constants/experiences/Object3dId";
+import { THREE_WORLD_CONFIG } from "../../../../constants/experiences/ThreeWorldConfig";
 import DebugManager from "../../../../managers/DebugManager";
 import ThreeAssetsManager from "../../../../managers/threes/ThreeAssetsManager";
 import ThreeModelBase from "../../bases/components/ThreeModelBase";
