@@ -36,6 +36,8 @@ export default class MainThreeWebGLRenderer extends ThreeWebGLRendererBase {
         this.shadowMap.enabled = true;
         this.shadowMap.type = MainThreeWebGLRenderer._DEFAULT_SHADOW_MAP_TYPE;
         this.setClearColor(new Color(MainThreeWebGLRenderer._CLEAR_COLOR), MainThreeWebGLRenderer._CLEAR_ALPHA);
+        this.setIsPostProcessingActive(THREE_WORLD_CONFIG.renderer.postProcessing);
+        this.setDownscale(THREE_WORLD_CONFIG.kuwahara.downscale);
 
         if (DebugManager.isActive) {
             const rendererFolder = DebugManager.getGuiFolder(DebugGuiTitle.THREE_RENDERER)
@@ -60,7 +62,6 @@ export default class MainThreeWebGLRenderer extends ThreeWebGLRendererBase {
                     this.outputColorSpace = value;
                 });
             const postProcProxy = { active: THREE_WORLD_CONFIG.renderer.postProcessing };
-            this.setIsPostProcessingActive(THREE_WORLD_CONFIG.renderer.postProcessing);
             const postProcCtrl = rendererFolder
                 .add(postProcProxy, 'active')
                 .name('post-processing')

@@ -15,7 +15,7 @@
             },
             "kuwahara": {
                 "enabled": true,
-                "downscale": 3
+                "downscale": 2
             },
             "smaa": {
                 "enabled": true
@@ -92,7 +92,7 @@
             },
             "kuwahara": {
                 "enabled": true,
-                "downscale": 3
+                "downscale": 2
             },
             "smaa": {
                 "enabled": true
@@ -169,7 +169,7 @@
             },
             "kuwahara": {
                 "enabled": true,
-                "downscale": 3
+                "downscale": 2
             },
             "smaa": {
                 "enabled": true
@@ -246,7 +246,7 @@
             },
             "kuwahara": {
                 "enabled": true,
-                "downscale": 3
+                "downscale": 2
             },
             "smaa": {
                 "enabled": true

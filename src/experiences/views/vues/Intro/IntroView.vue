@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import LogoNedaura from './LogoNedaura.vue';
 import { ref } from 'vue';
+import { TimelineExperienceState } from '../../../constants/experiences/TimelineExperienceState';
+import TimelineExperienceManager from '../../../managers/TimelineExperienceManager';
+import LogoNedaura from './LogoNedaura.vue';
 
 const isVisible = ref(true);
 
 const onClick = (): void => {
     isVisible.value = false;
+    TimelineExperienceManager.setState(TimelineExperienceState.PATH_INTRO);
 };
 </script>
 
