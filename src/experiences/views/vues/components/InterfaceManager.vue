@@ -2,10 +2,7 @@
     <div class="container">
         <div v-for="{ id, component, noAnimation, props } in stack" :key="id">
             <Transition :name="noAnimation ? '' : 'item'" appear>
-                <component
-                    :is="component"
-                    v-bind="props"
-                />
+                <component :is="component" v-bind="props" />
             </Transition>
         </div>
     </div>

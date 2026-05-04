@@ -30,7 +30,7 @@ onMounted(() => {
 
 const onClick = () => {
     const tl = gsap.timeline();
-    
+
     tl.to('#webcamButton', {
         opacity: 0,
         duration: 0.8,
@@ -53,7 +53,7 @@ const _onHandUpdate = (e: CustomEvent<MediapipeHandsSnapshot>) => {
     const leftFist = leftHand?.isFist ? leftHand.fist : undefined;
     const rightFist = e.detail.right?.isFist ? e.detail.right.fist : undefined;
     if (leftFist && rightFist) {
-        if (!showInstruction.value ) {
+        if (!showInstruction.value) {
             if (!isDebug.value) {
                 setWebcamVisible(false);
             }
@@ -61,17 +61,17 @@ const _onHandUpdate = (e: CustomEvent<MediapipeHandsSnapshot>) => {
             onStartExperience();
         }
     }
-}
+};
 
 const onStartExperience = async () => {
-    console.log("Starting experience...");
+    console.log('Starting experience...');
     gsap.to('.intro-container', {
         opacity: 0,
         duration: 0.8,
         ease: 'power2.inOut',
         onComplete: () => {
             TimelineExperienceManager.setState(TimelineExperienceState.PATH_INTRO);
-        }
+        },
     });
 
     // baissse les bg progressivement
@@ -82,22 +82,25 @@ const onStartExperience = async () => {
         duration: 38.6,
         ease: 'none',
     });
-    tl.to('.intro-background', {
-        opacity: 0,
-        delay: 20,
-        duration: 38.6,
-        ease: 'none',
-        onComplete: () => {
-            unmount('intro');
+    tl.to(
+        '.intro-background',
+        {
+            opacity: 0,
+            delay: 20,
+            duration: 38.6,
+            ease: 'none',
+            onComplete: () => {
+                unmount('intro');
+            },
         },
-    }, 0); 
+        0
+    );
 };
 
 onBeforeUnmount(() => {
     controller.abort();
     window.removeEventListener('hand:update', _onHandUpdate);
 });
-
 </script>
 
 <template>
@@ -105,7 +108,10 @@ onBeforeUnmount(() => {
         <div class="intro-bg-overlay"></div>
         <div class="intro-container">
             <div class="intro-text">
-                <p>Cette expérience se repose sur la reconnaissance des gestes par la caméra. Vous pourrez vous déplacer et interagir avec les éléments du site en utilisant simplement vos mains.</p>
+                <p>
+                    Cette expérience se repose sur la reconnaissance des gestes par la caméra. Vous pourrez vous
+                    déplacer et interagir avec les éléments du site en utilisant simplement vos mains.
+                </p>
                 <p id="instruction" v-if="showInstruction">
                     Veuillez autoriser l'utilisation de la caméra sur ce site.
                 </p>
@@ -126,14 +132,14 @@ onBeforeUnmount(() => {
     top: 0;
     left: 0;
     height: 100%;
-    
+
     z-index: 101;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 23px;
-    
+
     color: white;
 
     .intro-bg-overlay {
