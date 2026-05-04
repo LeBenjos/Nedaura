@@ -1,21 +1,24 @@
 <script setup lang="ts">
+import LogoNedaura from './LogoNedaura.vue';
+import { useInterfaceManager } from '../hooks/useInterfaceManager';
 import { ref } from 'vue';
 import { TimelineExperienceState } from '../../../constants/experiences/TimelineExperienceState';
 import TimelineExperienceManager from '../../../managers/TimelineExperienceManager';
-import LogoNedaura from './LogoNedaura.vue';
 
 const isVisible = ref(true);
+const { unmount } = useInterfaceManager();
 
 const onClick = (): void => {
     isVisible.value = false;
     TimelineExperienceManager.setState(TimelineExperienceState.PATH_INTRO);
+    unmount('intro');
 };
 </script>
 
 <template>
     <transition name="intro">
         <div class="intro-container" v-if="isVisible">
-            <div class="intro-logo">    
+            <div class="intro-logo">
                 <LogoNedaura />
             </div>
 
@@ -39,7 +42,7 @@ const onClick = (): void => {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center; 
+    justify-content: center;
     gap: 23px;
 
     background-color: rgba(16, 6, 1, 0.7);
@@ -59,19 +62,19 @@ const onClick = (): void => {
     gap: 10px;
 
     border-radius: 80px;
-    border: 2px solid #FFF;
+    border: 2px solid #fff;
     background: radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.22) 0%, rgba(153, 153, 153, 0.34) 100%);
     background-blend-mode: hard-light;
-    box-shadow: 0 0 8px 0 #FFF;
+    box-shadow: 0 0 8px 0 #fff;
     transition: all 0.3s ease-in-out;
 
     &:hover {
         background-blend-mode: hard-light;
-        box-shadow: 0 0 6px 2px #FFF;
+        box-shadow: 0 0 6px 2px #fff;
     }
 
     p {
-        color: #FFF;
+        color: #fff;
         text-align: center;
         font-size: 16px;
         line-height: 36px;
