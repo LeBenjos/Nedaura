@@ -19,7 +19,7 @@ export const THREE_WORLD_PRESETS: Record<ThreeWorldPresetId, ThreeWorldConfig> =
         },
         "kuwahara": {
             "enabled": true,
-            "downscale": 3
+            "downscale": 2
         },
         "smaa": {
             "enabled": true
@@ -95,7 +95,7 @@ export const THREE_WORLD_PRESETS: Record<ThreeWorldPresetId, ThreeWorldConfig> =
         },
         "kuwahara": {
             "enabled": true,
-            "downscale": 3
+            "downscale": 2
         },
         "smaa": {
             "enabled": true
@@ -171,7 +171,7 @@ export const THREE_WORLD_PRESETS: Record<ThreeWorldPresetId, ThreeWorldConfig> =
         },
         "kuwahara": {
             "enabled": true,
-            "downscale": 3
+            "downscale": 2
         },
         "smaa": {
             "enabled": true
@@ -247,7 +247,7 @@ export const THREE_WORLD_PRESETS: Record<ThreeWorldPresetId, ThreeWorldConfig> =
         },
         "kuwahara": {
             "enabled": true,
-            "downscale": 3
+            "downscale": 2
         },
         "smaa": {
             "enabled": true

@@ -83,7 +83,7 @@ export const THREE_WORLD_CONFIG: ThreeWorldConfig = {
     },
     "kuwahara": {
         "enabled": true,
-        "downscale": 3
+        "downscale": 2
     },
     "smaa": {
         "enabled": true

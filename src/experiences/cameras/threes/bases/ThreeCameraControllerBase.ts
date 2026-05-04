@@ -85,6 +85,9 @@ export default abstract class ThreeCameraControllerBase<T extends ThreeControls 
     public get camera(): PerspectiveCamera | OrthographicCamera {
         return this._camera;
     }
+    public get container(): Object3D {
+        return this._container;
+    }
     //
     //#endregion
 }
