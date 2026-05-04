@@ -1,5 +1,6 @@
 import { Vector2 } from 'three';
 import { DebugGuiTitle } from '../../../constants/experiences/DebugGuiTitle';
+import { THREE_WORLD_CONFIG } from '../../../constants/experiences/ThreeWorldConfig';
 import MainThreeApp from '../../../engines/threes/app/MainThreeApp';
 import DebugManager from '../../../managers/DebugManager';
 import KuwaharaPassFragmentShader from '../../../shaders/threes/composers/kuwahara/KuwaharaPassFragmentShader.glsl';
@@ -8,7 +9,6 @@ import ThreePassBase from '../bases/passes/ThreePassBase';
 
 export default class KuwaharaThreePass extends ThreePassBase {
     private static readonly _FOLDER_TITLE: string = 'Kuwahara';
-    private static readonly _DEFAULT_DOWNSCALE: number = 1;
     private static readonly _MIN_DOWNSCALE: number = 1;
     private static readonly _MAX_DOWNSCALE: number = 8;
 
@@ -33,10 +33,11 @@ export default class KuwaharaThreePass extends ThreePassBase {
     private _initDebug(): void {
         const composersFolder = DebugManager.getGuiFolder(DebugGuiTitle.THREE_COMPOSERS);
         const folder = composersFolder.addFolder(KuwaharaThreePass._FOLDER_TITLE);
-        folder.add(this, 'enabled').name('enabled');
+        this.enabled = THREE_WORLD_CONFIG.kuwahara.enabled;
+        const enabledCtrl = folder.add(this, 'enabled').name('enabled');
 
-        const downscaleProxy = { value: KuwaharaThreePass._DEFAULT_DOWNSCALE };
-        folder
+        const downscaleProxy = { value: THREE_WORLD_CONFIG.kuwahara.downscale };
+        const downscaleCtrl = folder
             .add(
                 downscaleProxy,
                 'value',
@@ -46,5 +47,11 @@ export default class KuwaharaThreePass extends ThreePassBase {
             )
             .name('downscale')
             .onChange((value: number) => MainThreeApp.renderer.setDownscale(value));
+
+        DebugManager.registerConfigGetter('kuwahara.enabled', () => this.enabled);
+        DebugManager.registerConfigGetter('kuwahara.downscale', () => downscaleProxy.value);
+
+        DebugManager.registerConfigSetter('kuwahara.enabled', (v) => enabledCtrl.setValue(v));
+        DebugManager.registerConfigSetter('kuwahara.downscale', (v) => downscaleCtrl.setValue(v));
     }
 }
