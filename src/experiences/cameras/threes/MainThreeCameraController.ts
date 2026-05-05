@@ -1,13 +1,9 @@
 import { Curve, MathUtils, PerspectiveCamera, Spherical, Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
-import { Curve, MathUtils, PerspectiveCamera, Spherical, Vector3 } from 'three';
-import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import { CameraId } from '../../constants/experiences/CameraId';
 import { DebugGuiTitle } from '../../constants/experiences/DebugGuiTitle';
 import { THREE_WORLD_CONFIG } from '../../constants/experiences/ThreeWorldConfig';
 import DebugManager from '../../managers/DebugManager';
-import { MediapipeHandsSnapshot } from '../../managers/MediapipeManager';
-import TimelineExperienceManager from '../../managers/TimelineExperienceManager';
 import { MediapipeHandsSnapshot } from '../../managers/MediapipeManager';
 import TimelineExperienceManager from '../../managers/TimelineExperienceManager';
 import { ThreeCameraType, type ThreeCameraOptions } from '../../types/cameraTypes';
@@ -43,7 +39,7 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
         far: 100,
     };
 
-    public static readonly _ROTATE_SPEED: number = 6;
+    private static readonly _ROTATE_SPEED: number = 6;
     private static readonly _DAMPING: number = 10;
     private static readonly _DEFAULT_FRICTION: number = 3;
     private static readonly _VELOCITY_SMOOTHING: number = 0.4;
@@ -53,16 +49,6 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
     private readonly _spherical: Spherical = new Spherical();
     private readonly _sphericalTarget: Spherical = new Spherical();
     private readonly _tmpPos: Vector3 = new Vector3();
-    private readonly _tmpToPos: Vector3 = new Vector3();
-    private readonly _tmpTangent: Vector3 = new Vector3();
-    private readonly _tmpLookAt: Vector3 = new Vector3();
-
-    private _friction: number = MainThreeCameraController._DEFAULT_FRICTION;
-    private _previousFistX: number | null = null;
-    private _previousEventTime: number = 0;
-    private _angularVelocity: number = 0;
-    private _pathState: PathState | null = null;
-    private _idleTransition: IdleTransitionState | null = null;
     private readonly _tmpToPos: Vector3 = new Vector3();
     private readonly _tmpTangent: Vector3 = new Vector3();
     private readonly _tmpLookAt: Vector3 = new Vector3();
