@@ -3,6 +3,8 @@ import {
     Mesh,
     MeshBasicMaterial,
     NormalBlending,
+    Plane,
+    Raycaster,
     Vector2,
     Vector3,
     Texture,
@@ -53,6 +55,15 @@ export default class WindLines extends ThreeActorBase {
     private _debugRaycastPoint: Mesh | null = null;
 
     private readonly _settings = { ...THREE_WORLD_CONFIG.windLines };
+
+    // Reusable ray + plane for stable NDC→world mapping (no allocations in hot path)
+    private readonly _raycaster = new Raycaster();
+    private readonly _ndc = new Vector2();
+    private readonly _fallbackPlane = new Plane();
+    private readonly _tmpIntersection = new Vector3();
+    private readonly _tmpStatueCenter = new Vector3();
+    private readonly _fallbackPlanePoint = new Vector3();
+    private _hasFallbackPlanePoint = false;
 
     // Reusable vectors — allocated once, never inside the hot path
     private readonly _right   = new Vector3();
@@ -233,14 +244,33 @@ export default class WindLines extends ThreeActorBase {
             .addScaledVector(this._up,      ny * this._settings.handSpread);
     }
 
+    private _ndcToWorldOnPlane(ndcX: number, ndcY: number, planePoint: Vector3): Vector3 | null {
+        const camera = this._cameraController.camera;
+
+        // raycast depuis la camera
+        this._ndc.set(ndcX, ndcY);
+        this._raycaster.setFromCamera(this._ndc, camera);
+
+        // Construit un plan 
+        camera.matrixWorld.extractBasis(this._right, this._up, this._forward);
+        this._forward.negate();
+        this._fallbackPlane.setFromNormalAndCoplanarPoint(this._forward, planePoint);
+
+        const hit = this._raycaster.ray.intersectPlane(this._fallbackPlane, this._tmpIntersection);
+        return hit ? this._tmpIntersection : null;
+    }
+
     private _onHandUpdate = (e: CustomEvent<MediapipeHandsSnapshot>): void => {
         if (!this._settings.enabled) return;
         const tip = e.detail.right?.indexTip;
         if (tip) {
-            // Convert Mediapipe [0..1] → NDC [-1..1].
-            // Mirror X to match your UI/camera mapping.
-            const ndcX = (0.5 - tip.x) * 2;
-            const ndcY = (0.5 - tip.y) * 2;
+            // Mediapipe can slightly overshoot [0..1] near edges; clamp to avoid huge ray swings.
+            const x01 = MathUtils.clamp(tip.x, 0, 1);
+            const y01 = MathUtils.clamp(tip.y, 0, 1);
+
+            // Convertit le pont index, en coordonnée, inversé pour que x soit a gauche quand = 0
+            const ndcX = MathUtils.clamp((0.5 - x01) * 2, -1, 1);
+            const ndcY = MathUtils.clamp((0.5 - y01) * 2, -1, 1);
 
             const statueRoot =
                 MainThreeApp.scene.getObjectByName(Object3DId.STATUE) ?? MainThreeApp.scene.getObjectByName('STATUE001');
@@ -250,13 +280,26 @@ export default class WindLines extends ThreeActorBase {
                 if (hits.length > 0) {
                     const hit = hits[0];
                     this._target3D.copy(hit.point);
+                    this._fallbackPlanePoint.copy(hit.point);
+                    this._hasFallbackPlanePoint = true;
                     this._applyHitToStatue(hit.object, hit);
+                    return;
+                }
+
+                // Fallback si aucune intersection.
+                const planePoint = this._hasFallbackPlanePoint
+                    ? this._fallbackPlanePoint
+                    : statueRoot.getWorldPosition(this._tmpStatueCenter);
+
+                const p = this._ndcToWorldOnPlane(ndcX, ndcY, planePoint);
+                if (p) {
+                    this._target3D.copy(p);
                     return;
                 }
             }
 
             // Fallback: keep the previous behavior if we don't hit the statue.
-            this._target3D.copy(this._handToWorld(tip));
+            this._target3D.copy(this._handToWorld({ ...tip, x: x01, y: y01 }));
         };
     };
 
