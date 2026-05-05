@@ -200,11 +200,11 @@ export const THREE_WORLD_PRESETS: Record<ThreeWorldPresetId, ThreeWorldConfig> =
             "fogDensity": 0.0364
         },
         "sky": {
-            "turbidity": 0.4,
+            "turbidity": 0,
             "rayleigh": 1.151,
             "mieCoefficient": 0.0942,
             "mieDirectionalG": 1,
-            "sunElevationDeg": 15.9,
+            "sunElevationDeg": 14.1,
             "sunAzimuthDeg": 180,
             "tintColor": "#fe8ebf"
         },
@@ -276,11 +276,11 @@ export const THREE_WORLD_PRESETS: Record<ThreeWorldPresetId, ThreeWorldConfig> =
             "fogDensity": 0.0364
         },
         "sky": {
-            "turbidity": 0.4,
+            "turbidity": 0,
             "rayleigh": 1.151,
             "mieCoefficient": 0.0942,
             "mieDirectionalG": 1,
-            "sunElevationDeg": 15.9,
+            "sunElevationDeg": 14.1,
             "sunAzimuthDeg": 180,
             "tintColor": "#eecbff"
         },
