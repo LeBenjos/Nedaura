@@ -40,7 +40,11 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
     };
 
     public static readonly _ROTATE_SPEED: number = 6;
-    private static readonly _DAMPING: number = 12;
+    private static readonly _DAMPING: number = 10;
+    private static readonly _DEFAULT_FRICTION: number = 3;
+    private static readonly _VELOCITY_SMOOTHING: number = 0.4;
+    private static readonly _IDLE_TRANSITION_DURATION_S: number = 1.5;
+    private static readonly _PATH_LOOK_AHEAD: number = 0.02;
 
     private readonly _target: Vector3 = new Vector3(...THREE_WORLD_CONFIG.camera.target);
     private readonly _spherical: Spherical = new Spherical();
@@ -177,8 +181,18 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
         state.curve.getPointAt(state.t, this._tmpPos);
         this._container.position.copy(this._tmpPos);
 
-        state.curve.getTangentAt(state.t, this._tmpTangent);
-        this._tmpLookAt.copy(this._tmpPos).add(this._tmpTangent);
+        // Sample further along the curve instead of using the local tangent:
+        // acts as a spatial low-pass filter, smoothing rotation through tight
+        // Catmull-Rom bends.
+        const lookT = state.t + MainThreeCameraController._PATH_LOOK_AHEAD;
+        if (lookT <= 1) {
+            state.curve.getPointAt(lookT, this._tmpLookAt);
+        } else {
+            // End of open curve: tangent extrapolation avoids a degenerate
+            // lookAt where target collapses onto the camera position.
+            state.curve.getTangentAt(state.t, this._tmpTangent);
+            this._tmpLookAt.copy(this._tmpPos).add(this._tmpTangent);
+        }
         this._camera.lookAt(this._tmpLookAt);
     }
 
