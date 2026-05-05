@@ -1,6 +1,7 @@
 import {
     CanvasTexture,
     ClampToEdgeWrapping,
+    DoubleSide,
     Mesh,
     MeshStandardMaterial,
     NoColorSpace,
@@ -101,6 +102,8 @@ export default class Statue extends ThreeModelBase {
                 material.normalMap = normalMap;
                 material.normalMap.colorSpace = NoColorSpace;
 
+                material.side = DoubleSide;
+
                 material.defines = {
                     ...(material.defines ?? {}),
                     USE_UV: '',
@@ -114,7 +117,7 @@ export default class Statue extends ThreeModelBase {
                     shader.uniforms.uErodedTexture       = { value: textureErodedWindMat };
                     shader.uniforms.uBaseNormal          = { value: normalMap };
                     shader.uniforms.uErodedNormal        = { value: normalErodedWindMat };
-                    shader.uniforms.uDisplacementStrength = { value: 0.05 };
+                    shader.uniforms.uDisplacementStrength = { value: 0.25 };
 
                     this._activeShaders.add(shader);
 
