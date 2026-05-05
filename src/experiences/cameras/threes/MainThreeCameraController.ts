@@ -181,8 +181,18 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
         state.curve.getPointAt(state.t, this._tmpPos);
         this._container.position.copy(this._tmpPos);
 
-        state.curve.getTangentAt(state.t, this._tmpTangent);
-        this._tmpLookAt.copy(this._tmpPos).add(this._tmpTangent);
+        // Sample further along the curve instead of using the local tangent:
+        // acts as a spatial low-pass filter, smoothing rotation through tight
+        // Catmull-Rom bends.
+        const lookT = state.t + MainThreeCameraController._PATH_LOOK_AHEAD;
+        if (lookT <= 1) {
+            state.curve.getPointAt(lookT, this._tmpLookAt);
+        } else {
+            // End of open curve: tangent extrapolation avoids a degenerate
+            // lookAt where target collapses onto the camera position.
+            state.curve.getTangentAt(state.t, this._tmpTangent);
+            this._tmpLookAt.copy(this._tmpPos).add(this._tmpTangent);
+        }
         this._camera.lookAt(this._tmpLookAt);
     }
 
