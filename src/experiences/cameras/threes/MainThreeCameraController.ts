@@ -23,7 +23,7 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
     private static readonly _MIN_RADIUS: number = 1;
     private static readonly _MAX_RADIUS: number = 10;
 
-    private static readonly _ROTATE_SPEED: number = 6;
+    public static readonly _ROTATE_SPEED: number = 6;
     private static readonly _DAMPING: number = 12;
 
     private readonly _target: Vector3 = new Vector3(...THREE_WORLD_CONFIG.camera.target);
