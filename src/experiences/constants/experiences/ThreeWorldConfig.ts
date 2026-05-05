@@ -57,6 +57,7 @@ export interface ThreeWorldConfig {
         handDepth: number;
         handSpread: number;
         smoothing: number;
+        minHeight: number;
         numTrails: number;
         lineWidth: number;
         trailSpread: number;
@@ -134,6 +135,7 @@ export const THREE_WORLD_CONFIG: ThreeWorldConfig = {
         "handDepth": 0,
         "handSpread": 8.9,
         "smoothing": 0.41,
+        "minHeight": 0,
         "numTrails": 5,
         "lineWidth": 0.35,
         "trailSpread": 0.3,

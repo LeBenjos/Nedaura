@@ -93,6 +93,7 @@ export default class WindLines extends ThreeActorBase {
         controllers.handDepth = folder.add(this._settings, 'handDepth', -10, 10, 0.01).name('handDepth');
         controllers.handSpread = folder.add(this._settings, 'handSpread', 0, 10, 0.01).name('handSpread');
         controllers.smoothing = folder.add(this._settings, 'smoothing', 0.01, 0.5, 0.01).name('smoothing');
+        controllers.minHeight = folder.add(this._settings, 'minHeight', -5, 5, 0.01).name('minHeight');
 
         controllers.lineWidth = folder
             .add(this._settings, 'lineWidth', 0.01, 2, 0.01)
@@ -355,7 +356,10 @@ export default class WindLines extends ThreeActorBase {
             Math.cos(t * tr.speed * 1.3   + tr.phase + idx * 0.15) * aXY,
             Math.sin(t * tr.speed * 0.7   + tr.phase + idx * 0.10) * aZ,
         );
-        return new Vector3().copy(tr.smoothedTarget).add(tr.offset).add(wave);
+
+        const p = new Vector3().copy(tr.smoothedTarget).add(tr.offset).add(wave);
+        if (p.y < this._settings.minHeight) p.y = this._settings.minHeight;
+        return p;
     }
 
     public override reset(): void {}
