@@ -39,11 +39,8 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
         far: 100,
     };
 
-    private static readonly _ROTATE_SPEED: number = 6;
-    private static readonly _DAMPING: number = 10;
-    private static readonly _DEFAULT_FRICTION: number = 3;
-    private static readonly _VELOCITY_SMOOTHING: number = 0.4;
-    private static readonly _IDLE_TRANSITION_DURATION_S: number = 1.5;
+    public static readonly _ROTATE_SPEED: number = 6;
+    private static readonly _DAMPING: number = 12;
 
     private readonly _target: Vector3 = new Vector3(...THREE_WORLD_CONFIG.camera.target);
     private readonly _spherical: Spherical = new Spherical();

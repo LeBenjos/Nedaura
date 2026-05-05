@@ -7,6 +7,7 @@ import Sand from './components/Sand';
 import Sky from './components/Sky';
 import Statue from './components/Statue';
 import WindLines from './components/WindLines';
+import MovementHelper from './components/MovementHelper';
 
 export default class WorldThreeView extends ThreeViewBase {
     constructor() {
@@ -26,6 +27,7 @@ export default class WorldThreeView extends ThreeViewBase {
         this._actors.push(new Statue());
         this._actors.push(new CameraPath());
         this._actors.push(new WindLines());
+        this._actors.push(new MovementHelper());
         this._actors.push(new Sand());
 
         for (const actor of this._actors) this.add(actor);

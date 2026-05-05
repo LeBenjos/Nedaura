@@ -57,6 +57,8 @@ class InitCommand {
         ThreeAssetsManager.addTexture(AssetId.THREE_TEXTURE_DUNES_ARM, AssetUtils.GetPath('textures/dunes/dunes_arm.png'));
         ThreeAssetsManager.addTexture(AssetId.THREE_TEXTURE_DUNES_NORMAL, AssetUtils.GetPath('textures/dunes/dunes_normal.png'));
         
+        ThreeAssetsManager.addTexture(AssetId.UI_WHITE_STAR, AssetUtils.GetPath('textures/ui/white_star.png'));
+        
         ThreeAssetsManager.addTexture(AssetId.THREE_TEXTURE_STATUE_BASE_NORMAL, AssetUtils.GetPath('textures/statue/statue_stone_normal.jpg'));
         ThreeAssetsManager.addTexture(AssetId.THREE_TEXTURE_STATUE_BASE_TEXTURE, AssetUtils.GetPath('textures/statue/statue_stone_texture.jpg'));
         ThreeAssetsManager.addTexture(AssetId.THREE_TEXTURE_STATUE_ERODED_WIND_NORMAL, AssetUtils.GetPath('textures/statue/statue_eroded_normal.jpg'));
