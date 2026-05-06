@@ -4,8 +4,9 @@ import GUI from 'lil-gui';
 import Stats from 'stats.js';
 import { ThreePerf } from 'three-perf';
 import { DebugGuiTitle } from '../constants/experiences/DebugGuiTitle';
-import { THREE_WORLD_PRESETS, type ThreeWorldPresetId } from '../constants/experiences/ThreeWorldPresets';
+import { type ThreeWorldPresetId } from '../constants/experiences/ThreeWorldPresets';
 import MainThreeApp from '../engines/threes/app/MainThreeApp';
+import WorldPresetManager from './WorldPresetManager';
 
 class DebugManager {
     private static readonly _IS_ACTIVE_STRING: string = '#debug';
@@ -143,6 +144,18 @@ class DebugManager {
         this._configSetters.set(path, setter);
     }
 
+    public hasConfigSetter(path: string): boolean {
+        return this._configSetters.has(path);
+    }
+
+    public getConfigValue(path: string): unknown {
+        return this._configGetters.get(path)?.();
+    }
+
+    public setConfigValue(path: string, value: unknown): void {
+        this._configSetters.get(path)?.(value);
+    }
+
     private static readonly _PRESET_IDS: readonly ThreeWorldPresetId[] = ['base', 'wind', 'rain', 'sun'];
 
     private _buildPresetButtons(): HTMLDivElement {
@@ -156,25 +169,10 @@ class DebugManager {
                 'background:#5a5a5a;border:none;border-radius:3px;cursor:pointer;font-family:inherit;';
             btn.onmouseenter = () => (btn.style.background = '#777');
             btn.onmouseleave = () => (btn.style.background = '#5a5a5a');
-            btn.onclick = () => this._applyPreset(id);
+            btn.onclick = () => WorldPresetManager.showPreset(id);
             wrap.appendChild(btn);
         }
         return wrap;
-    }
-
-    private _applyPreset(id: ThreeWorldPresetId): void {
-        const preset = THREE_WORLD_PRESETS[id];
-        if (!preset) {
-            console.warn(`[DebugManager] Unknown preset "${id}"`);
-            return;
-        }
-        for (const [section, fields] of Object.entries(preset)) {
-            if (!fields || typeof fields !== 'object') continue;
-            for (const [key, value] of Object.entries(fields as Record<string, unknown>)) {
-                const setter = this._configSetters.get(`${section}.${key}`);
-                if (setter) setter(value);
-            }
-        }
     }
 
     private _exportSceneConfig(): Record<string, unknown> {

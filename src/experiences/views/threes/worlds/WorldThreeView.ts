@@ -1,9 +1,10 @@
 import { ViewId } from '../../../constants/experiences/ViewId';
 import ThreeViewBase from '../bases/ThreeViewBase';
+import CameraPath from './components/CameraPath';
 import Dunes from './components/Dunes';
-import Statue from './components/Statue';
 import Environment from './components/Environment';
 import Sky from './components/Sky';
+import Statue from './components/Statue';
 import WindLines from './components/WindLines';
 
 export default class WorldThreeView extends ThreeViewBase {
@@ -22,6 +23,7 @@ export default class WorldThreeView extends ThreeViewBase {
         this._actors.push(new Sky());
         this._actors.push(new Dunes());
         this._actors.push(new Statue());
+        this._actors.push(new CameraPath());
         this._actors.push(new WindLines());
 
         for (const actor of this._actors) this.add(actor);

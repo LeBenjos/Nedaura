@@ -13,6 +13,7 @@ dist-ssr
 *.local
 
 # assets_source/*
+assets_source/*.blend1
 # !assets_source/.gitkeep
 improvements.md
 

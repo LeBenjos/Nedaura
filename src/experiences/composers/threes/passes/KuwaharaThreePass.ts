@@ -22,6 +22,8 @@ export default class KuwaharaThreePass extends ThreePassBase {
             fragmentShader: KuwaharaPassFragmentShader,
         });
 
+        this.enabled = THREE_WORLD_CONFIG.kuwahara.enabled;
+
         if (DebugManager.isActive) this._initDebug();
     }
 
@@ -33,7 +35,6 @@ export default class KuwaharaThreePass extends ThreePassBase {
     private _initDebug(): void {
         const composersFolder = DebugManager.getGuiFolder(DebugGuiTitle.THREE_COMPOSERS);
         const folder = composersFolder.addFolder(KuwaharaThreePass._FOLDER_TITLE);
-        this.enabled = THREE_WORLD_CONFIG.kuwahara.enabled;
         const enabledCtrl = folder.add(this, 'enabled').name('enabled');
 
         const downscaleProxy = { value: THREE_WORLD_CONFIG.kuwahara.downscale };
