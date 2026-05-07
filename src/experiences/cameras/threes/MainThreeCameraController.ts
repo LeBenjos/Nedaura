@@ -62,7 +62,6 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
 
     constructor() {
         super(CameraId.THREE_MAIN, MainThreeCameraController._MAIN_CAMERA_OPTIONS);
-        super(CameraId.THREE_MAIN, MainThreeCameraController._MAIN_CAMERA_OPTIONS);
 
         this._sphericalTarget.set(
             THREE_WORLD_CONFIG.camera.radius,
@@ -282,7 +281,6 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
         const positionFolder = folder.addFolder('Position');
         const radiusCtrl = positionFolder
             .add(sphericalProxy, 'radius', 1, 10, 0.001)
-            .add(sphericalProxy, 'radius', 1, 10, 0.001)
             .name('distance')
             .onChange(applySpherical);
         const phiCtrl = positionFolder
@@ -308,7 +306,7 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
 
         DebugManager.registerConfigGetter('camera.fov', () => (
             this._camera instanceof PerspectiveCamera ? this._camera.fov : THREE_WORLD_CONFIG.camera.fov
-        );
+        ));
         DebugManager.registerConfigGetter('camera.target', () => [this._target.x, this._target.y, this._target.z]);
         DebugManager.registerConfigGetter('camera.radius', () => this._sphericalTarget.radius);
         DebugManager.registerConfigGetter('camera.phiDeg', () => MathUtils.radToDeg(this._sphericalTarget.phi));

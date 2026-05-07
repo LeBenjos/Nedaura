@@ -99,9 +99,6 @@ export default class WindLines extends ThreeActorBase {
         folder.add(this._settings, 'handSpread', 0, 10, 0.01).name('handSpread');
         folder.add(this._settings, 'smoothing', 0.01, 0.5, 0.01).name('smoothing');
 
-        const controllers: Partial<Record<keyof typeof THREE_WORLD_CONFIG.windLines, Controller>> = {};
-
-
         controllers.lineWidth = folder
             .add(this._settings, 'lineWidth', 0.01, 2, 0.01)
             .name('lineWidth')
