@@ -71,37 +71,53 @@ const onStartExperience = async () => {
         ease: 'power2.inOut',
     });
 
+    const totalDuration = 1.2 * 7 + 0.8 * 7 * 10;
+
+    // baissse le bg progressivement
+    gsap.to('.intro-background', {
+        opacity: 0,
+        duration: totalDuration,
+        ease: 'none',
+    });
+
+
     if (true) {
         await playTextSequence(
             [
                 {
                     id: TextId.INTRO_1,
                     displayDuration: 2000,
-                    // options: { duration: 1.2, hideDuration: 0.8 },
+                    options: { duration: 1.2, hideDuration: 0.8 },
                 },
                 {
                     id: TextId.INTRO_2,
                     displayDuration: 3500,
+                    options: { duration: 1.2, hideDuration: 0.8 },
                 },
                 {
                     id: TextId.INTRO_3,
                     displayDuration: 3500,
+                    options: { duration: 1.2, hideDuration: 0.8 },
                 },
                 {
                     id: TextId.INTRO_4,
                     displayDuration: 3500,
+                    options: { duration: 1.2, hideDuration: 0.8 },
                 },
                 {
                     id: TextId.INTRO_5,
                     displayDuration: 3500,
+                    options: { duration: 1.2, hideDuration: 0.8 },
                 },
                 {
                     id: TextId.INTRO_6,
                     displayDuration: 3500,
+                    options: { duration: 1.2, hideDuration: 0.8 },
                 },
                 {
                     id: TextId.INTRO_7,
                     displayDuration: 3500,
+                    options: { duration: 1.2, hideDuration: 0.8 },
                 },
             ],
             { signal: controller.signal }
@@ -118,7 +134,6 @@ onBeforeUnmount(() => {
     controller.abort();
     window.removeEventListener('hand:update', _onHandUpdate);
 });
-
 
 </script>
 

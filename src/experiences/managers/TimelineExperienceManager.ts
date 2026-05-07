@@ -1,8 +1,9 @@
 import { Action } from "@benjos/cookware";
 import { TextId } from "../constants/experiences/TextId";
 import { TimelineExperienceState } from "../constants/experiences/TimelineExperienceState";
-import TextManager from "./TextManager";
+
 import WorldPresetManager from "./WorldPresetManager";
+import TextManager from "./TextManager/TextManager";
 
 class TimelineExperienceManager {
     private declare _state: TimelineExperienceState;
