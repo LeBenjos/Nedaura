@@ -1,6 +1,13 @@
 import type { ColorSpace, ToneMapping } from 'three';
 
 export interface ThreeWorldConfig {
+    camera: {
+        fov: number;
+        target: [number, number, number];
+        radius: number;
+        phiDeg: number;
+        thetaDeg: number;
+    };
     kuwahara: {
         enabled: boolean;
         downscale: number;
@@ -13,8 +20,6 @@ export interface ThreeWorldConfig {
         toneMapping: ToneMapping;
         outputColorSpace: ColorSpace;
         toneMappingExposure: number;
-        clearColor: string;
-        clearAlpha: number;
     };
     environment: {
         mapIntensity: number;
@@ -22,8 +27,8 @@ export interface ThreeWorldConfig {
         sunLightColor: string;
         sunLightIntensity: number;
         sunShadowCameraFar: number;
-        sunShadowMapSize: number;
-        sunShadowNormalBias: number;
+        sunShadowCameraNear: number;
+        sunShadowCameraSize: number;
         sunPosition: [number, number, number];
         fogEnabled: boolean;
         fogColor: string;
@@ -52,7 +57,6 @@ export interface ThreeWorldConfig {
         handDepth: number;
         handSpread: number;
         smoothing: number;
-        minHeight: number;
         numTrails: number;
         lineWidth: number;
         trailSpread: number;
@@ -66,6 +70,17 @@ export interface ThreeWorldConfig {
 }
 
 export const THREE_WORLD_CONFIG: ThreeWorldConfig = {
+    "camera": {
+        "fov": 38,
+        "target": [
+            0,
+            1.05,
+            0
+        ],
+        "radius": 4,
+        "phiDeg": 91.01,
+        "thetaDeg": 0
+    },
     "kuwahara": {
         "enabled": true,
         "downscale": 2
@@ -77,59 +92,56 @@ export const THREE_WORLD_CONFIG: ThreeWorldConfig = {
         "postProcessing": true,
         "toneMapping": 5,
         "outputColorSpace": "srgb",
-        "toneMappingExposure": 1,
-        "clearColor": "#fafafa",
-        "clearAlpha": 0
+        "toneMappingExposure": 1
     },
     "environment": {
         "mapIntensity": 1,
         "hdrId": "THREE_HDR_3",
-        "sunLightColor": "#ffffff",
-        "sunLightIntensity": 1,
-        "sunShadowCameraFar": 15,
-        "sunShadowMapSize": 1024,
-        "sunShadowNormalBias": 0.05,
+        "sunLightColor": "#ffd4b8",
+        "sunLightIntensity": 2.797,
+        "sunShadowCameraFar": 10,
+        "sunShadowCameraNear": 1,
+        "sunShadowCameraSize": 20,
         "sunPosition": [
-            0,
-            2,
-            1
+            -3.2564509231010397,
+            3.650811383103761,
+            -1.0330070815025356
         ],
         "fogEnabled": true,
-        "fogColor": "#d8a878",
-        "fogDensity": 0.015
+        "fogColor": "#c287ab",
+        "fogDensity": 0.0364
     },
     "sky": {
-        "turbidity": 10,
-        "rayleigh": 2,
-        "mieCoefficient": 0.005,
-        "mieDirectionalG": 0.8,
-        "sunElevationDeg": 30,
+        "turbidity": 0,
+        "rayleigh": 4,
+        "mieCoefficient": 0.0906,
+        "mieDirectionalG": 0.841,
+        "sunElevationDeg": 14.1,
         "sunAzimuthDeg": 180,
-        "tintColor": "#ffffff"
+        "tintColor": "#ae959e"
     },
     "dunes": {
-        "textureRepeat": 50,
-        "textureRotation": 0,
-        "color": "#8c2120",
-        "roughness": 1,
-        "metalness": 0,
-        "normalScaleX": 1,
-        "normalScaleY": 1
+        "textureRepeat": 127.2,
+        "textureRotation": 58.6,
+        "color": "#8e1c26",
+        "roughness": 0.702,
+        "metalness": 1,
+        "normalScaleX": 2.998,
+        "normalScaleY": -2.046
     },
     "windLines": {
         "enabled": true,
         "handDepth": 0,
         "handSpread": 8.9,
         "smoothing": 0.41,
-        "minHeight": 0,
         "numTrails": 5,
         "lineWidth": 0.35,
         "trailSpread": 0.3,
         "amplitudeXY": 0.2,
         "amplitudeZ": 0.1,
-        "color0": "#f2f2f2",
-        "color1": "#ececec",
-        "color2": "#e0e0e0",
-        "color3": "#dadada"
+        "color0": "#ffffff",
+        "color1": "#ffffff",
+        "color2": "#ffffff",
+        "color3": "#ffffff"
     }
 } as const;
