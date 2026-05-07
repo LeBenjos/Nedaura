@@ -3,6 +3,8 @@ import MediapipeView from '../../views/mediapipe/MediapipeView.vue';
 import IntroView from '../../views/vues/Intro/IntroView.vue';
 import LoaderView from '../../views/vues/LoaderView.vue';
 import LoaderManager from '../../managers/LoaderManager';
+import TextManager from '../../managers/TextManager';
+import { TextId } from '../../constants/experiences/TextId';
 import { onMounted, ref } from 'vue';
 
 const isVisible = ref(false);

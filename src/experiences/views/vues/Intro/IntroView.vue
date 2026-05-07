@@ -15,7 +15,7 @@ const onClick = (): void => {
 <template>
     <transition name="intro">
         <div class="intro-container" v-if="isVisible">
-            <div class="intro-logo">    
+            <div class="intro-logo">
                 <LogoNedaura />
             </div>
 
