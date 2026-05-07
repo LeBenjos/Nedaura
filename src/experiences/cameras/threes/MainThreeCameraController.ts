@@ -71,17 +71,17 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
         this._spherical.copy(this._sphericalTarget);
         this._container.position.setFromSpherical(this._spherical).add(this._target);
 
-        TimelineExperienceManager.onEnterIdle.add(this._onEnterIdle);
-        TimelineExperienceManager.onLeaveIdle.add(this._onLeaveIdle);
+        TimelineExperienceManager.onEnterVerse1.add(this._onEnterVerse1);
+        TimelineExperienceManager.onLeaveVerse1.add(this._onLeaveVerse1);
 
         if (DebugManager.isActive) this._setupDebugGui();
     }
 
-    private _onEnterIdle = (): void => {
+    private _onEnterVerse1 = (): void => {
         window.addEventListener('hand:update', this._onHandUpdate);
     }
 
-    private _onLeaveIdle = (): void => {
+    private _onLeaveVerse1 = (): void => {
         window.removeEventListener('hand:update', this._onHandUpdate);
     }
 

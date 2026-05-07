@@ -10,4 +10,5 @@ export const TEXTS: Record<TextIdType, string> = {
     [TextId.INTRO_6]: "La nature nous interroge sur ce qu’il reste vraiment lorsque tout ce que l’on croyait éternel disparaît.",
     [TextId.INTRO_7]: "C’est l'histoire de Nedaŭra.",
     [TextId.INTRO_BONJOUR]: 'Bonjour le monde',
+    [TextId.CAMERA_PATH]: 'Cette expérience est inspiré du sonnet Ozymandias de Percy Bysshe Shelley.',
 };

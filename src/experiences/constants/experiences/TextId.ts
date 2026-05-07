@@ -8,6 +8,7 @@ export const TextId = {
     INTRO_6: 'INTRO_6',
     INTRO_7: 'INTRO_7',
     INTRO_BONJOUR: 'INTRO_BONJOUR',
+    CAMERA_PATH: 'CAMERA_PATH',
 } as const;
 
 export type TextId = (typeof TextId)[keyof typeof TextId];
