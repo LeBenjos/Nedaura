@@ -5,6 +5,8 @@ import InterfaceManager from '../../views/vues/components/InterfaceManager.vue';
 import { useInterfaceManager } from '../../views/vues/hooks/useInterfaceManager';
 import LoaderView from '../../views/vues/LoaderView.vue';
 import LoaderManager from '../../managers/LoaderManager';
+import TextManager from '../../managers/TextManager';
+import { TextId } from '../../constants/experiences/TextId';
 import { onMounted, ref } from 'vue';
 
 const isVisible = ref(false);

@@ -4,6 +4,7 @@ export const DebugGuiTitle = {
     THREE_VIEWS: 'Three Views',
     THREE_CAMERAS: 'Three Cameras',
     WINDLINES: 'Windlines',
+    TEXT: 'Text',
 } as const;
 
 export type DebugGuiTitle = (typeof DebugGuiTitle)[keyof typeof DebugGuiTitle];
