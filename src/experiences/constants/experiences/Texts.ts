@@ -8,4 +8,5 @@ export const TEXTS: Record<TextIdType, string> = {
     [TextId.INTRO_5]: "Aujourd’hui, les fragments de cette grandeur passée témoignent seulement d’ambitions révolue. ",
     [TextId.INTRO_6]: "La nature nous interroge sur ce qu’il reste vraiment lorsque tout ce que l’on croyait éternel disparaît.",
     [TextId.INTRO_7]: "C’est l'histoire de Nedaŭra.",
-    };
+    [TextId.CAMERA_PATH]: 'Cette expérience est inspiré du sonnet Ozymandias de Percy Bysshe Shelley.',
+};
