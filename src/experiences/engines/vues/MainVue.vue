@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import MediapipeView from '../../views/mediapipe/MediapipeView.vue';
-import IntroView from '../../views/vues/Intro/IntroView.vue';
 import InterfaceManager from '../../views/vues/components/InterfaceManager.vue';
 import { useInterfaceManager } from '../../views/vues/hooks/useInterfaceManager';
 import LoaderView from '../../views/vues/LoaderView.vue';
 import LoaderManager from '../../managers/LoaderManager';
-import TextManager from '../../managers/TextManager';
-import { TextId } from '../../constants/experiences/TextId';
 import { onMounted, ref } from 'vue';
+import MenuView from '../../views/vues/Menu/MenuView.vue';
 
 const isVisible = ref(false);
 
@@ -18,7 +16,7 @@ onMounted(() => {
 });
 
 const onShow = (): void => {
-    mount({ id: 'intro', component: IntroView });
+    mount({ id: 'menu', component: MenuView });
     isVisible.value = true;
 };
 </script>

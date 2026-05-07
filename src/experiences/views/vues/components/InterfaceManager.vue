@@ -1,9 +1,13 @@
 <template>
-    <!-- Hold all mounted ui components, mounts and unmounts them -->
     <div class="container">
-        <TransitionGroup name="item" appear>
-            <component v-for="{ id, component, props } in stack" :key="id" :is="component" v-bind="props" />
-        </TransitionGroup>
+        <div v-for="{ id, component, noAnimation, props } in stack" :key="id">
+            <Transition :name="noAnimation ? '' : 'item'" appear>
+                <component
+                    :is="component"
+                    v-bind="props"
+                />
+            </Transition>
+        </div>
     </div>
 </template>
 
