@@ -118,10 +118,11 @@ onBeforeUnmount(() => {
     width: 320px;
     aspect-ratio: 4 / 3;
     overflow: hidden;
+    z-index: 9999;
 
-    &:not(.debug) {
-        visibility: hidden;
-    }
+    // &:not(.debug) {
+    //     visibility: hidden;
+    // }
 }
 
 /* VIDEO + CANVAS SUPERPOSÉS */

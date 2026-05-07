@@ -2,10 +2,10 @@ import { DomResizeManager, TickerManager } from '@benjos/cookware';
 import gsap from 'gsap';
 import * as THREE from 'three';
 import type { Controller } from 'lil-gui';
-import type { TextId } from '../constants/experiences/TextId';
-import { TEXTS } from '../constants/experiences/Texts';
-import { DebugGuiTitle } from '../constants/experiences/DebugGuiTitle';
-import DebugManager from './DebugManager';
+import type { TextId } from '../../constants/experiences/TextId';
+import { TEXTS } from '../../constants/experiences/Texts';
+import { DebugGuiTitle } from '../../constants/experiences/DebugGuiTitle';
+import DebugManager from '../DebugManager';
 
 type TextAnchor = 'center' | 'top-left';
 

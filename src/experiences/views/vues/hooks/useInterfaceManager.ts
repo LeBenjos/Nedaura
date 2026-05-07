@@ -3,6 +3,7 @@ import { markRaw, shallowRef, type Component, type ShallowRef } from 'vue';
 interface MountedComponent {
     id: string;
     component: Component;
+    noAnimation?: boolean;
     props?: Record<string, unknown>;
 }
 
@@ -17,7 +18,7 @@ export function useInterfaceManager(): {
     function mount(params: MountedComponent): void {
         if (stack.value.find((c) => c.id === params.id)) return; // eviter des doublons
 
-        stack.value = [...stack.value, { id: params.id, component: markRaw(params.component), props: params.props }];
+        stack.value = [...stack.value, { id: params.id, component: markRaw(params.component), noAnimation: params.noAnimation, props: params.props }];
         console.log('mouting this bitch', stack.value);
     }
     function unmount(id: string): void {

@@ -27,7 +27,7 @@ class MainMediapipe {
     private _getOrCreateVideoElement(): HTMLVideoElement {
         const existing = document.getElementById("webcam") as HTMLVideoElement | null;
         if (existing) return existing;
-
+        console.log("ici")
         const video = document.createElement('video');
         video.id = 'webcam';
         video.autoplay = true;
@@ -94,7 +94,7 @@ class MainMediapipe {
         tryBindButton();
     }
 
-    enableCam = (event: Event) => {
+    public enableCam = (event: Event) => {
         console.log("enableCam", this.handLandmarker);
         if (!this.handLandmarker) {
             console.log("Wait! objectDetector not loaded yet.");
