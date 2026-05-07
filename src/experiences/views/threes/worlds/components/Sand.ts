@@ -4,7 +4,7 @@ import { THREE_WORLD_CONFIG } from "../../../../constants/experiences/ThreeWorld
 import ThreeActorBase from "../../bases/components/ThreeActorBase";
 
 export default class Sand extends ThreeActorBase {
-    private static readonly _COUNT: number = 50000;
+    private static readonly _COUNT: number = 10000;
     private static readonly _RADIUS: number = 20;
     private static readonly _POINT_SIZE: number = 0.02;
     private static readonly _SPEED: number = 0.5;
