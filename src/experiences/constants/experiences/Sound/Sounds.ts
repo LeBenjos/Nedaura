@@ -5,6 +5,7 @@ export const SOUNDS: Record<SoundIdType, string> = {
     [SoundId.MENU_AMBIANCE]: "/menu/accueil.wav",
     [SoundId.MENU_MUSIC]: "/menu/sand_background_02.mp3",
 
+    [SoundId.INTRO_AMBIANCE]: "/intro/sand_background_01.mp3",
     [SoundId.INTRO_1]: "/intro/voixoff_intro_ecran1.wav",
     [SoundId.INTRO_2]: "/intro/voixoff_intro_ecran2.wav",
     [SoundId.INTRO_3]: "/intro/voixoff_intro_ecran3.wav",

@@ -51,7 +51,7 @@ class SoundManager {
         });
 
         sound.play();
-        sound.fade(0, 0.3, fadeDuration);
+        sound.fade(0, 0.1, fadeDuration);
         this._ambientSounds.set(soundId, sound);
     }
 
