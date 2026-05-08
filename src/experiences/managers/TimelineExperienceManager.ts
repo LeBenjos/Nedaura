@@ -6,6 +6,7 @@ import WorldPresetManager from "./WorldPresetManager";
 import TextManager from "./TextManager/TextManager";
 import { playTextSequence } from "./TextManager/TextSequence";
 import { SoundId } from "../constants/experiences/Sound/SoundId";
+import SoundManager from "./SoundManager";
 
 class TimelineExperienceManager {
     private declare _state: TimelineExperienceState;
@@ -70,6 +71,8 @@ class TimelineExperienceManager {
     }
 
     private _enterPathIntro(): void {
+        SoundManager.playAmbientSound(SoundId.TRAVELLING_AMBIANCE);
+        SoundManager.playAmbientSound(SoundId.TRAVELLING_MUSIC);
         TextManager.showText(TextId.CAMERA_PATH);
         TextManager.hideText(TextId.CAMERA_PATH);
         this.onEnterPathIntro.execute();
@@ -77,6 +80,8 @@ class TimelineExperienceManager {
     
     private _leavePathIntro(): void {
         console.log("leave path intro");
+        SoundManager.stopAmbientSound(SoundId.TRAVELLING_AMBIANCE);
+        SoundManager.stopAmbientSound(SoundId.TRAVELLING_MUSIC);
         this.onLeavePathIntro.execute();
     }
     

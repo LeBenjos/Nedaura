@@ -3,6 +3,7 @@ export const SoundId = {
     MENU_AMBIANCE: 'MENU_AMBIANCE',
     MENU_MUSIC: 'MENU_MUSIC',
 
+    // intro
     INTRO_AMBIANCE: 'INTRO_AMBIANCE',
     INTRO_1: 'INTRO_1',
     INTRO_2: 'INTRO_2',
@@ -11,6 +12,7 @@ export const SoundId = {
     INTRO_5: 'INTRO_5',
     INTRO_6: 'INTRO_6',
     INTRO_7: 'INTRO_7',
+
     // sand interractions
     SAND_1: 'SAND_1',
     SAND_2: 'SAND_2',
@@ -19,6 +21,11 @@ export const SoundId = {
     SAND_5: 'SAND_5',
     SAND_6: 'SAND_6',
     SAND_7: 'SAND_7',
+
+    // travelling
+    TRAVELLING_AMBIANCE: 'TRAVELLING_AMBIANCE',
+    TRAVELLING_MUSIC: 'TRAVELLING_MUSIC',
+
     // verset 1 
     VERSE_1_1: 'VERSE_1_1',
     VERSE_1_2: 'VERSE_1_2',

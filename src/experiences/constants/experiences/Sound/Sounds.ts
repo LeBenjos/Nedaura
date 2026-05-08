@@ -23,6 +23,11 @@ export const SOUNDS: Record<SoundIdType, string> = {
     [SoundId.SAND_6]: "/interractions/sand_interaction_06.mp3",
     [SoundId.SAND_7]: "/interractions/sand_interaction_07.mp3",
     
+    // travelling
+    [SoundId.TRAVELLING_AMBIANCE]: "/travelling/ambiance.wav",
+    [SoundId.TRAVELLING_MUSIC]: "/travelling/music.mp3",
+    
+    
     // verset 1
     [SoundId.VERSE_1_1]: "/verset_1/01.mp3",
     [SoundId.VERSE_1_2]: "/verset_1/02.mp3",
