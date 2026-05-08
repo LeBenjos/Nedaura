@@ -7,6 +7,11 @@ import TextManager from "./TextManager/TextManager";
 import { playTextSequence } from "./TextManager/TextSequence";
 import { SoundId } from "../constants/experiences/Sound/SoundId";
 import SoundManager from "./SoundManager";
+import MainThreeCameraController from "../cameras/threes/MainThreeCameraController";
+import InteractionWindView from "../views/vues/interactions/InteractionWindView.vue";
+import { useInterfaceManager } from "../views/vues/hooks/useInterfaceManager";
+import ThreeCameraControllerManager from "./threes/ThreeCameraControllerManager";
+import { CameraId } from "../constants/experiences/CameraId";
 
 class TimelineExperienceManager {
     private declare _state: TimelineExperienceState;
@@ -21,6 +26,16 @@ class TimelineExperienceManager {
     public readonly onLeaveVerse2 = new Action();
 
     private _controller = new AbortController();
+
+    private mount = (options: { id: string; component: any; noAnimation?: boolean }) => {
+        const { mount } = useInterfaceManager();
+        mount(options);
+    }
+
+    private unmount = (id: string) => {
+        const { unmount } = useInterfaceManager();
+        unmount(id);
+    }
 
     public init(): void {
         this.setState(TimelineExperienceState.INITIAL);
@@ -78,55 +93,56 @@ class TimelineExperienceManager {
 
         await playTextSequence(
             [
-                {
-                    id: TextId.CAMERA_PATH,
-                    displayDuration: 2500,
-                    options: { duration: 0.8, hideDuration: 0.8 },
-                },
-                {
-                    id: TextId.INTRO_1,
-                    displayDuration: 2500,
-                    sound: SoundId.INTRO_1,
-                    options: { duration: 0.8, hideDuration: 0.8 },
-                },
-                {
-                    id: TextId.INTRO_2,
-                    displayDuration: 8000,
-                    sound: SoundId.INTRO_2,
-                    options: { duration: 0.8, hideDuration: 0.8 },
-                },
-                {
-                    id: TextId.INTRO_3,
-                    displayDuration: 3500,
-                    sound: SoundId.INTRO_3,
-                    options: { duration: 0.8, hideDuration: 0.8 },
-                },
-                {
-                    id: TextId.INTRO_4,
-                    displayDuration: 9000,
-                    sound: SoundId.INTRO_4,
-                    options: { duration: 0.8, hideDuration: 0.8 },
-                },
-                {
-                    id: TextId.INTRO_5,
-                    displayDuration: 3500,
-                    sound: SoundId.INTRO_5,
-                    options: { duration: 0.8, hideDuration: 0.8 },
-                },
-                {
-                    id: TextId.INTRO_6,
-                    displayDuration: 6000,
-                    sound: SoundId.INTRO_6,
-                    options: { duration: 0.8, hideDuration: 0.8 },
-                },
-                {
-                    id: TextId.INTRO_7,
-                    displayDuration: 3000,
-                    sound: SoundId.INTRO_7,
-                    options: { duration: 0.8, hideDuration: 0.8 },
-                },
+                // {
+                //     id: TextId.CAMERA_PATH,
+                //     displayDuration: 2500,
+                //     options: { duration: 0.8, hideDuration: 0.8 },
+                // },
+                // {
+                //     id: TextId.INTRO_1,
+                //     displayDuration: 2500,
+                //     sound: SoundId.INTRO_1,
+                //     options: { duration: 0.8, hideDuration: 0.8 },
+                // },
+                // {
+                //     id: TextId.INTRO_2,
+                //     displayDuration: 8000,
+                //     sound: SoundId.INTRO_2,
+                //     options: { duration: 0.8, hideDuration: 0.8 },
+                // },
+                // {
+                //     id: TextId.INTRO_3,
+                //     displayDuration: 3500,
+                //     sound: SoundId.INTRO_3,
+                //     options: { duration: 0.8, hideDuration: 0.8 },
+                // },
+                // {
+                //     id: TextId.INTRO_4,
+                //     displayDuration: 9000,
+                //     sound: SoundId.INTRO_4,
+                //     options: { duration: 0.8, hideDuration: 0.8 },
+                // },
+                // {
+                //     id: TextId.INTRO_5,
+                //     displayDuration: 3500,
+                //     sound: SoundId.INTRO_5,
+                //     options: { duration: 0.8, hideDuration: 0.8 },
+                // },
+                // {
+                //     id: TextId.INTRO_6,
+                //     displayDuration: 6000,
+                //     sound: SoundId.INTRO_6,
+                //     options: { duration: 0.8, hideDuration: 0.8 },
+                // },
+                // {
+                //     id: TextId.INTRO_7,
+                //     displayDuration: 3000,
+                //     sound: SoundId.INTRO_7,
+                //     options: { duration: 0.8, hideDuration: 0.8 },
+                // },
             ],
         ).then(() => {
+            SoundManager.stopAmbientSound(SoundId.INTRO_AMBIANCE);
             SoundManager.playAmbientSound(SoundId.TRAVELLING_MUSIC);
         });
 
@@ -155,15 +171,15 @@ class TimelineExperienceManager {
             },
             {
                 id: TextId.VERSE_1_2,
-                displayDuration: 2000,
+                displayDuration: 2500,
                 sound: SoundId.VERSE_1_2,
-                options: { duration: 0.5, hideDuration: 0.5 },
+                options: { duration: 0.7, hideDuration: 0.5 },
             },
             {
                 id: TextId.VERSE_1_3,
-                displayDuration: 2000,
+                displayDuration: 2500,
                 sound: SoundId.VERSE_1_3,
-                options: { duration: 0.5, hideDuration: 0.5 },
+                options: { duration: 0.7, hideDuration: 0.5 },
             },
             {
                 id: TextId.VERSE_1_4,
@@ -186,17 +202,23 @@ class TimelineExperienceManager {
     private _enterInteract1(): void {
         console.log("enter interact 1");
         WorldPresetManager.showPreset('wind');
+        this.mount({ id: 'interaction-wind', component: InteractionWindView });
         this.onEnterInteract1.execute();
     }
 
     private _leaveInteract1(): void {
         console.log("leave interact 1");
+        this.unmount('interaction-wind');
         this.onLeaveInteract1.execute();
     }
 
     private _enterVerse2(): void {
         console.log("enter verse 2");
         this.onEnterVerse2.execute();
+    }
+
+    private _getCamera(): MainThreeCameraController {
+        return ThreeCameraControllerManager.get(CameraId.THREE_MAIN) as MainThreeCameraController;
     }
 
     private _leaveVerse2(): void {

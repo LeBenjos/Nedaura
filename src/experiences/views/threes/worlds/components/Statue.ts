@@ -35,6 +35,10 @@ export default class Statue extends ThreeModelBase {
     private _textureDirty = false;
     private _canInteract = false;
 
+    // tracking seuil peinture statue pour next phase 
+    private _paintedPixels: number = 0;
+    private static readonly _MAX_PAINTED_PIXELS = Statue._HIT_MASK_SIZE * Statue._HIT_MASK_SIZE * 0.7; // 70% du canvas
+
     constructor() {
         super(AssetId.THREE_GLTF_DUNES, {
             object3DId: Object3DId.STATUE,
@@ -250,6 +254,8 @@ export default class Statue extends ThreeModelBase {
     private _paint(uvX: number, uvY: number, radius = 30): void {
         // si nous ne sommes pas en interaction, on n'affiche pas les effets de peinture
         if (!this._canInteract) return;
+        if (this._paintedPixels >= Statue._MAX_PAINTED_PIXELS) return;
+        
         const { _hitMaskCtx: ctx } = this;
         const size = Statue._HIT_MASK_SIZE;
 
@@ -267,12 +273,34 @@ export default class Statue extends ThreeModelBase {
         ctx.fill();
 
         this._textureDirty = true;
+
+        this._paintedPixels += Math.PI * radius * radius;
+        this._textureDirty = true;
+
+        // Dispatch de l'event de mise à jour de la jauge
+        const percentage = Math.min(1, this._paintedPixels / Statue._MAX_PAINTED_PIXELS);
+        this._updateJaugeInteraction(percentage);
+
+        if (this._paintedPixels >= Statue._MAX_PAINTED_PIXELS) {
+            this.launchNextPhase();
+        }
+    }
+
+    _updateJaugeInteraction(percentage: number): void {
+        // ici on fait dispatch un event custom pour que le composant Vue de la jauge puisse écouter et mettre à jour son affichage en conséquence
+        const event = new CustomEvent('jauge:update', { detail: { percentage } });
+        window.dispatchEvent(event);
+    }
+
+    private launchNextPhase(): void {
+        TimelineExperienceManager.setState(TimelineExperienceState.VERSE_2);
     }
 
     public override reset(): void {
         this._clearCanvas();
         this._hitMaskTexture.needsUpdate = true;
         this._textureDirty = false;
+        this._paintedPixels = 0;
 
         for (const shader of this._activeShaders) {
             shader.uniforms.uHitMask.value = this._hitMaskTexture;
