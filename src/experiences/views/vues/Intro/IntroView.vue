@@ -68,70 +68,75 @@ const onStartExperience = async () => {
         ease: 'power2.inOut',
     });
 
-    const totalDuration = 1.2 * 7 + 0.8 * 7 * 10;
+    const totalDuration = 0.8 * 7 + 0.8 * 7 * 9;
 
-    // baissse le bg progressivement
-    gsap.to('.intro-background', {
+    // baissse les bg progressivement
+    const tl = gsap.timeline();
+    tl.to('.intro-bg-overlay', {
         opacity: 0,
         duration: totalDuration,
         ease: 'none',
     });
+    tl.to('.intro-background', {
+        opacity: 0,
+        duration: totalDuration,
+        ease: 'none',
+        onComplete: () => {
+            // on enleve la scene 
+            unmount('intro');
+            // lancement du path desert
+            TimelineExperienceManager.setState(TimelineExperienceState.PATH_INTRO);
+        },
+    }, 0); 
 
 
-    if (true) {
-        await playTextSequence(
-            [
-                {
-                    id: TextId.INTRO_1,
-                    displayDuration: 2500,
-                    sound: SoundId.INTRO_1,
-                    options: { duration: 0.8, hideDuration: 0.8 },
-                },
-                {
-                    id: TextId.INTRO_2,
-                    displayDuration: 7000,
-                    sound: SoundId.INTRO_2,
-                    options: { duration: 0.8, hideDuration: 0.8 },
-                },
-                {
-                    id: TextId.INTRO_3,
-                    displayDuration: 3000,
-                    sound: SoundId.INTRO_3,
-                    options: { duration: 0.8, hideDuration: 0.8 },
-                },
-                {
-                    id: TextId.INTRO_4,
-                    displayDuration: 8000,
-                    sound: SoundId.INTRO_4,
-                    options: { duration: 0.8, hideDuration: 0.8 },
-                },
-                {
-                    id: TextId.INTRO_5,
-                    displayDuration: 3500,
-                    sound: SoundId.INTRO_5,
-                    options: { duration: 0.8, hideDuration: 0.8 },
-                },
-                {
-                    id: TextId.INTRO_6,
-                    displayDuration: 6000,
-                    sound: SoundId.INTRO_6,
-                    options: { duration: 0.8, hideDuration: 0.8 },
-                },
-                {
-                    id: TextId.INTRO_7,
-                    displayDuration: 3000,
-                    sound: SoundId.INTRO_7,
-                    options: { duration: 0.8, hideDuration: 0.8 },
-                },
-            ],
-            { signal: controller.signal }
-        );
-    }
-
-    unmount('intro');
-    TimelineExperienceManager.setState(TimelineExperienceState.PATH_INTRO);
-
-    console.log("Séquence terminée");
+    await playTextSequence(
+        [
+            {
+                id: TextId.INTRO_1,
+                displayDuration: 2500,
+                sound: SoundId.INTRO_1,
+                options: { duration: 0.8, hideDuration: 0.8 },
+            },
+            {
+                id: TextId.INTRO_2,
+                displayDuration: 8000,
+                sound: SoundId.INTRO_2,
+                options: { duration: 0.8, hideDuration: 0.8 },
+            },
+            {
+                id: TextId.INTRO_3,
+                displayDuration: 3500,
+                sound: SoundId.INTRO_3,
+                options: { duration: 0.8, hideDuration: 0.8 },
+            },
+            {
+                id: TextId.INTRO_4,
+                displayDuration: 9000,
+                sound: SoundId.INTRO_4,
+                options: { duration: 0.8, hideDuration: 0.8 },
+            },
+            {
+                id: TextId.INTRO_5,
+                displayDuration: 3500,
+                sound: SoundId.INTRO_5,
+                options: { duration: 0.8, hideDuration: 0.8 },
+            },
+            {
+                id: TextId.INTRO_6,
+                displayDuration: 6000,
+                sound: SoundId.INTRO_6,
+                options: { duration: 0.8, hideDuration: 0.8 },
+            },
+            {
+                id: TextId.INTRO_7,
+                displayDuration: 3000,
+                sound: SoundId.INTRO_7,
+                options: { duration: 0.8, hideDuration: 0.8 },
+            },
+        ],
+        { signal: controller.signal }
+    );
 };
 
 onBeforeUnmount(() => {
@@ -142,22 +147,21 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <transition name="intro">
-        <div class="intro-background">
-            <div class="intro-container">
-                <div class="intro-text">
-                    <p>Cette expérience se repose sur la reconnaissance des gestes par la caméra. Vous pourrez vous déplacer et interagir avec les éléments du site en utilisant simplement vos mains.</p>
-                    <p id="instruction" v-if="showInstruction">
-                        Veuillez autoriser l'utilisation de la caméra sur ce site.
-                    </p>
-                    <p v-if="!showInstruction" id="ready-instruction" class="ready">
-                        Quand vous êtes prêt, fermez les deux poings.
-                    </p>
-                </div>
-                <button class="button" id="webcamButton" @click="onClick">Activer la caméra</button>
+    <div class="intro-background">
+        <div class="intro-bg-overlay"></div>
+        <div class="intro-container">
+            <div class="intro-text">
+                <p>Cette expérience se repose sur la reconnaissance des gestes par la caméra. Vous pourrez vous déplacer et interagir avec les éléments du site en utilisant simplement vos mains.</p>
+                <p id="instruction" v-if="showInstruction">
+                    Veuillez autoriser l'utilisation de la caméra sur ce site.
+                </p>
+                <p v-if="!showInstruction" id="ready-instruction" class="ready">
+                    Quand vous êtes prêt, fermez les deux poings.
+                </p>
             </div>
+            <button class="button" id="webcamButton" @click="onClick">Activer la caméra</button>
         </div>
-    </transition>
+    </div>
 </template>
 
 <style lang="scss" scoped>
@@ -177,8 +181,14 @@ onBeforeUnmount(() => {
     gap: 23px;
     
     color: white;
-    background-color: rgba(16, 6, 1, 0.7);
-    backdrop-filter: blur(4px);
+
+    .intro-bg-overlay {
+        position: absolute;
+        inset: 0;
+        background-color: rgba(16, 6, 1, 0.7);
+        backdrop-filter: blur(4px);
+        z-index: -1;
+    }
 
     .intro-container {
         opacity: 0;
