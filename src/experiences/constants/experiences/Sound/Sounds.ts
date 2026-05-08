@@ -8,6 +8,16 @@ export const SOUNDS: Record<SoundIdType, string> = {
     [SoundId.INTRO_5]: "/intro/voixoff_intro_ecran5.wav",
     [SoundId.INTRO_6]: "/intro/voixoff_intro_ecran6.wav",
     [SoundId.INTRO_7]: "/intro/voixoff_intro_ecran7.wav",
+
+    // sand interractions
+    [SoundId.SAND_1]: "/interractions/sand_interaction_01.mp3",
+    [SoundId.SAND_2]: "/interractions/sand_interaction_02.mp3",
+    [SoundId.SAND_3]: "/interractions/sand_interaction_03.mp3",
+    [SoundId.SAND_4]: "/interractions/sand_interaction_04.mp3",
+    [SoundId.SAND_5]: "/interractions/sand_interaction_05.mp3",
+    [SoundId.SAND_6]: "/interractions/sand_interaction_06.mp3",
+    [SoundId.SAND_7]: "/interractions/sand_interaction_07.mp3",
+    
     // verset 1
     [SoundId.VERSE_1_1]: "/verset_1/01.mp3",
     [SoundId.VERSE_1_2]: "/verset_1/02.mp3",

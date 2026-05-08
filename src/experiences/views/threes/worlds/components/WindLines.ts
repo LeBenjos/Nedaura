@@ -26,6 +26,8 @@ import * as THREE from 'three';
 import { HitMaskPainter } from './Statue';
 import type { Controller } from 'lil-gui';
 import TimelineExperienceManager from '../../../../managers/TimelineExperienceManager';
+import SoundManager from '../../../../managers/SoundManager';
+import { TimelineExperienceState } from '../../../../constants/experiences/TimelineExperienceState';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -41,7 +43,6 @@ type Trail = {
 }
 
 // ─── Class ────────────────────────────────────────────────────────────────────
-
 export default class WindLines extends ThreeActorBase {
     private static readonly _NUM_TRAILS   = 6;
     private static readonly _TRAIL_LEN    = 200;
@@ -70,6 +71,8 @@ export default class WindLines extends ThreeActorBase {
     private readonly _right   = new Vector3();
     private readonly _up      = new Vector3();
     private readonly _forward = new Vector3();
+
+    private readonly _canInteract: boolean = false;
 
     constructor() {
         super();
@@ -293,7 +296,7 @@ export default class WindLines extends ThreeActorBase {
 
             if (statueRoot) {
                 const hits = ThreeRaycasterManager.castFromCameraToNdc(ndcX, ndcY, [statueRoot]);
-                if (hits.length > 0) {
+                if (hits.length > 0 && this.visible ) {
                     const hit = hits[0];
                     this._target3D.copy(hit.point);
                     this._fallbackPlanePoint.copy(hit.point);
@@ -321,7 +324,11 @@ export default class WindLines extends ThreeActorBase {
 
     private _applyHitToStatue(hitNode: THREE.Object3D, hit: THREE.Intersection): void {
         const painter = this._findHitMaskPainter(hitNode);
-        if (!painter) return;
+        
+        if (!painter && !this.visible ) return;
+
+        // on joue un son au hasard parmi une sélection, pour ajouter du feedback sonore à l'interaction
+        SoundManager.playInteractionSandSound();
 
         // UV explicitement typé et validé
         if (!hit.uv) return;
