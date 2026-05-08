@@ -1,8 +1,5 @@
 <script setup lang="ts">
 import { useInterfaceManager } from '../hooks/useInterfaceManager';
-import { ref } from 'vue';
-import { TimelineExperienceState } from '../../../constants/experiences/TimelineExperienceState';
-import TimelineExperienceManager from '../../../managers/TimelineExperienceManager';
 import LogoNedaura from './LogoNedaura.vue';
 import IntroView from '../Intro/IntroView.vue';
 import gsap from 'gsap';
@@ -10,7 +7,6 @@ import gsap from 'gsap';
 const { mount, unmount } = useInterfaceManager();
 
 const onClick = (): void => {
-    //TimelineExperienceManager.setState(TimelineExperienceState.PATH_INTRO);
     gsap.to('.menu-container', {
         opacity: 0,
         duration: 0.8,
@@ -65,7 +61,7 @@ const onClick = (): void => {
         align-items: center;
         justify-content: center;
         gap: 40px;
-        
+
         .menu-button {
             position: relative;
             overflow: hidden;

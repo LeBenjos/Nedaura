@@ -8,7 +8,6 @@ class SoundManager {
     }
 
     playSound(soundId: SoundId): void {
-        console.log("playSound", soundId);
         const sound = new Howl({
             src: [`/assets/sounds/${SOUNDS[soundId]}`],
             volume: 0.5,

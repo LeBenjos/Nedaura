@@ -25,6 +25,7 @@ import { Object3DId } from '../../../../constants/experiences/Object3dId';
 import * as THREE from 'three';
 import { HitMaskPainter } from './Statue';
 import type { Controller } from 'lil-gui';
+import TimelineExperienceManager from '../../../../managers/TimelineExperienceManager';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -75,9 +76,19 @@ export default class WindLines extends ThreeActorBase {
         this._cameraController = ThreeCameraControllerManager.get(CameraId.THREE_MAIN);
         this._initMesh();
         window.addEventListener('hand:update', this._onHandUpdate);
-
+        this.visible = false;
         this._initDebug();
     }
+
+    public override init(): void {
+        super.init();
+        
+        TimelineExperienceManager.onEnterInteract1.add(this._show, this);
+        TimelineExperienceManager.onLeaveInteract1.add(this._hide, this);
+    }
+
+    private _show = () => { this.visible = true; };
+    private _hide = () => { this.visible = false; };
 
     private _initDebug(): void {
         if (!DebugManager.isActive) return;
@@ -369,6 +380,10 @@ export default class WindLines extends ThreeActorBase {
     public override reset(): void {}
 
     public dispose(): void {
+        TimelineExperienceManager.onEnterInteract1.remove(this._show, this);
+        TimelineExperienceManager.onLeaveInteract1.remove(this._hide, this);
+        super.dispose();
+        
         window.removeEventListener('hand:update', this._onHandUpdate);
         for (const trail of this._trails) {
             this.remove(trail.mesh);

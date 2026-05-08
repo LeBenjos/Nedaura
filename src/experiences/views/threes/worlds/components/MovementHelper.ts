@@ -10,6 +10,7 @@ import { MeshBasicMaterial } from 'three/src/materials/Materials.js';
 import { DoubleSide, LinearFilter } from 'three/src/Three.WebGPU.Nodes.js';
 import MainThreeCameraController from '../../../../cameras/threes/MainThreeCameraController';
 import * as THREE from 'three';
+import TimelineExperienceManager from '../../../../managers/TimelineExperienceManager';
 
 export default class MovementHelper extends ThreeActorBase {
     private _material: MeshLineMaterial | undefined;
@@ -26,7 +27,7 @@ export default class MovementHelper extends ThreeActorBase {
 
     constructor() {
         super();
-
+        this.visible = false;
         this.createMesh();
         this.createIcon();
         this.add(this._group); // ← on ajoute le groupe une seule fois
@@ -114,4 +115,20 @@ export default class MovementHelper extends ThreeActorBase {
 
         this._group.rotation.y = this._rotationY;
     }
+
+    public override init(): void {
+        super.init();
+        
+        TimelineExperienceManager.onEnterInteract1.add(this._show, this);
+        TimelineExperienceManager.onLeaveInteract1.add(this._hide, this);
+    }
+
+    public override dispose(): void {
+        TimelineExperienceManager.onEnterInteract1.remove(this._show, this);
+        TimelineExperienceManager.onLeaveInteract1.remove(this._hide, this);
+        super.dispose();
+    }
+
+    private _show = () => { this.visible = true; };
+    private _hide = () => { this.visible = false; };
 }

@@ -8,4 +8,9 @@ export const SOUNDS: Record<SoundIdType, string> = {
     [SoundId.INTRO_5]: "/intro/voixoff_intro_ecran5.wav",
     [SoundId.INTRO_6]: "/intro/voixoff_intro_ecran6.wav",
     [SoundId.INTRO_7]: "/intro/voixoff_intro_ecran7.wav",
+    // verset 1
+    [SoundId.VERSE_1_1]: "/verset_1/01.mp3",
+    [SoundId.VERSE_1_2]: "/verset_1/02.mp3",
+    [SoundId.VERSE_1_3]: "/verset_1/03.mp3",
+    [SoundId.VERSE_1_4]: "/verset_1/04.mp3",
 };
