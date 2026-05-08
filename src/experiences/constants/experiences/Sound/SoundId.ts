@@ -1,4 +1,8 @@
 export const SoundId = {
+    // menu
+    MENU_AMBIANCE: 'MENU_AMBIANCE',
+    MENU_MUSIC: 'MENU_MUSIC',
+
     INTRO_1: 'INTRO_1',
     INTRO_2: 'INTRO_2',
     INTRO_3: 'INTRO_3',

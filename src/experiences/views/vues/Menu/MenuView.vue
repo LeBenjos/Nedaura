@@ -1,10 +1,20 @@
 <script setup lang="ts">
-import { useInterfaceManager } from '../hooks/useInterfaceManager';
+import gsap from 'gsap';
+import { onMounted } from 'vue';
+
 import LogoNedaura from './LogoNedaura.vue';
 import IntroView from '../Intro/IntroView.vue';
-import gsap from 'gsap';
+import { useInterfaceManager } from '../hooks/useInterfaceManager';
+import SoundManager from '../../../managers/SoundManager';
+import { SoundId } from '../../../constants/experiences/Sound/SoundId';
 
 const { mount, unmount } = useInterfaceManager();
+
+onMounted(() => {
+    SoundManager.playAmbientSound(SoundId.MENU_MUSIC);
+    SoundManager.playAmbientSound(SoundId.MENU_AMBIANCE);
+});
+
 
 const onClick = (): void => {
     gsap.to('.menu-container', {
@@ -13,11 +23,14 @@ const onClick = (): void => {
         ease: 'power2.inOut',
 
         onComplete: () => {
+            SoundManager.stopAmbientSound(SoundId.MENU_MUSIC);
+            SoundManager.stopAmbientSound(SoundId.MENU_AMBIANCE);
             unmount('menu');
             mount({ id: 'intro', component: IntroView, noAnimation: true });
         },
     });
 };
+
 </script>
 
 <template>

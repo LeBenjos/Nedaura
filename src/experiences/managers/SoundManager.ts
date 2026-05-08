@@ -4,6 +4,7 @@ import { SOUNDS } from '../constants/experiences/Sound/Sounds';
 
 class SoundManager {
     private _isPlayingInteraction: boolean = false;
+    private _ambientSounds: Map<SoundId, Howl> = new Map();
 
     constructor() {}
 
@@ -40,19 +41,40 @@ class SoundManager {
         sound.play();
     }
 
-    playAmbiantSound(soundId: string): void {
+    playAmbientSound(soundId: SoundId, fadeDuration: number = 1000): void {
+        if (this._ambientSounds.has(soundId)) return;
+
         const sound = new Howl({
-            src: [`/assets/sounds/${soundId}`],
-            volume: 0.5,
+            src: [`/assets/sounds/${SOUNDS[soundId]}`],
+            volume: 0,
             loop: true,
-        })
-        
+        });
+
         sound.play();
+        sound.fade(0, 0.3, fadeDuration);
+        this._ambientSounds.set(soundId, sound);
     }
 
-    stopSound(soundId: string): void {
+    stopAmbientSound(soundId: SoundId, fadeDuration: number = 1000): void {
+        const sound = this._ambientSounds.get(soundId);
+        if (!sound) return;
+
+        sound.fade(sound.volume(), 0, fadeDuration);
+        sound.once('fade', () => {
+            sound.stop();
+            this._ambientSounds.delete(soundId);
+        });
+    }
+
+    stopAllAmbientSounds(fadeDuration: number = 1000): void {
+        for (const soundId of this._ambientSounds.keys()) {
+            this.stopAmbientSound(soundId, fadeDuration);
+        }
+    }
+
+    stopSound(soundId: SoundId): void {
         const sound = new Howl({
-            src: [`/assets/sounds/${soundId}`],
+            src: [`/assets/sounds/${SOUNDS[soundId]}`],
             volume: 0.5,
         });
         sound.stop();
