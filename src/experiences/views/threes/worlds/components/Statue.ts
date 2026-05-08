@@ -11,6 +11,8 @@ import { AssetId } from "../../../../constants/experiences/AssetId";
 import { Object3DId } from "../../../../constants/experiences/Object3dId";
 import ThreeModelBase from "../../bases/components/ThreeModelBase";
 import ThreeAssetsManager from '../../../../managers/threes/ThreeAssetsManager';
+import TimelineExperienceManager from "../../../../managers/TimelineExperienceManager";
+import { TimelineExperienceState } from "../../../../constants/experiences/TimelineExperienceState";
 
 export interface HitMaskPainter {
     canvas: HTMLCanvasElement;
@@ -31,6 +33,7 @@ export default class Statue extends ThreeModelBase {
     private readonly _activeShaders = new Set<WebGLProgramParametersWithUniforms>();
 
     private _textureDirty = false;
+    private _canInteract = false;
 
     constructor() {
         super(AssetId.THREE_GLTF_DUNES, {
@@ -52,6 +55,12 @@ export default class Statue extends ThreeModelBase {
         this._clearCanvas();
         this._setupMaterials();
         this._exposePainter();
+    }
+
+    public init(): void {
+        super.init();
+        TimelineExperienceManager.onEnterInteract1.add(this._updateInteractiveState, this);
+        TimelineExperienceManager.onLeaveInteract1.add(this._updateInteractiveState, this);
     }
 
     private _clearCanvas(): void {
@@ -118,6 +127,7 @@ export default class Statue extends ThreeModelBase {
                     shader.uniforms.uBaseNormal          = { value: normalMap };
                     shader.uniforms.uErodedNormal        = { value: normalErodedWindMat };
                     shader.uniforms.uDisplacementStrength = { value: 0.35 };
+                    shader.uniforms.canInteract = { value: this._canInteract };
 
                     this._activeShaders.add(shader);
 
@@ -127,6 +137,7 @@ export default class Statue extends ThreeModelBase {
                     shader.vertexShader = `
                         uniform sampler2D uHitMask;
                         uniform float     uDisplacementStrength;
+                        uniform bool      canInteract;
                     ` + shader.vertexShader;
 
                     shader.vertexShader = shader.vertexShader.replace(
@@ -152,7 +163,7 @@ export default class Statue extends ThreeModelBase {
                         float noiseVal = mix( mix(na,nb,nU.x), mix(nc,nd,nU.x), nU.y );
 
                         // Déplace le long de la normale, modulé par le mask et le bruit
-                        transformed   -= objectNormal * hitD * noiseVal * uDisplacementStrength;
+                        transformed   -= objectNormal * hitD * noiseVal * uDisplacementStrength * (canInteract ? 1.0 : 0.0);
                         `
                     );
 
@@ -165,6 +176,7 @@ export default class Statue extends ThreeModelBase {
                         uniform sampler2D uErodedTexture;
                         uniform sampler2D uBaseNormal;
                         uniform sampler2D uErodedNormal;
+                        uniform bool      canInteract;
                     ` + shader.fragmentShader;
 
                     // Blend des textures diffuse
@@ -185,7 +197,7 @@ export default class Statue extends ThreeModelBase {
                         erodedColor.rgb   = pow( erodedColor.rgb, vec3( 1.8 ) );
 
                         float mask        = clamp( hitStrength, 0.0, 1.0 );
-                        diffuseColor     *= mix( baseColor, erodedColor, mask );
+                        diffuseColor *= canInteract ? mix( baseColor, erodedColor, mask ) : baseColor;
                         `
                     );
 
@@ -200,7 +212,7 @@ export default class Statue extends ThreeModelBase {
                             vec3 normalEroded  = texture2D( uErodedNormal, vUv ).xyz * 2.0 - 1.0;
 
                             vec3 blendedNormal = normalize( mix( normalBase, normalEroded, maskN ) );
-                            normal             = normalize( tbn * blendedNormal );
+                            normal = normalize( tbn * (canInteract ? blendedNormal : normalBase) );
                         #endif
                         `
                     );
@@ -209,6 +221,14 @@ export default class Statue extends ThreeModelBase {
                 };
             }
         });
+    }
+
+    private _updateInteractiveState = (): void => {
+        this._canInteract = TimelineExperienceManager.state === TimelineExperienceState.INTERACT_1;
+        
+        for (const shader of this._activeShaders) {
+            shader.uniforms.canInteract.value = this._canInteract;
+        }
     }
 
     private _exposePainter(): void {
@@ -228,6 +248,8 @@ export default class Statue extends ThreeModelBase {
     }
 
     private _paint(uvX: number, uvY: number, radius = 30): void {
+        // si nous ne sommes pas en interaction, on n'affiche pas les effets de peinture
+        if (!this._canInteract) return;
         const { _hitMaskCtx: ctx } = this;
         const size = Statue._HIT_MASK_SIZE;
 
