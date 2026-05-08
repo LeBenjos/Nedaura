@@ -217,10 +217,6 @@ class TimelineExperienceManager {
         this.onEnterVerse2.execute();
     }
 
-    private _getCamera(): MainThreeCameraController {
-        return ThreeCameraControllerManager.get(CameraId.THREE_MAIN) as MainThreeCameraController;
-    }
-
     private _leaveVerse2(): void {
         WorldPresetManager.showPreset('base');
         this.onLeaveVerse2.execute();

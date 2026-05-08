@@ -5,6 +5,7 @@ import {
     Mesh,
     MeshStandardMaterial,
     NoColorSpace,
+    Vector3,
     type WebGLProgramParametersWithUniforms,
 } from "three";
 import { AssetId } from "../../../../constants/experiences/AssetId";
@@ -13,6 +14,9 @@ import ThreeModelBase from "../../bases/components/ThreeModelBase";
 import ThreeAssetsManager from '../../../../managers/threes/ThreeAssetsManager';
 import TimelineExperienceManager from "../../../../managers/TimelineExperienceManager";
 import { TimelineExperienceState } from "../../../../constants/experiences/TimelineExperienceState";
+import ThreeCameraControllerManager from "../../../../managers/threes/ThreeCameraControllerManager";
+import MainThreeCameraController from "../../../../cameras/threes/MainThreeCameraController";
+import { CameraId } from "../../../../constants/experiences/CameraId";
 
 export interface HitMaskPainter {
     canvas: HTMLCanvasElement;
@@ -38,6 +42,9 @@ export default class Statue extends ThreeModelBase {
     // tracking seuil peinture statue pour next phase 
     private _paintedPixels: number = 0;
     private static readonly _MAX_PAINTED_PIXELS = Statue._HIT_MASK_SIZE * Statue._HIT_MASK_SIZE * 0.7; // 70% du canvas
+
+    private _camera = this._getCamera();
+    private _initialCameraPosition: Vector3 | null = null;
 
     constructor() {
         super(AssetId.THREE_GLTF_DUNES, {
@@ -66,6 +73,10 @@ export default class Statue extends ThreeModelBase {
         TimelineExperienceManager.onEnterInteract1.add(this._updateInteractiveState, this);
         TimelineExperienceManager.onLeaveInteract1.add(this._updateInteractiveState, this);
     }
+
+    private _getCamera(): MainThreeCameraController {
+        return ThreeCameraControllerManager.get(CameraId.THREE_MAIN) as MainThreeCameraController;
+    }   
 
     private _clearCanvas(): void {
         this._hitMaskCtx.fillStyle = "black";
@@ -130,7 +141,7 @@ export default class Statue extends ThreeModelBase {
                     shader.uniforms.uErodedTexture       = { value: textureErodedWindMat };
                     shader.uniforms.uBaseNormal          = { value: normalMap };
                     shader.uniforms.uErodedNormal        = { value: normalErodedWindMat };
-                    shader.uniforms.uDisplacementStrength = { value: 0.35 };
+                    shader.uniforms.uDisplacementStrength = { value: 0.5 };
                     shader.uniforms.canInteract = { value: this._canInteract };
 
                     this._activeShaders.add(shader);
@@ -198,7 +209,7 @@ export default class Statue extends ThreeModelBase {
                         vec4  erodedColor = texture2D( uErodedTexture, vUv );
                         
                         baseColor.rgb   = pow( baseColor.rgb, vec3( 0.4 ) );
-                        erodedColor.rgb   = pow( erodedColor.rgb, vec3( 1.8 ) );
+                        erodedColor.rgb   = pow( erodedColor.rgb, vec3( 3.0 ) );
 
                         float mask        = clamp( hitStrength, 0.0, 1.0 );
                         diffuseColor *= canInteract ? mix( baseColor, erodedColor, mask ) : baseColor;
@@ -229,7 +240,11 @@ export default class Statue extends ThreeModelBase {
 
     private _updateInteractiveState = (): void => {
         this._canInteract = TimelineExperienceManager.state === TimelineExperienceState.INTERACT_1;
-        
+
+        if (this._canInteract) {
+            this._camera.saveSpherical();
+        }
+
         for (const shader of this._activeShaders) {
             shader.uniforms.canInteract.value = this._canInteract;
         }
@@ -293,6 +308,7 @@ export default class Statue extends ThreeModelBase {
     }
 
     private launchNextPhase(): void {
+        this._camera.restoreSpherical(3); // retour a la position de base
         TimelineExperienceManager.setState(TimelineExperienceState.VERSE_2);
     }
 

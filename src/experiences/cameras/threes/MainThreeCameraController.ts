@@ -244,6 +244,29 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
         this._camera.lookAt(this._target);
     }
 
+    private _savedSpherical: Spherical | null = null;
+
+    public saveSpherical(): void {
+        this._savedSpherical = this._spherical.clone();
+    }
+
+    public restoreSpherical(duration: number = 3): void {
+        if (!this._savedSpherical) return;
+
+        // Met à jour la cible sphérique vers la position sauvegardée
+        this._sphericalTarget.copy(this._savedSpherical);
+
+        // Lance la transition depuis la position actuelle
+        this._idleTransition = {
+            duration,
+            elapsed: 0,
+            fromPos: this._container.position.clone(),
+            fromLookAt: this._target.clone(),
+        };
+
+        this._pathState = null;
+    }
+
     private _setupDebugGui(): void {
         const folder = DebugManager.getGuiFolder(DebugGuiTitle.THREE_CAMERAS).addFolder('Main Camera');
 
