@@ -8,6 +8,9 @@ import Sky from './components/Sky';
 import Statue from './components/Statue';
 import WindLines from './components/WindLines';
 import MovementHelper from './components/MovementHelper';
+import MainThreeCameraController from '../../../cameras/threes/MainThreeCameraController';
+import ThreeCameraControllerManager from '../../../managers/threes/ThreeCameraControllerManager';
+import { CameraId } from '../../../constants/experiences/CameraId';
 
 export default class WorldThreeView extends ThreeViewBase {
     constructor() {
@@ -16,6 +19,8 @@ export default class WorldThreeView extends ThreeViewBase {
 
     protected override _generateActors(): void {
         super._generateActors();
+
+        const cameraController = this._getCamera();
 
         this._actors.push(new Environment());
         // this._actors.push(new TemplateMesh());
@@ -27,7 +32,7 @@ export default class WorldThreeView extends ThreeViewBase {
         this._actors.push(new Statue());
         this._actors.push(new CameraPath());
         this._actors.push(new WindLines());
-        this._actors.push(new MovementHelper());
+        this._actors.push(new MovementHelper(cameraController));
         this._actors.push(new Sand());
 
         for (const actor of this._actors) this.add(actor);
@@ -35,5 +40,9 @@ export default class WorldThreeView extends ThreeViewBase {
 
     public override update(dt: number): void {
         for (const actor of this._actors) actor.update(dt);
+    }
+
+    private _getCamera(): MainThreeCameraController {
+        return ThreeCameraControllerManager.get(CameraId.THREE_MAIN) as MainThreeCameraController;
     }
 }

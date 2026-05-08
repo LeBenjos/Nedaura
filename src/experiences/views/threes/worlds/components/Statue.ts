@@ -117,7 +117,7 @@ export default class Statue extends ThreeModelBase {
                     shader.uniforms.uErodedTexture       = { value: textureErodedWindMat };
                     shader.uniforms.uBaseNormal          = { value: normalMap };
                     shader.uniforms.uErodedNormal        = { value: normalErodedWindMat };
-                    shader.uniforms.uDisplacementStrength = { value: 0.25 };
+                    shader.uniforms.uDisplacementStrength = { value: 0.35 };
 
                     this._activeShaders.add(shader);
 
@@ -180,8 +180,9 @@ export default class Statue extends ThreeModelBase {
                         float hitStrength = texture2D( uHitMask,      vUv ).r;
                         vec4  baseColor   = texture2D( uBaseTexture,   vUv );
                         vec4  erodedColor = texture2D( uErodedTexture, vUv );
-
-                        erodedColor.rgb   = pow( erodedColor.rgb, vec3( 0.6 ) );
+                        
+                        baseColor.rgb   = pow( baseColor.rgb, vec3( 0.4 ) );
+                        erodedColor.rgb   = pow( erodedColor.rgb, vec3( 1.8 ) );
 
                         float mask        = clamp( hitStrength, 0.0, 1.0 );
                         diffuseColor     *= mix( baseColor, erodedColor, mask );
