@@ -70,21 +70,78 @@ class TimelineExperienceManager {
         }
     }
 
-    private _enterPathIntro(): void {
-        SoundManager.playAmbientSound(SoundId.TRAVELLING_AMBIANCE);
-        SoundManager.playAmbientSound(SoundId.TRAVELLING_MUSIC);
-        TextManager.showText(TextId.CAMERA_PATH);
-        TextManager.hideText(TextId.CAMERA_PATH);
+    private async _enterPathIntro(): Promise<void> {
+        SoundManager.playAmbientSound(SoundId.INTRO_AMBIANCE);
+        //SoundManager.playAmbientSound(SoundId.TRAVELLING_MUSIC);
+
         this.onEnterPathIntro.execute();
+
+        await playTextSequence(
+            [
+                {
+                    id: TextId.CAMERA_PATH,
+                    displayDuration: 2500,
+                    options: { duration: 0.8, hideDuration: 0.8 },
+                },
+                {
+                    id: TextId.INTRO_1,
+                    displayDuration: 2500,
+                    sound: SoundId.INTRO_1,
+                    options: { duration: 0.8, hideDuration: 0.8 },
+                },
+                {
+                    id: TextId.INTRO_2,
+                    displayDuration: 8000,
+                    sound: SoundId.INTRO_2,
+                    options: { duration: 0.8, hideDuration: 0.8 },
+                },
+                {
+                    id: TextId.INTRO_3,
+                    displayDuration: 3500,
+                    sound: SoundId.INTRO_3,
+                    options: { duration: 0.8, hideDuration: 0.8 },
+                },
+                {
+                    id: TextId.INTRO_4,
+                    displayDuration: 9000,
+                    sound: SoundId.INTRO_4,
+                    options: { duration: 0.8, hideDuration: 0.8 },
+                },
+                {
+                    id: TextId.INTRO_5,
+                    displayDuration: 3500,
+                    sound: SoundId.INTRO_5,
+                    options: { duration: 0.8, hideDuration: 0.8 },
+                },
+                {
+                    id: TextId.INTRO_6,
+                    displayDuration: 6000,
+                    sound: SoundId.INTRO_6,
+                    options: { duration: 0.8, hideDuration: 0.8 },
+                },
+                {
+                    id: TextId.INTRO_7,
+                    displayDuration: 3000,
+                    sound: SoundId.INTRO_7,
+                    options: { duration: 0.8, hideDuration: 0.8 },
+                },
+            ],
+        ).then(() => {
+            SoundManager.playAmbientSound(SoundId.TRAVELLING_MUSIC);
+        });
+
+        const totalDuration = 3100+ 2500 + 8000 + 3500 + 9000 + 3500 + 6000 + 3000; // durée totale des textes + transitions
+        const totalDurationSeconds = totalDuration / 1000;
+        console.log(`Total duration of intro sequence: ${totalDurationSeconds} seconds`);
     }
-    
+
     private _leavePathIntro(): void {
         console.log("leave path intro");
-        SoundManager.stopAmbientSound(SoundId.TRAVELLING_AMBIANCE);
+        // SoundManager.stopAmbientSound(SoundId.TRAVELLING_AMBIANCE);
         SoundManager.stopAmbientSound(SoundId.TRAVELLING_MUSIC);
         this.onLeavePathIntro.execute();
     }
-    
+
     private async _enterVerse1() {
         console.log("enter verse 1");
         this.onEnterVerse1.execute();
@@ -125,7 +182,7 @@ class TimelineExperienceManager {
         console.log("leave verse 1");
         this.onLeaveVerse1.execute();
     }
-    
+
     private _enterInteract1(): void {
         console.log("enter interact 1");
         WorldPresetManager.showPreset('wind');

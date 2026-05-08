@@ -12,7 +12,7 @@ import ThreeModelBase from '../../bases/components/ThreeModelBase';
 export default class CameraPath extends ThreeModelBase {
     private static readonly _DEDUPE_EPSILON = 1e-5;
     private static readonly _CLOSE_LOOP_EPSILON = 1e-2;
-    private static readonly _INTRO_DURATION_S = 30;
+    private static readonly _INTRO_DURATION_S = 80;
 
     declare private _curve: CatmullRomCurve3;
 

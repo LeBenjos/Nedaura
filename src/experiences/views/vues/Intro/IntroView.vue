@@ -67,84 +67,32 @@ const onStartExperience = async () => {
         opacity: 0,
         duration: 0.8,
         ease: 'power2.inOut',
+        onComplete: () => {
+            TimelineExperienceManager.setState(TimelineExperienceState.PATH_INTRO);
+        }
     });
-
-    const totalDuration = 0.8 * 7 + 0.8 * 7 * 9; // durée totale des textes + transitions
 
     // baissse les bg progressivement
     const tl = gsap.timeline();
     tl.to('.intro-bg-overlay', {
         opacity: 0,
-        duration: totalDuration,
+        delay: 20,
+        duration: 38.6,
         ease: 'none',
     });
     tl.to('.intro-background', {
         opacity: 0,
-        duration: totalDuration,
+        delay: 20,
+        duration: 38.6,
         ease: 'none',
         onComplete: () => {
-            SoundManager.stopAmbientSound(SoundId.INTRO_AMBIANCE);
-            // on enleve la scene 
             unmount('intro');
-            // lancement du path desert
-            TimelineExperienceManager.setState(TimelineExperienceState.PATH_INTRO);
         },
     }, 0); 
-
-
-    SoundManager.playAmbientSound(SoundId.INTRO_AMBIANCE);
-    await playTextSequence(
-        [
-            {
-                id: TextId.INTRO_1,
-                displayDuration: 2500,
-                sound: SoundId.INTRO_1,
-                options: { duration: 0.8, hideDuration: 0.8 },
-            },
-            {
-                id: TextId.INTRO_2,
-                displayDuration: 8000,
-                sound: SoundId.INTRO_2,
-                options: { duration: 0.8, hideDuration: 0.8 },
-            },
-            {
-                id: TextId.INTRO_3,
-                displayDuration: 3500,
-                sound: SoundId.INTRO_3,
-                options: { duration: 0.8, hideDuration: 0.8 },
-            },
-            {
-                id: TextId.INTRO_4,
-                displayDuration: 9000,
-                sound: SoundId.INTRO_4,
-                options: { duration: 0.8, hideDuration: 0.8 },
-            },
-            {
-                id: TextId.INTRO_5,
-                displayDuration: 3500,
-                sound: SoundId.INTRO_5,
-                options: { duration: 0.8, hideDuration: 0.8 },
-            },
-            {
-                id: TextId.INTRO_6,
-                displayDuration: 6000,
-                sound: SoundId.INTRO_6,
-                options: { duration: 0.8, hideDuration: 0.8 },
-            },
-            {
-                id: TextId.INTRO_7,
-                displayDuration: 3000,
-                sound: SoundId.INTRO_7,
-                options: { duration: 0.8, hideDuration: 0.8 },
-            },
-        ],
-        { signal: controller.signal }
-    );
 };
 
 onBeforeUnmount(() => {
     controller.abort();
-    SoundManager.stopAmbientSound(SoundId.INTRO_AMBIANCE);
     window.removeEventListener('hand:update', _onHandUpdate);
 });
 
