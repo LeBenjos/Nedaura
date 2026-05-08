@@ -1,5 +1,5 @@
 import { Action } from "@benjos/cookware";
-import { TextId } from "../constants/experiences/TextId";
+import { TextId } from "../constants/experiences/Text/TextId";
 import { TimelineExperienceState } from "../constants/experiences/TimelineExperienceState";
 
 import WorldPresetManager from "./WorldPresetManager";

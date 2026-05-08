@@ -7,6 +7,7 @@ import ThreeAssetsManager from '../managers/threes/ThreeAssetsManager';
 import ThreeCameraControllerManager from '../managers/threes/ThreeCameraControllerManager';
 import ThreeRaycasterManager from '../managers/threes/ThreeRaycasterManager';
 import TimelineExperienceManager from '../managers/TimelineExperienceManager';
+import SoundManager from '../managers/SoundManager';
 
 class InitCommand {
     public init(): void {

@@ -1,6 +1,8 @@
 // utils/textSequence.ts
 
-import { TextId } from '../../constants/experiences/TextId';
+import { SoundId } from '../../constants/experiences/Sound/SoundId';
+import { TextId } from '../../constants/experiences/Text/TextId';
+import SoundManager from '../SoundManager';
 import TextManager from './TextManager';
 import type { TextShowOptions } from './TextManager';
 
@@ -8,6 +10,7 @@ type TextStep = {
     id: TextId;
     x?: number;
     y?: number;
+    sound?: SoundId;
     options?: Partial<TextShowOptions>;
     displayDuration: number; // en secondes 
 };
@@ -38,6 +41,10 @@ export const playTextSequence = async (
         
         await wait(showDuration, signal).catch(() => {});
         
+        if (step.sound) {
+            console.log("playSound", step.sound);
+            SoundManager.playSound(step.sound);
+        }
         TextManager.showText(step.id, step.x, step.y, step.options);
 
         // attendre que le show soit fini + le temps d'affichage

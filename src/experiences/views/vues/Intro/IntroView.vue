@@ -4,18 +4,16 @@ import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { TimelineExperienceState } from '../../../constants/experiences/TimelineExperienceState';
 import TimelineExperienceManager from '../../../managers/TimelineExperienceManager';
 import { transition } from 'three/examples/jsm/tsl/display/TransitionNode.js';
-import TextManager from '../../../managers/TextManager/TextManager';
-import { TextId } from '../../../constants/experiences/TextId';
+import { TextId } from '../../../constants/experiences/Text/TextId';
 import gsap from 'gsap';
-import MainMediapipe from '../../../engines/mediapipe/MainMediapipe';
 import { MediapipeHandsSnapshot } from '../../../managers/MediapipeManager';
 import { playTextSequence } from '../../../managers/TextManager/TextSequence';
 import DebugManager from '../../../managers/DebugManager';
+import { SoundId } from '../../../constants/experiences/Sound/SoundId';
 
 const showInstruction = ref(true);
-const startExperience: boolean = false;
 
-const { mount, unmount } = useInterfaceManager();
+const { unmount } = useInterfaceManager();
 const controller = new AbortController();
 
 const isDebug = ref<boolean>(DebugManager.isActive);
@@ -56,7 +54,6 @@ const _onHandUpdate = (e: CustomEvent<MediapipeHandsSnapshot>) => {
     if (leftFist && rightFist) {
         if (!showInstruction.value ) {
             console.log("Hand update received:", { leftFist, rightFist });
-            showInstruction.value = true;
             window.removeEventListener('hand:update', _onHandUpdate);
             onStartExperience();
         }
@@ -86,38 +83,45 @@ const onStartExperience = async () => {
             [
                 {
                     id: TextId.INTRO_1,
-                    displayDuration: 2000,
-                    options: { duration: 1.2, hideDuration: 0.8 },
+                    displayDuration: 2500,
+                    sound: SoundId.INTRO_1,
+                    options: { duration: 0.8, hideDuration: 0.8 },
                 },
                 {
                     id: TextId.INTRO_2,
-                    displayDuration: 3500,
-                    options: { duration: 1.2, hideDuration: 0.8 },
+                    displayDuration: 7000,
+                    sound: SoundId.INTRO_2,
+                    options: { duration: 0.8, hideDuration: 0.8 },
                 },
                 {
                     id: TextId.INTRO_3,
-                    displayDuration: 3500,
-                    options: { duration: 1.2, hideDuration: 0.8 },
+                    displayDuration: 3000,
+                    sound: SoundId.INTRO_3,
+                    options: { duration: 0.8, hideDuration: 0.8 },
                 },
                 {
                     id: TextId.INTRO_4,
-                    displayDuration: 3500,
-                    options: { duration: 1.2, hideDuration: 0.8 },
+                    displayDuration: 8000,
+                    sound: SoundId.INTRO_4,
+                    options: { duration: 0.8, hideDuration: 0.8 },
                 },
                 {
                     id: TextId.INTRO_5,
                     displayDuration: 3500,
-                    options: { duration: 1.2, hideDuration: 0.8 },
+                    sound: SoundId.INTRO_5,
+                    options: { duration: 0.8, hideDuration: 0.8 },
                 },
                 {
                     id: TextId.INTRO_6,
-                    displayDuration: 3500,
-                    options: { duration: 1.2, hideDuration: 0.8 },
+                    displayDuration: 6000,
+                    sound: SoundId.INTRO_6,
+                    options: { duration: 0.8, hideDuration: 0.8 },
                 },
                 {
                     id: TextId.INTRO_7,
-                    displayDuration: 3500,
-                    options: { duration: 1.2, hideDuration: 0.8 },
+                    displayDuration: 3000,
+                    sound: SoundId.INTRO_7,
+                    options: { duration: 0.8, hideDuration: 0.8 },
                 },
             ],
             { signal: controller.signal }
