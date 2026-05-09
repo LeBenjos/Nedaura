@@ -123,6 +123,13 @@ onBeforeUnmount(() => {
     // &:not(.debug) {
     //     visibility: hidden;
     // }
+    transition: opacity 0.5s ease;
+    opacity: 1;
+
+    &.hidden {
+        // transition on opacity for smooth fade out
+        opacity: 0;
+    }
 }
 
 /* VIDEO + CANVAS SUPERPOSÉS */
