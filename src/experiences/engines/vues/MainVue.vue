@@ -6,6 +6,7 @@ import LoaderView from '../../views/vues/LoaderView.vue';
 import LoaderManager from '../../managers/LoaderManager';
 import { onMounted, ref } from 'vue';
 import MenuView from '../../views/vues/Menu/MenuView.vue';
+import MenuBurgerView from '../../views/vues/MenuBurgerView.vue/MenuBurgerView.vue';
 
 const isVisible = ref(false);
 
@@ -17,6 +18,7 @@ onMounted(() => {
 
 const onShow = (): void => {
     mount({ id: 'menu', component: MenuView });
+    mount({ id: 'menu-burger', component: MenuBurgerView });
     isVisible.value = true;
 };
 </script>

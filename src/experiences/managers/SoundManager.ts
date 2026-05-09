@@ -5,6 +5,7 @@ import { SOUNDS } from '../constants/experiences/Sound/Sounds';
 class SoundManager {
     private _isPlayingInteraction: boolean = false;
     private _ambientSounds: Map<SoundId, Howl> = new Map();
+    private _isMuted: boolean = false; 
 
     constructor() {}
 
@@ -82,6 +83,26 @@ class SoundManager {
 
     clearSounds(): void {
         Howler.stop();
+    }
+
+
+    get isMuted(): boolean {
+        return this._isMuted;
+    }
+
+    toggleMute(): void {
+        this._isMuted = !this._isMuted;
+        Howler.volume(this._isMuted ? 0 : 1);
+    }
+
+    mute(): void {
+        this._isMuted = true;
+        Howler.volume(0);
+    }
+
+    unmute(): void {
+        this._isMuted = false;
+        Howler.volume(1);
     }
 }
 
