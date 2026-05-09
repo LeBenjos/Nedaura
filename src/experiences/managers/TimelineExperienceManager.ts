@@ -94,53 +94,53 @@ class TimelineExperienceManager {
 
         await playTextSequence(
             [
-                // {
-                //     id: TextId.CAMERA_PATH,
-                //     displayDuration: 2500,
-                //     options: { duration: 0.8, hideDuration: 0.8 },
-                // },
-                // {
-                //     id: TextId.INTRO_1,
-                //     displayDuration: 2500,
-                //     sound: SoundId.INTRO_1,
-                //     options: { duration: 0.8, hideDuration: 0.8 },
-                // },
-                // {
-                //     id: TextId.INTRO_2,
-                //     displayDuration: 8000,
-                //     sound: SoundId.INTRO_2,
-                //     options: { duration: 0.8, hideDuration: 0.8 },
-                // },
-                // {
-                //     id: TextId.INTRO_3,
-                //     displayDuration: 3500,
-                //     sound: SoundId.INTRO_3,
-                //     options: { duration: 0.8, hideDuration: 0.8 },
-                // },
-                // {
-                //     id: TextId.INTRO_4,
-                //     displayDuration: 9000,
-                //     sound: SoundId.INTRO_4,
-                //     options: { duration: 0.8, hideDuration: 0.8 },
-                // },
-                // {
-                //     id: TextId.INTRO_5,
-                //     displayDuration: 3500,
-                //     sound: SoundId.INTRO_5,
-                //     options: { duration: 0.8, hideDuration: 0.8 },
-                // },
-                // {
-                //     id: TextId.INTRO_6,
-                //     displayDuration: 6000,
-                //     sound: SoundId.INTRO_6,
-                //     options: { duration: 0.8, hideDuration: 0.8 },
-                // },
-                // {
-                //     id: TextId.INTRO_7,
-                //     displayDuration: 3000,
-                //     sound: SoundId.INTRO_7,
-                //     options: { duration: 0.8, hideDuration: 0.8 },
-                // },
+                {
+                    id: TextId.CAMERA_PATH,
+                    displayDuration: 2500,
+                    options: { duration: 0.8, hideDuration: 0.8 },
+                },
+                {
+                    id: TextId.INTRO_1,
+                    displayDuration: 2500,
+                    sound: SoundId.INTRO_1,
+                    options: { duration: 0.8, hideDuration: 0.8 },
+                },
+                {
+                    id: TextId.INTRO_2,
+                    displayDuration: 8000,
+                    sound: SoundId.INTRO_2,
+                    options: { duration: 0.8, hideDuration: 0.8 },
+                },
+                {
+                    id: TextId.INTRO_3,
+                    displayDuration: 3500,
+                    sound: SoundId.INTRO_3,
+                    options: { duration: 0.8, hideDuration: 0.8 },
+                },
+                {
+                    id: TextId.INTRO_4,
+                    displayDuration: 9000,
+                    sound: SoundId.INTRO_4,
+                    options: { duration: 0.8, hideDuration: 0.8 },
+                },
+                {
+                    id: TextId.INTRO_5,
+                    displayDuration: 3500,
+                    sound: SoundId.INTRO_5,
+                    options: { duration: 0.8, hideDuration: 0.8 },
+                },
+                {
+                    id: TextId.INTRO_6,
+                    displayDuration: 6000,
+                    sound: SoundId.INTRO_6,
+                    options: { duration: 0.8, hideDuration: 0.8 },
+                },
+                {
+                    id: TextId.INTRO_7,
+                    displayDuration: 3000,
+                    sound: SoundId.INTRO_7,
+                    options: { duration: 0.8, hideDuration: 0.8 },
+                },
             ],
         ).then(() => {
             SoundManager.stopAmbientSound(SoundId.INTRO_AMBIANCE);
