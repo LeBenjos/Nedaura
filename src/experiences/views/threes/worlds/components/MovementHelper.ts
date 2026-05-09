@@ -108,6 +108,9 @@ export default class MovementHelper extends ThreeActorBase {
                     if (this._material && this._icon) {
                         const iconMaterial = this._icon.material as MeshBasicMaterial;
 
+                        // cache en meme temps les hand movment helper 
+                        document.querySelector('#hand-helpers')?.classList.add('hidden');
+
                         gsap.to(this._material, {
                             opacity: 0,
                             duration: 1.2,
@@ -194,17 +197,17 @@ export default class MovementHelper extends ThreeActorBase {
 
             gsap.to(this._material, {
                 opacity: 1,
-                duration: 1.2,
+                duration: 1,
                 ease: 'power2.out',
             });
 
             gsap.to(iconMaterial, {
                 opacity: 1,
-                duration: 1.2,
+                duration: 1,
                 ease: 'power2.out',
             });
         }
     };
-    
+
     private _hide = () => { this.visible = false; };
 }

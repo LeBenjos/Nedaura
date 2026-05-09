@@ -55,7 +55,9 @@ const _onHandUpdate = (e: CustomEvent<MediapipeHandsSnapshot>) => {
     if (leftFist && rightFist) {
         if (!showInstruction.value ) {
             console.log("Hand update received:", { leftFist, rightFist });
-            document.querySelector('.webcam-container')?.classList.toggle('hidden');
+            if (!isDebug.value && !isDebugVisible.value) {
+                document.querySelector('.webcam-container')?.classList.toggle('hidden');
+            }
             window.removeEventListener('hand:update', _onHandUpdate);
             onStartExperience();
         }

@@ -42,7 +42,6 @@ export const playTextSequence = async (
         await wait(showDuration, signal).catch(() => {});
         
         if (step.sound) {
-            console.log("playSound", step.sound);
             SoundManager.playSound(step.sound);
         }
         TextManager.showText(step.id, step.x, step.y, step.options);

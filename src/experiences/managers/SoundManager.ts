@@ -30,7 +30,6 @@ class SoundManager {
             SoundId.SAND_6,
             SoundId.SAND_7
         ];
-        console.log("play sand interaction sound"); 
         const soundIndex = Math.floor(Math.random() * listSandInterractionsSound.length);
         const sound = new Howl({
             src: [`/assets/sounds/${SOUNDS[listSandInterractionsSound[soundIndex]]}`],

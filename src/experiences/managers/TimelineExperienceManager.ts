@@ -12,6 +12,7 @@ import InteractionWindView from "../views/vues/interactions/InteractionWindView.
 import { useInterfaceManager } from "../views/vues/hooks/useInterfaceManager";
 import ThreeCameraControllerManager from "./threes/ThreeCameraControllerManager";
 import { CameraId } from "../constants/experiences/CameraId";
+import HandMovementHelper from "../views/vues/interactions/HandMovementHelper.vue";
 
 class TimelineExperienceManager {
     private declare _state: TimelineExperienceState;
@@ -203,12 +204,14 @@ class TimelineExperienceManager {
         console.log("enter interact 1");
         WorldPresetManager.showPreset('wind');
         this.mount({ id: 'interaction-wind', component: InteractionWindView });
+        this.mount({id: 'hand-movement-helper', component: HandMovementHelper});
         this.onEnterInteract1.execute();
     }
 
     private _leaveInteract1(): void {
         console.log("leave interact 1");
         this.unmount('interaction-wind');
+        this.unmount('hand-movement-helper');
         this.onLeaveInteract1.execute();
     }
 
