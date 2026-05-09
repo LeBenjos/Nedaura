@@ -74,6 +74,8 @@ export default class WindLines extends ThreeActorBase {
 
     private readonly _canInteract: boolean = false;
 
+    private _isHandVisible: boolean = false;
+
     constructor() {
         super();
         this._cameraController = ThreeCameraControllerManager.get(CameraId.THREE_MAIN);
@@ -282,44 +284,55 @@ export default class WindLines extends ThreeActorBase {
     private _onHandUpdate = (e: CustomEvent<MediapipeHandsSnapshot>): void => {
         if (!this._settings.enabled) return;
         const tip = e.detail.right?.indexTip;
-        if (tip) {
-            // Mediapipe can slightly overshoot [0..1] near edges; clamp to avoid huge ray swings.
-            const x01 = MathUtils.clamp(tip.x, 0, 1);
-            const y01 = MathUtils.clamp(tip.y, 0, 1);
 
-            // Convertit le pont index, en coordonnée, inversé pour que x soit a gauche quand = 0
-            const ndcX = MathUtils.clamp((0.5 - x01) * 2, -1, 1);
-            const ndcY = MathUtils.clamp((0.5 - y01) * 2, -1, 1);
+        if (!tip) {
+            this._isHandVisible = false;    
+            return;
+        }
 
-            const statueRoot =
-                MainThreeApp.scene.getObjectByName(Object3DId.STATUE) ?? MainThreeApp.scene.getObjectByName('STATUE001');
+        const justAppeared = !this._isHandVisible;
+        this._isHandVisible = true;
 
-            if (statueRoot) {
-                const hits = ThreeRaycasterManager.castFromCameraToNdc(ndcX, ndcY, [statueRoot]);
-                if (hits.length > 0 && this.visible ) {
-                    const hit = hits[0];
-                    this._target3D.copy(hit.point);
-                    this._fallbackPlanePoint.copy(hit.point);
-                    this._hasFallbackPlanePoint = true;
-                    this._applyHitToStatue(hit.object, hit);
-                    return;
-                }
+        // Mediapipe can slightly overshoot [0..1] near edges; clamp to avoid huge ray swings.
+        const x01 = MathUtils.clamp(tip.x, 0, 1);
+        const y01 = MathUtils.clamp(tip.y, 0, 1);
 
-                // Fallback si aucune intersection.
-                const planePoint = this._hasFallbackPlanePoint
-                    ? this._fallbackPlanePoint
-                    : statueRoot.getWorldPosition(this._tmpStatueCenter);
+        // Convertit le pont index, en coordonnée, inversé pour que x soit a gauche quand = 0
+        const ndcX = MathUtils.clamp((0.5 - x01) * 2, -1, 1);
+        const ndcY = MathUtils.clamp((0.5 - y01) * 2, -1, 1);
 
-                const p = this._ndcToWorldOnPlane(ndcX, ndcY, planePoint);
-                if (p) {
-                    this._target3D.copy(p);
-                    return;
-                }
+        const statueRoot =
+            MainThreeApp.scene.getObjectByName(Object3DId.STATUE) ?? MainThreeApp.scene.getObjectByName('STATUE001');
+
+        if (statueRoot) {
+            const hits = ThreeRaycasterManager.castFromCameraToNdc(ndcX, ndcY, [statueRoot]);
+            if (hits.length > 0 && this.visible ) {
+                const hit = hits[0];
+                this._target3D.copy(hit.point);
+                this._fallbackPlanePoint.copy(hit.point);
+                this._hasFallbackPlanePoint = true;
+                this._applyHitToStatue(hit.object, hit);
+                return;
             }
 
-            // Fallback: keep the previous behavior if we don't hit the statue.
-            this._target3D.copy(this._handToWorld({ ...tip, x: x01, y: y01 }));
-        };
+            // Fallback si aucune intersection.
+            const planePoint = this._hasFallbackPlanePoint
+                ? this._fallbackPlanePoint
+                : statueRoot.getWorldPosition(this._tmpStatueCenter);
+
+            const p = this._ndcToWorldOnPlane(ndcX, ndcY, planePoint);
+            if (p) {
+                this._target3D.copy(p);
+                return;
+            }
+        }
+
+        // Fallback: keep the previous behavior if we don't hit the statue.
+        this._target3D.copy(this._handToWorld({ ...tip, x: x01, y: y01 }));
+
+        if (justAppeared) {
+            this._trails.forEach(tr => tr.smoothedTarget.copy(this._target3D));
+        }
     };
 
     private _applyHitToStatue(hitNode: THREE.Object3D, hit: THREE.Intersection): void {
