@@ -12,6 +12,11 @@ export const TextId = {
     VERSE_1_2: 'VERSE_1_2',
     VERSE_1_3: 'VERSE_1_3',
     VERSE_1_4: 'VERSE_1_4',
+    // verset 2
+    VERSE_2_1: 'VERSE_2_1',
+    VERSE_2_2: 'VERSE_2_2',
+    VERSE_2_3: 'VERSE_2_3',
+    VERSE_2_4: 'VERSE_2_4',
 } as const;
 
 export type TextId = (typeof TextId)[keyof typeof TextId];

@@ -212,8 +212,34 @@ class TimelineExperienceManager {
         this.onLeaveInteract1.execute();
     }
 
-    private _enterVerse2(): void {
+    private async _enterVerse2(): Promise<void> {
         console.log("enter verse 2");
+        await playTextSequence([
+            {
+                id: TextId.VERSE_2_1,
+                displayDuration: 2000,
+                sound: SoundId.VERSE_2_1,
+                options: { duration: 0.5, hideDuration: 0.5 },
+            },
+            {
+                id: TextId.VERSE_2_2,
+                displayDuration: 2000,
+                sound: SoundId.VERSE_2_2,
+                options: { duration: 0.7, hideDuration: 0.5 },
+            },
+            {
+                id: TextId.VERSE_2_3,
+                displayDuration: 3500,
+                sound: SoundId.VERSE_2_3,
+                options: { duration: 0.7, hideDuration: 0.5 },
+            },
+            {
+                id: TextId.VERSE_2_4,
+                displayDuration: 3000,
+                sound: SoundId.VERSE_2_4,
+                options: { duration: 0.5, hideDuration: 0.5 },
+            },
+        ]);
         this.onEnterVerse2.execute();
     }
 

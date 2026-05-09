@@ -33,4 +33,11 @@ export const SOUNDS: Record<SoundIdType, string> = {
     [SoundId.VERSE_1_2]: "/verset_1/02.mp3",
     [SoundId.VERSE_1_3]: "/verset_1/03.mp3",
     [SoundId.VERSE_1_4]: "/verset_1/04.mp3",
+
+    // verset 2
+    [SoundId.VERSE_2_1]: "/verset_2/05.mp3",
+    [SoundId.VERSE_2_2]: "/verset_2/06.mp3",
+    [SoundId.VERSE_2_3]: "/verset_2/07.mp3",
+    [SoundId.VERSE_2_4]: "/verset_2/08.mp3",
+
 };

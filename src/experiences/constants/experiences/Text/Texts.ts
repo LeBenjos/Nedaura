@@ -15,4 +15,9 @@ export const TEXTS: Record<TextIdType, string> = {
     [TextId.VERSE_1_2]: "Mon être porte l’empreinte de l’humanité et de sa puissance.",
     [TextId.VERSE_1_3]: "Je semble défier la course des années,",
     [TextId.VERSE_1_4]: "comme si ma pierre jurait éternité.",
+    // verset 2
+    [TextId.VERSE_2_1]: "Mais un jour le vent se lève,",
+    [TextId.VERSE_2_2]: "Le murmure devient tempête,",
+    [TextId.VERSE_2_3]: "et ses rafales entaillent mon corps, brisant ma flamme.",
+    [TextId.VERSE_2_4]: "Le feu des hommes s’éteint dans la poussière.",
 };
