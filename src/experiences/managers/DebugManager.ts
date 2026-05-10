@@ -6,6 +6,7 @@ import { ThreePerf } from 'three-perf';
 import { DebugGuiTitle } from '../constants/experiences/DebugGuiTitle';
 import { type ThreeWorldPresetId } from '../constants/experiences/ThreeWorldPresets';
 import MainThreeApp from '../engines/threes/app/MainThreeApp';
+import { toggleWebcam } from '../views/mediapipe/webcamVisibility';
 import WorldPresetManager from './WorldPresetManager';
 
 class DebugManager {
@@ -256,6 +257,7 @@ class DebugManager {
             this._gui.show(this._isDebugVisible);
             if (this._threePerf) this._threePerf.visible = this._isDebugVisible;
             if (this._stats) this._stats.dom.style.display = this._isDebugVisible ? 'block' : 'none';
+            toggleWebcam();
             this.onVisibilityChange.execute();
         }
     };

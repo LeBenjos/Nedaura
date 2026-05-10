@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import SoundManager from '../../../managers/SoundManager';
+import { isWebcamVisible, toggleWebcam } from '../../mediapipe/webcamVisibility';
 
 const isSoundOn = ref(true);
-const isCameraOn = ref(false);
 
 const onClickSound = (): void => {
     isSoundOn.value = !isSoundOn.value;
@@ -11,9 +11,7 @@ const onClickSound = (): void => {
 };
 
 const onClickCamera = (): void => {
-    isCameraOn.value = !isCameraOn.value;
-    console.log(document.querySelector('.webcam-container'));
-    document.querySelector('.webcam-container')?.classList.toggle('hidden');
+    toggleWebcam();
 };
 
 </script>
@@ -41,7 +39,7 @@ const onClickCamera = (): void => {
                     </svg>
                 </a>
                 <a href="#" class="menu-item" @click="onClickCamera">
-                    <svg width="35" height="25" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#000000" v-if="isCameraOn">
+                    <svg width="35" height="25" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#000000" v-if="isWebcamVisible">
                         <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
                         <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g>
                         <g id="SVGRepo_iconCarrier"> 

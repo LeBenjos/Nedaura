@@ -4,6 +4,7 @@ import { ViewId } from '../../../constants/experiences/ViewId';
 import ThreeCameraControllerManager from '../../../managers/threes/ThreeCameraControllerManager';
 import ThreeViewBase from '../bases/ThreeViewBase';
 import CameraPath from './components/CameraPath';
+import Clouds from './components/Clouds';
 import Dunes from './components/Dunes';
 import Environment from './components/Environment';
 import MovementHelper from './components/MovementHelper';
@@ -16,6 +17,7 @@ import WindLines from './components/WindLines';
 export default class WorldThreeView extends ThreeViewBase {
     private declare _sand: Sand;
     private declare _stormWind: StormWind;
+    private declare _clouds: Clouds;
 
     constructor() {
         super(ViewId.THREE_WORLD);
@@ -38,6 +40,8 @@ export default class WorldThreeView extends ThreeViewBase {
         this._actors.push(new WindLines());
         this._stormWind = new StormWind();
         this._actors.push(this._stormWind);
+        this._clouds = new Clouds();
+        this._actors.push(this._clouds);
         this._actors.push(new MovementHelper(cameraController));
         this._sand = new Sand();
         this._sand.setCount(10000);
@@ -62,6 +66,10 @@ export default class WorldThreeView extends ThreeViewBase {
 
     public get stormWind(): StormWind {
         return this._stormWind;
+    }
+
+    public get clouds(): Clouds {
+        return this._clouds;
     }
     //
     //#endregion

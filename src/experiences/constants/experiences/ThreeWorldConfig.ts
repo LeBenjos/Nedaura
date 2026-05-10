@@ -62,6 +62,7 @@ export interface ThreeWorldConfig {
         trailSpread: number;
         amplitudeXY: number;
         amplitudeZ: number;
+        minHeight: number;
         color0: string;
         color1: string;
         color2: string;
@@ -139,6 +140,7 @@ export const THREE_WORLD_CONFIG: ThreeWorldConfig = {
         "trailSpread": 0.3,
         "amplitudeXY": 0.2,
         "amplitudeZ": 0.1,
+        "minHeight": 0,
         "color0": "#ffffff",
         "color1": "#ffffff",
         "color2": "#ffffff",

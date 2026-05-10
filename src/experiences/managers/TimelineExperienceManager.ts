@@ -203,7 +203,8 @@ class TimelineExperienceManager {
         WorldPresetManager.showPreset('wind');
         const view = MainThreeApp.currentView as WorldThreeView;
         view.sand.setCount(50000);
-        view.stormWind.setCount(2000);
+        view.stormWind.setCount(1000);
+        view.clouds.setIntensity(0.1);
         this.mount({ id: 'interaction-wind', component: InteractionWindView });
         this.mount({ id: 'hand-movement-helper', component: HandMovementHelper });
         this.onEnterInteract1.execute();
@@ -220,7 +221,8 @@ class TimelineExperienceManager {
         console.log("enter verse 2");
         const view = MainThreeApp.currentView as WorldThreeView;
         view.sand.setCount(200000);
-        view.stormWind.setCount(10000);
+        view.stormWind.setCount(5000);
+        view.clouds.setIntensity(0.4);
         await playTextSequence([
             {
                 id: TextId.VERSE_2_1,

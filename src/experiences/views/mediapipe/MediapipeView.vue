@@ -1,16 +1,13 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
-import DebugManager from '../../managers/DebugManager';
 import type { MediapipeHandsSnapshot } from '../../managers/MediapipeManager';
+import { isWebcamVisible } from './webcamVisibility';
 
 type HandPointState = {
     visible: boolean;
     x: number;
     y: number;
 };
-
-const isDebug = ref<boolean>(DebugManager.isActive);
-const isDebugVisible = ref<boolean>(DebugManager.isVisible);
 
 const leftPoint = reactive<HandPointState>({ visible: false, x: 0.5, y: 0.5 });
 const rightPoint = reactive<HandPointState>({ visible: false, x: 0.5, y: 0.5 });
@@ -35,14 +32,6 @@ const rightStyle = computed(() => ({
     left: toPercent(1 - rightPoint.x),
     top: toPercent(rightPoint.y),
 }));
-
-const onHashChange = (): void => {
-    isDebug.value = DebugManager.isActive;
-};
-
-const onDebugVisibilityChange = (): void => {
-    isDebugVisible.value = DebugManager.isVisible;
-};
 
 const onHandUpdate = (e: Event): void => {
     const snapshot = (e as CustomEvent<MediapipeHandsSnapshot>).detail;
@@ -85,17 +74,12 @@ const tick = (): void => {
 };
 
 onMounted(() => {
-    window.addEventListener('hashchange', onHashChange);
     window.addEventListener('hand:update', onHandUpdate as EventListener);
-    DebugManager.onVisibilityChange.add(onDebugVisibilityChange);
     rafId = window.requestAnimationFrame(tick);
-    console.log("MediapipeView mounted, event listeners added, tick started");
 });
 
 onBeforeUnmount(() => {
-    window.removeEventListener('hashchange', onHashChange);
     window.removeEventListener('hand:update', onHandUpdate as EventListener);
-    DebugManager.onVisibilityChange.remove(onDebugVisibilityChange);
     if (rafId !== null) window.cancelAnimationFrame(rafId);
 });
 </script>
@@ -106,7 +90,7 @@ onBeforeUnmount(() => {
         <div v-show="rightPoint.visible" class="right-hand dot" :class="{ 'dot--grab': rightIsFist }" :style="rightStyle"></div>
     </div>
 
-    <div class="webcam-container" :class="{ 'debug': isDebug && isDebugVisible }">
+    <div class="webcam-container" :class="{ 'hidden': !isWebcamVisible }">
         <video id="webcam" class="webcam" autoplay playsinline></video>
         <canvas class="output_canvas" id="output_canvas"></canvas>
     </div>
@@ -123,15 +107,12 @@ onBeforeUnmount(() => {
     overflow: hidden;
     z-index: 9999;
 
-    // &:not(.debug) {
-    //     visibility: hidden;
-    // }
     transition: opacity 0.5s ease;
     opacity: 1;
 
     &.hidden {
-        // transition on opacity for smooth fade out
         opacity: 0;
+        pointer-events: none;
     }
 }
 

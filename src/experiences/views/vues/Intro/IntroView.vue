@@ -11,6 +11,7 @@ import { playTextSequence } from '../../../managers/TextManager/TextSequence';
 import DebugManager from '../../../managers/DebugManager';
 import { SoundId } from '../../../constants/experiences/Sound/SoundId';
 import SoundManager from '../../../managers/SoundManager';
+import { setWebcamVisible } from '../../mediapipe/webcamVisibility';
 
 const showInstruction = ref(true);
 
@@ -18,7 +19,6 @@ const { unmount } = useInterfaceManager();
 const controller = new AbortController();
 
 const isDebug = ref<boolean>(DebugManager.isActive);
-const isDebugVisible = ref<boolean>(DebugManager.isVisible);
 
 onMounted(() => {
     gsap.to('.intro-container', {
@@ -54,10 +54,8 @@ const _onHandUpdate = (e: CustomEvent<MediapipeHandsSnapshot>) => {
     const rightFist = e.detail.right?.isFist ? e.detail.right.fist : undefined;
     if (leftFist && rightFist) {
         if (!showInstruction.value ) {
-            console.log("Hand update received:", { leftFist, rightFist });
-            console.log("Debug info:", { isDebug: isDebug.value, isDebugVisible: isDebugVisible.value });
             if (!isDebug.value) {
-                document.querySelector('.webcam-container')?.classList.toggle('hidden');
+                setWebcamVisible(false);
             }
             window.removeEventListener('hand:update', _onHandUpdate);
             onStartExperience();
