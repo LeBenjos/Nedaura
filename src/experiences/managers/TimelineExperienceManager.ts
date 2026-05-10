@@ -2,17 +2,15 @@ import { Action } from "@benjos/cookware";
 import { TextId } from "../constants/experiences/Text/TextId";
 import { TimelineExperienceState } from "../constants/experiences/TimelineExperienceState";
 
-import WorldPresetManager from "./WorldPresetManager";
-import TextManager from "./TextManager/TextManager";
-import { playTextSequence } from "./TextManager/TextSequence";
 import { SoundId } from "../constants/experiences/Sound/SoundId";
-import SoundManager from "./SoundManager";
-import MainThreeCameraController from "../cameras/threes/MainThreeCameraController";
-import InteractionWindView from "../views/vues/interactions/InteractionWindView.vue";
+import MainThreeApp from "../engines/threes/app/MainThreeApp";
+import WorldThreeView from "../views/threes/worlds/WorldThreeView";
 import { useInterfaceManager } from "../views/vues/hooks/useInterfaceManager";
-import ThreeCameraControllerManager from "./threes/ThreeCameraControllerManager";
-import { CameraId } from "../constants/experiences/CameraId";
 import HandMovementHelper from "../views/vues/interactions/HandMovementHelper.vue";
+import InteractionWindView from "../views/vues/interactions/InteractionWindView.vue";
+import SoundManager from "./SoundManager";
+import { playTextSequence } from "./TextManager/TextSequence";
+import WorldPresetManager from "./WorldPresetManager";
 
 class TimelineExperienceManager {
     private declare _state: TimelineExperienceState;
@@ -147,7 +145,7 @@ class TimelineExperienceManager {
             SoundManager.playAmbientSound(SoundId.TRAVELLING_MUSIC);
         });
 
-        const totalDuration = 3100+ 2500 + 8000 + 3500 + 9000 + 3500 + 6000 + 3000; // durée totale des textes + transitions
+        const totalDuration = 3100 + 2500 + 8000 + 3500 + 9000 + 3500 + 6000 + 3000; // durée totale des textes + transitions
         const totalDurationSeconds = totalDuration / 1000;
         console.log(`Total duration of intro sequence: ${totalDurationSeconds} seconds`);
     }
@@ -203,8 +201,9 @@ class TimelineExperienceManager {
     private _enterInteract1(): void {
         console.log("enter interact 1");
         WorldPresetManager.showPreset('wind');
+        (MainThreeApp.currentView as WorldThreeView).sand.setCount(50000);
         this.mount({ id: 'interaction-wind', component: InteractionWindView });
-        this.mount({id: 'hand-movement-helper', component: HandMovementHelper});
+        this.mount({ id: 'hand-movement-helper', component: HandMovementHelper });
         this.onEnterInteract1.execute();
     }
 
@@ -217,6 +216,7 @@ class TimelineExperienceManager {
 
     private async _enterVerse2(): Promise<void> {
         console.log("enter verse 2");
+        (MainThreeApp.currentView as WorldThreeView).sand.setCount(200000);
         await playTextSequence([
             {
                 id: TextId.VERSE_2_1,

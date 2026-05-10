@@ -123,6 +123,9 @@ export default abstract class ThreeAppBase {
     public get cameraController(): ThreeCameraControllerBase {
         return this._cameraController;
     }
+    public get currentView(): ThreeViewBase {
+        return this._currentView;
+    }
     //
     //#endregion
 }

@@ -4,7 +4,7 @@ import { THREE_WORLD_CONFIG } from "../../../../constants/experiences/ThreeWorld
 import ThreeActorBase from "../../bases/components/ThreeActorBase";
 
 export default class Sand extends ThreeActorBase {
-    private static readonly _COUNT: number = 10000;
+    private static readonly _MAX_COUNT: number = 200000;
     private static readonly _RADIUS: number = 20;
     private static readonly _POINT_SIZE: number = 0.02;
     private static readonly _SPEED: number = 0.5;
@@ -12,6 +12,8 @@ export default class Sand extends ThreeActorBase {
     declare private _geometry: BufferGeometry;
     declare private _material: ShaderMaterial;
     declare private _points: Points;
+
+    private _count: number = Sand._MAX_COUNT;
 
     constructor() {
         super();
@@ -23,12 +25,12 @@ export default class Sand extends ThreeActorBase {
     }
 
     private _generateGeometry(): void {
-        const positions = new Float32Array(Sand._COUNT * 3);
-        const random = new Float32Array(Sand._COUNT);
-        const sizes = new Float32Array(Sand._COUNT);
+        const positions = new Float32Array(Sand._MAX_COUNT * 3);
+        const random = new Float32Array(Sand._MAX_COUNT);
+        const sizes = new Float32Array(Sand._MAX_COUNT);
 
         const size = Sand._RADIUS * 2;
-        for (let i = 0; i < Sand._COUNT; i++) {
+        for (let i = 0; i < Sand._MAX_COUNT; i++) {
             positions[i * 3] = (Math.random() - 0.5) * size;
             positions[i * 3 + 1] = (Math.random() - 0.5) * size;
             positions[i * 3 + 2] = (Math.random() - 0.5) * size;
@@ -41,6 +43,7 @@ export default class Sand extends ThreeActorBase {
         this._geometry.setAttribute("position", new BufferAttribute(positions, 3));
         this._geometry.setAttribute("aRandom", new BufferAttribute(random, 1));
         this._geometry.setAttribute("aSize", new BufferAttribute(sizes, 1));
+        this._geometry.setDrawRange(0, this._count);
     }
 
     private _generateMaterial(): void {
@@ -57,6 +60,7 @@ export default class Sand extends ThreeActorBase {
                     uRadius: { value: Sand._RADIUS },
                     uSpeed: { value: Sand._SPEED },
                     uWind: { value: [0.5, 0.0, 0.0] },
+                    uIntensity: { value: this._count / Sand._MAX_COUNT },
                     uColor: { value: new Color(THREE_WORLD_CONFIG.dunes.color) },
                 },
             ]),
@@ -69,6 +73,7 @@ export default class Sand extends ThreeActorBase {
                 uniform float uScale;
                 uniform float uRadius;
                 uniform float uSpeed;
+                uniform float uIntensity;
                 uniform vec3 uWind;
 
                 varying float vRandom;
@@ -77,11 +82,14 @@ export default class Sand extends ThreeActorBase {
 
                 void main() {
                     float phase = aRandom * 6.2831853;
+                    float speedFactor = mix(0.3, 1.5, uIntensity);
+                    float verticalFactor = mix(0.3, 4.0, uIntensity);
+
                     vec3 drift = uWind * uTime + vec3(
                         cos(uTime * 0.4 + phase) * 0.1,
-                        sin(uTime * 0.6 + phase) * 0.15,
+                        sin(uTime * 0.6 + phase) * 0.15 * verticalFactor,
                         sin(uTime * 0.5 + phase) * 0.1
-                    ) * uSpeed * (1.0 - aRandom);
+                    ) * uSpeed * speedFactor * (1.0 - aRandom);
 
                     vec3 boxSize = vec3(uRadius * 2.0);
                     vec3 worldPos = mod(position + drift - cameraPosition + uRadius, boxSize) - uRadius + cameraPosition;
@@ -129,6 +137,18 @@ export default class Sand extends ThreeActorBase {
 
     public override reset(): void {
         //
+    }
+
+    public get count(): number {
+        return this._count;
+    }
+
+    public setCount(count: number): void {
+        const clamped = Math.max(0, Math.min(Math.floor(count), Sand._MAX_COUNT));
+        if (clamped === this._count) return;
+        this._count = clamped;
+        this._geometry.setDrawRange(0, this._count);
+        this._material.uniforms.uIntensity.value = this._count / Sand._MAX_COUNT;
     }
 
     public update(dt: number): void {
