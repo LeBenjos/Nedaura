@@ -10,10 +10,12 @@ import MovementHelper from './components/MovementHelper';
 import Sand from './components/Sand';
 import Sky from './components/Sky';
 import Statue from './components/Statue';
+import StormWind from './components/StormWind';
 import WindLines from './components/WindLines';
 
 export default class WorldThreeView extends ThreeViewBase {
     private declare _sand: Sand;
+    private declare _stormWind: StormWind;
 
     constructor() {
         super(ViewId.THREE_WORLD);
@@ -34,6 +36,8 @@ export default class WorldThreeView extends ThreeViewBase {
         this._actors.push(new Statue());
         this._actors.push(new CameraPath());
         this._actors.push(new WindLines());
+        this._stormWind = new StormWind();
+        this._actors.push(this._stormWind);
         this._actors.push(new MovementHelper(cameraController));
         this._sand = new Sand();
         this._sand.setCount(10000);
@@ -54,6 +58,10 @@ export default class WorldThreeView extends ThreeViewBase {
     //
     public get sand(): Sand {
         return this._sand;
+    }
+
+    public get stormWind(): StormWind {
+        return this._stormWind;
     }
     //
     //#endregion

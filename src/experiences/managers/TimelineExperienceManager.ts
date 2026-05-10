@@ -201,7 +201,9 @@ class TimelineExperienceManager {
     private _enterInteract1(): void {
         console.log("enter interact 1");
         WorldPresetManager.showPreset('wind');
-        (MainThreeApp.currentView as WorldThreeView).sand.setCount(50000);
+        const view = MainThreeApp.currentView as WorldThreeView;
+        view.sand.setCount(50000);
+        view.stormWind.setCount(2000);
         this.mount({ id: 'interaction-wind', component: InteractionWindView });
         this.mount({ id: 'hand-movement-helper', component: HandMovementHelper });
         this.onEnterInteract1.execute();
@@ -216,7 +218,9 @@ class TimelineExperienceManager {
 
     private async _enterVerse2(): Promise<void> {
         console.log("enter verse 2");
-        (MainThreeApp.currentView as WorldThreeView).sand.setCount(200000);
+        const view = MainThreeApp.currentView as WorldThreeView;
+        view.sand.setCount(200000);
+        view.stormWind.setCount(10000);
         await playTextSequence([
             {
                 id: TextId.VERSE_2_1,

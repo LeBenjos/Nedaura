@@ -19,6 +19,7 @@ const leftTarget = reactive({ x: 0.5, y: 0.5 });
 const rightTarget = reactive({ x: 0.5, y: 0.5 });
 
 const leftIsFist = ref<boolean>(false);
+const rightIsFist = ref<boolean>(false);
 
 const SMOOTHING = 0.18;
 let rafId: number | null = null;
@@ -61,11 +62,13 @@ const onHandUpdate = (e: Event): void => {
     const right = snapshot.right;
     if (right) {
         rightPoint.visible = true;
-        const p = right.indexTip;
+        const p = right.isFist && right.fist ? right.fist : right.indexTip;
         rightTarget.x = p.x;
         rightTarget.y = p.y;
+        rightIsFist.value = !!right.isFist;
     } else {
         rightPoint.visible = false;
+        rightIsFist.value = false;
     }
 };
 
@@ -100,7 +103,7 @@ onBeforeUnmount(() => {
 <template>
     <div class="hand-overlay">
         <div v-show="leftPoint.visible" class="left-hand dot" :class="{ 'dot--grab': leftIsFist }" :style="leftStyle"></div>
-        <div v-show="rightPoint.visible" class="right-hand dot" :style="rightStyle"></div>
+        <div v-show="rightPoint.visible" class="right-hand dot" :class="{ 'dot--grab': rightIsFist }" :style="rightStyle"></div>
     </div>
 
     <div class="webcam-container" :class="{ 'debug': isDebug && isDebugVisible }">
