@@ -38,13 +38,14 @@ export const playTextSequence = async (
         
         const showDuration = (step.options?.duration ?? 1.2) * 1000;
         const hideDuration = (step.options?.hideDuration ?? 0.8) * 1000;
+        const maxWidthPercent = step.options?.maxWidthPercent ?? 0.64;
         
         await wait(showDuration, signal).catch(() => {});
         
         if (step.sound) {
             SoundManager.playSound(step.sound);
         }
-        TextManager.showText(step.id, step.x, step.y, step.options);
+        TextManager.showText(step.id, step.x, step.y, { ...step.options, maxWidthPercent });
 
         // attendre que le show soit fini + le temps d'affichage
         await wait(showDuration + step.displayDuration, signal).catch(() => {});

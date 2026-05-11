@@ -18,6 +18,7 @@ type TextShaderDebugState = {
 export type TextShowOptions = {
     text: string;
     maxWidthPx: number;
+    maxWidthPercent?: number;
     fontFamily: string;
     fontSizePx: number;
     fontWeight: string;
@@ -165,6 +166,11 @@ class TextManager {
         }
 
         this._renderer.render(this._scene, this._camera);
+    }
+
+    private _getMaxWidthFromPercent(percent: number): number {
+        const w = this._canvasEl?.clientWidth ?? window.innerWidth;
+        return Math.max(1, Math.floor(w * percent));
     }
 
     private _initDebugGuiIfNeeded(): void {
@@ -598,7 +604,9 @@ class TextManager {
 
         return {
             text: options?.text ?? required.text,
-            maxWidthPx: options?.maxWidthPx ?? 680,
+            maxWidthPx: options?.maxWidthPercent != null
+                ? this._getMaxWidthFromPercent(options.maxWidthPercent)
+                : (options?.maxWidthPx ?? 680),
             fontFamily: options?.fontFamily ?? '"Montserrat Alternates", sans-serif',
             fontSizePx,
             fontWeight: options?.fontWeight ?? '400',
