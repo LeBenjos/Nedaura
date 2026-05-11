@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import MediapipeView from '../../views/mediapipe/MediapipeView.vue';
-import InterfaceManager from '../../views/vues/components/InterfaceManager.vue';
-import { useInterfaceManager } from '../../views/vues/hooks/useInterfaceManager';
-import LoaderView from '../../views/vues/LoaderView.vue';
+import InterfaceManager from '@/comp/InterfaceManager.vue';
+import { useInterfaceManager } from '@/hooks/useInterfaceManager';
+import LoaderView from '@/views/LoaderView';
 import LoaderManager from '../../managers/LoaderManager';
 import { onMounted, ref } from 'vue';
 import MenuView from '../../views/vues/Menu/MenuView.vue';
