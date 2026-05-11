@@ -152,39 +152,41 @@ class TimelineExperienceManager {
 
     private _leavePathIntro(): void {
         console.log("leave path intro");
-        // SoundManager.stopAmbientSound(SoundId.TRAVELLING_AMBIANCE);
-        SoundManager.stopAmbientSound(SoundId.TRAVELLING_MUSIC);
         this.onLeavePathIntro.execute();
     }
-
+    
     private async _enterVerse1() {
         console.log("enter verse 1");
-        this.onEnterVerse1.execute();
 
+        SoundManager.stopAmbientSound(SoundId.TRAVELLING_MUSIC);
+
+        this.onEnterVerse1.execute();
+        
         await playTextSequence([
             {
                 id: TextId.VERSE_1_1,
+                
                 displayDuration: 2000,
                 sound: SoundId.VERSE_1_1,
-                options: { duration: 0.5, hideDuration: 0.5 },
+                options: { duration: 0.5, hideDuration: 0.5, anchor: 'center-right', maxWidthPercent: 0.5 },
             },
             {
                 id: TextId.VERSE_1_2,
                 displayDuration: 2500,
                 sound: SoundId.VERSE_1_2,
-                options: { duration: 0.7, hideDuration: 0.5 },
+                options: { duration: 0.7, hideDuration: 0.5, anchor: 'center-right', maxWidthPercent: 0.4 },
             },
             {
                 id: TextId.VERSE_1_3,
                 displayDuration: 2500,
                 sound: SoundId.VERSE_1_3,
-                options: { duration: 0.7, hideDuration: 0.5 },
+                options: { duration: 0.7, hideDuration: 0.5, anchor: 'center-right', maxWidthPercent: 0.5 },
             },
             {
                 id: TextId.VERSE_1_4,
                 displayDuration: 2000,
                 sound: SoundId.VERSE_1_4,
-                options: { duration: 0.5, hideDuration: 0.5 },
+                options: { duration: 0.5, hideDuration: 0.5, anchor: 'center-right', maxWidthPercent: 0.5 },
             },
         ]);
 
@@ -228,25 +230,25 @@ class TimelineExperienceManager {
                 id: TextId.VERSE_2_1,
                 displayDuration: 2000,
                 sound: SoundId.VERSE_2_1,
-                options: { duration: 0.5, hideDuration: 0.5 },
+                options: { duration: 0.5, hideDuration: 0.5, anchor: 'center-right', maxWidthPercent: 0.5 },
             },
             {
                 id: TextId.VERSE_2_2,
                 displayDuration: 2000,
                 sound: SoundId.VERSE_2_2,
-                options: { duration: 0.7, hideDuration: 0.5 },
+                options: { duration: 0.7, hideDuration: 0.5, anchor: 'center-right', maxWidthPercent: 0.5 },
             },
             {
                 id: TextId.VERSE_2_3,
                 displayDuration: 3500,
                 sound: SoundId.VERSE_2_3,
-                options: { duration: 0.7, hideDuration: 0.5 },
+                options: { duration: 0.7, hideDuration: 0.5, anchor: 'center-right', maxWidthPercent: 0.5 },
             },
             {
                 id: TextId.VERSE_2_4,
                 displayDuration: 3000,
                 sound: SoundId.VERSE_2_4,
-                options: { duration: 0.5, hideDuration: 0.5 },
+                options: { duration: 0.5, hideDuration: 0.5, anchor: 'center-right', maxWidthPercent: 0.5 },
             },
         ]);
         this.onEnterVerse2.execute();

@@ -7,7 +7,7 @@ import { TextId } from '../../constants/experiences/Text/TextId';
 import { TEXTS } from '../../constants/experiences/Text/Texts';
 import { DebugGuiTitle } from '../../constants/experiences/DebugGuiTitle';
 
-type TextAnchor = 'center' | 'top-left';
+type TextAnchor = 'center' | 'top-left' | 'center-right';
 
 type TextShaderDebugState = {
     enabled: boolean;
@@ -18,6 +18,7 @@ type TextShaderDebugState = {
 export type TextShowOptions = {
     text: string;
     maxWidthPx: number;
+    maxWidthPercent?: number;
     fontFamily: string;
     fontSizePx: number;
     fontWeight: string;
@@ -167,6 +168,11 @@ class TextManager {
         this._renderer.render(this._scene, this._camera);
     }
 
+    private _getMaxWidthFromPercent(percent: number): number {
+        const w = this._canvasEl?.clientWidth ?? window.innerWidth;
+        return Math.max(1, Math.floor(w * percent));
+    }
+
     private _initDebugGuiIfNeeded(): void {
         if (!DebugManager.isActive) return;
 
@@ -284,6 +290,9 @@ class TextManager {
         const py = instance.yPx ?? h * 0.5;
 
         if (instance.options.anchor === 'top-left') {
+            instance.mesh.position.x = px + instance.widthPx * 0.5;
+            instance.mesh.position.y = h - (py + instance.heightPx * 0.5);
+        } else if(instance.options.anchor === 'center-right') {
             instance.mesh.position.x = px + instance.widthPx * 0.5;
             instance.mesh.position.y = h - (py + instance.heightPx * 0.5);
         } else {
@@ -598,7 +607,9 @@ class TextManager {
 
         return {
             text: options?.text ?? required.text,
-            maxWidthPx: options?.maxWidthPx ?? 680,
+            maxWidthPx: options?.maxWidthPercent != null
+                ? this._getMaxWidthFromPercent(options.maxWidthPercent)
+                : (options?.maxWidthPx ?? 680),
             fontFamily: options?.fontFamily ?? '"Montserrat Alternates", sans-serif',
             fontSizePx,
             fontWeight: options?.fontWeight ?? '400',

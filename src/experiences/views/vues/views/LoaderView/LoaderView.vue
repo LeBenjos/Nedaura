@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref } from 'vue';
-import LoaderManager from '../../managers/LoaderManager';
+import LoaderManager from '../../../../managers/LoaderManager';
 import LoadingProgress from './components/LoadingProgress.vue';
 import LoadingBar from './components/LoadingBar.vue';
 
@@ -67,12 +67,7 @@ onUnmounted(() => {
             <svg :width="SVG_W" :height="SVG_H" viewBox="0 0 207 203" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <clipPath :id="clipId">
-                        <rect
-                            :x="fillRect.x"
-                            :y="fillRect.y"
-                            :width="fillRect.width"
-                            :height="fillRect.height"
-                        />
+                        <rect :x="fillRect.x" :y="fillRect.y" :width="fillRect.width" :height="fillRect.height" />
                     </clipPath>
                 </defs>
 

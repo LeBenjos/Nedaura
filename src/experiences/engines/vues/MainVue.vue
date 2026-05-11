@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import MediapipeView from '../../views/mediapipe/MediapipeView.vue';
-import InterfaceManager from '../../views/vues/components/InterfaceManager.vue';
-import { useInterfaceManager } from '../../views/vues/hooks/useInterfaceManager';
-import LoaderView from '../../views/vues/LoaderView.vue';
-import LoaderManager from '../../managers/LoaderManager';
+import InterfaceManager from '@/comp/InterfaceManager.vue';
+import { useInterfaceManager } from '@/hooks/useInterfaceManager';
+import LoaderView from '@/views/LoaderView';
+import LoaderManager from '@/managers/LoaderManager';
 import { onMounted, ref } from 'vue';
-import MenuView from '../../views/vues/Menu/MenuView.vue';
-import MenuBurgerView from '../../views/vues/MenuBurgerView.vue/MenuBurgerView.vue';
+import MenuView from '@/views/Menu';
+import MenuBurgerView from '@/views/MenuBurgerView';
 
 const isVisible = ref(false);
 

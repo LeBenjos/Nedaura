@@ -4,9 +4,9 @@ import { onMounted } from 'vue';
 
 import LogoNedaura from './LogoNedaura.vue';
 import IntroView from '../Intro/IntroView.vue';
-import { useInterfaceManager } from '../hooks/useInterfaceManager';
-import SoundManager from '../../../managers/SoundManager';
-import { SoundId } from '../../../constants/experiences/Sound/SoundId';
+import { useInterfaceManager } from '@/hooks/useInterfaceManager';
+import SoundManager from '@/managers/SoundManager';
+import { SoundId } from '@/constants/experiences/Sound/SoundId';
 
 const { mount, unmount } = useInterfaceManager();
 
@@ -14,7 +14,6 @@ onMounted(() => {
     SoundManager.playAmbientSound(SoundId.MENU_MUSIC);
     SoundManager.playAmbientSound(SoundId.MENU_AMBIANCE);
 });
-
 
 const onClick = (): void => {
     gsap.to('.menu-container', {
@@ -30,7 +29,6 @@ const onClick = (): void => {
         },
     });
 };
-
 </script>
 
 <template>
@@ -42,7 +40,7 @@ const onClick = (): void => {
                 </div>
 
                 <div class="menu-button" @click="onClick">
-                    <p>Commencer l'expérience</p>
+                    <p>Commencer</p>
                 </div>
             </div>
         </div>
@@ -73,7 +71,7 @@ const onClick = (): void => {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 40px;
+        gap: 8px;
 
         .menu-button {
             position: relative;
@@ -89,7 +87,11 @@ const onClick = (): void => {
 
             border-radius: 80px;
             border: 2px solid #fff;
-            background: radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.22) 0%, rgba(153, 153, 153, 0.34) 100%);
+            background: radial-gradient(
+                50% 50% at 50% 50%,
+                rgba(255, 255, 255, 0.22) 0%,
+                rgba(153, 153, 153, 0.34) 100%
+            );
             background-blend-mode: hard-light;
             box-shadow: 0 0 8px 0 #fff;
             transition: all 0.3s ease-in-out;
