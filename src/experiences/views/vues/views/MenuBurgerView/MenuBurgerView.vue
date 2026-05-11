@@ -1,12 +1,18 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import gsap from 'gsap';
 import SoundManager from '@/managers/SoundManager';
 import { isWebcamVisible, toggleWebcam } from '../../../mediapipe/webcamVisibility';
 
 const isSoundOn = ref(true);
 const isMenuOpen = ref(false);
+const closedRef = ref<HTMLDivElement | null>(null);
+const openRef = ref<HTMLDivElement | null>(null);
 const buttonsWrapperRef = ref<HTMLDivElement | null>(null);
+
+onMounted(() => {
+    gsap.set(openRef.value, { opacity: 0, rotate: -45, scale: 0.5 });
+});
 
 const onClickSound = (): void => {
     isSoundOn.value = !isSoundOn.value;
@@ -21,12 +27,18 @@ const onClickBurger = (): void => {
     isMenuOpen.value = !isMenuOpen.value;
 
     if (isMenuOpen.value) {
+        gsap.to(closedRef.value, { opacity: 0, scale: 0.5, duration: 0.2, ease: 'power2.in' });
+        gsap.to(openRef.value, { opacity: 1, rotate: 0, scale: 1, duration: 0.3, ease: 'power2.out', delay: 0.1 });
+
         gsap.fromTo(
             buttonsWrapperRef.value,
             { opacity: 0, pointerEvents: 'none' },
             { opacity: 1, pointerEvents: 'auto', duration: 0.4, ease: 'power2.out' }
         );
     } else {
+        gsap.to(openRef.value, { opacity: 0, rotate: -45, scale: 0.5, duration: 0.2, ease: 'power2.in' });
+        gsap.to(closedRef.value, { opacity: 1, scale: 1, duration: 0.3, ease: 'power2.out', delay: 0.1 });
+
         gsap.to(buttonsWrapperRef.value, {
             opacity: 0,
             pointerEvents: 'none',
@@ -47,9 +59,17 @@ const onClickReload = (): void => {
         <nav class="menu">
             <div class="menu-burger-wrapper" @click="onClickBurger">
                 <div class="menu-burger">
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
+                    <div class="closed" ref="closedRef"> 
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>    
+                    </div>
+                    <div class="open" ref="openRef">
+                        <svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M0.5 0.5L16.5 16.5" stroke="white" stroke-linecap="round"/>
+                            <path d="M16.5 0.5L1 16.5" stroke="white" stroke-linecap="round"/>
+                        </svg>
+                    </div>
                 </div>
             </div>
 
@@ -173,23 +193,42 @@ const onClickReload = (): void => {
 
             border-radius: 100%;
             border-radius: 31px;
-            border: 1px solid #FBFBFB;
             background: rgba(139, 56, 75, 0.20);    
             cursor: pointer;
             
             transition: box-shadow 0.3s ease;
             display: flex;
             flex-direction: row;
+            position: relative;
 
             &:hover {
                 box-shadow: 0 -9px 8.4px 0 rgba(139, 56, 75, 0.40) inset, 0 9px 8.4px 0 rgba(255, 255, 255, 0.17) inset;
             }
-            
-            .dot {
-                width: 6px;
-                height: 6px;
-                background-color: white;
-                border-radius: 50%;
+
+            .closed, .open {
+                position: absolute;
+            }
+
+            .closed {
+                display: flex;
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+                height: 100%;
+                gap: 4px;
+                
+                .dot {
+                    width: 6px;
+                    height: 6px;
+                    background-color: white;
+                    border-radius: 50%;
+                }
+            }
+            .open {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100%;
             }
         }
     }
