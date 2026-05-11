@@ -141,7 +141,7 @@ export default class Statue extends ThreeModelBase {
                     shader.uniforms.uErodedTexture = { value: textureErodedWindMat };
                     shader.uniforms.uBaseNormal = { value: normalMap };
                     shader.uniforms.uErodedNormal = { value: normalErodedWindMat };
-                    shader.uniforms.uDisplacementStrength = { value: 0.5 };
+                    shader.uniforms.uDisplacementStrength = { value: 0.6 };
                     shader.uniforms.canInteract = { value: this._canInteract };
 
                     this._activeShaders.add(shader);
@@ -153,6 +153,17 @@ export default class Statue extends ThreeModelBase {
                         uniform sampler2D uHitMask;
                         uniform float     uDisplacementStrength;
                         uniform bool      canInteract;
+
+                        float vNoise( vec2 p ) {
+                            vec2 i = floor( p );
+                            vec2 f = fract( p );
+                            vec2 u = f * f * ( 3.0 - 2.0 * f );
+                            float a = fract( sin( dot( i,             vec2(127.1, 311.7) ) ) * 43758.5453 );
+                            float b = fract( sin( dot( i + vec2(1,0), vec2(127.1, 311.7) ) ) * 43758.5453 );
+                            float c = fract( sin( dot( i + vec2(0,1), vec2(127.1, 311.7) ) ) * 43758.5453 );
+                            float d = fract( sin( dot( i + vec2(1,1), vec2(127.1, 311.7) ) ) * 43758.5453 );
+                            return mix( mix(a,b,u.x), mix(c,d,u.x), u.y );
+                        }
                     ` + shader.vertexShader;
 
                     shader.vertexShader = shader.vertexShader.replace(
@@ -163,22 +174,21 @@ export default class Statue extends ThreeModelBase {
                         #endif
 
                         // Displacement GPU selon le hitMask
-                        vec2  maskUv   = uv;
-                        float hitD     = texture2D( uHitMask, maskUv ).r;
+                        vec2  maskUv      = uv;
+                        float hitD        = texture2D( uHitMask, maskUv ).r;
 
-                        // Bruit organique Value Noise
-                        vec2  nUv      = maskUv * 6.0;
-                        vec2  nI       = floor( nUv );
-                        vec2  nF       = fract( nUv );
-                        vec2  nU       = nF * nF * ( 3.0 - 2.0 * nF );
-                        float na       = fract( sin( dot( nI,             vec2(127.1, 311.7) ) ) * 43758.5453 );
-                        float nb       = fract( sin( dot( nI + vec2(1,0), vec2(127.1, 311.7) ) ) * 43758.5453 );
-                        float nc       = fract( sin( dot( nI + vec2(0,1), vec2(127.1, 311.7) ) ) * 43758.5453 );
-                        float nd       = fract( sin( dot( nI + vec2(1,1), vec2(127.1, 311.7) ) ) * 43758.5453 );
-                        float noiseVal = mix( mix(na,nb,nU.x), mix(nc,nd,nU.x), nU.y );
+                        // Bruit multi-octaves : forme générale + grain fin (rugosité de pierre)
+                        float nLow        = vNoise( maskUv *  6.0 );
+                        float nHigh       = vNoise( maskUv * 28.0 );
+                        float noiseVal    = nLow * 0.65 + nHigh * 0.35;
+                        // Borne le bruit pour éviter les pits concentrés (abrasion vs. carving)
+                        float displaceN   = noiseVal * 0.5 + 0.3;
+
+                        // Ramp quadratique : l'enfoncement s'installe progressivement, pas en un coup
+                        float displaceM   = hitD * hitD;
 
                         // Déplace le long de la normale, modulé par le mask et le bruit
-                        transformed   -= objectNormal * hitD * noiseVal * uDisplacementStrength * (canInteract ? 1.0 : 0.0);
+                        transformed      -= objectNormal * displaceM * displaceN * uDisplacementStrength * (canInteract ? 1.0 : 0.0);
                         `
                     );
 
@@ -209,10 +219,12 @@ export default class Statue extends ThreeModelBase {
                         vec4  erodedColor = texture2D( uErodedTexture, vUv );
                         
                         baseColor.rgb   = pow( baseColor.rgb, vec3( 0.4 ) );
-                        erodedColor.rgb   = pow( erodedColor.rgb, vec3( 3.0 ) );
+                        erodedColor.rgb   = pow( erodedColor.rgb, vec3( 1.6 ) );
 
+                        // Courbe non-linéaire : la dégradation apparaît plus tôt et plus franchement
                         float mask        = clamp( hitStrength, 0.0, 1.0 );
-                        diffuseColor *= canInteract ? mix( baseColor, erodedColor, mask ) : baseColor;
+                        float visualMask  = pow( mask, 0.45 );
+                        diffuseColor *= canInteract ? mix( baseColor, erodedColor, visualMask ) : baseColor;
                         `
                     );
 
@@ -222,13 +234,33 @@ export default class Statue extends ThreeModelBase {
                         `
                         #ifdef USE_NORMALMAP
                             float maskN        = clamp( texture2D( uHitMask, vUv ).r, 0.0, 1.0 );
+                            // Même courbe non-linéaire que la diffuse pour la cohérence du relief
+                            float maskNorm     = pow( maskN, 0.45 );
 
                             vec3 normalBase    = texture2D( uBaseNormal,   vUv ).xyz * 2.0 - 1.0;
                             vec3 normalEroded  = texture2D( uErodedNormal, vUv ).xyz * 2.0 - 1.0;
+                            // Accentue les rugosités de l'érodé sur les axes tangents
+                            normalEroded.xy   *= 1.5;
 
-                            vec3 blendedNormal = normalize( mix( normalBase, normalEroded, maskN ) );
+                            vec3 blendedNormal = normalize( mix( normalBase, normalEroded, maskNorm ) );
+                            // Amplification supplémentaire localisée à la zone érodée (la base reste lisse)
+                            blendedNormal.xy  *= ( 1.0 + maskNorm * 1.2 );
+                            blendedNormal      = normalize( blendedNormal );
                             normal = normalize( tbn * (canInteract ? blendedNormal : normalBase) );
                         #endif
+                        `
+                    );
+
+                    // Boost de roughness dans la zone érodée — la pierre poreuse ne réfléchit pas comme la pierre lisse
+                    shader.fragmentShader = shader.fragmentShader.replace(
+                        `#include <roughnessmap_fragment>`,
+                        `
+                        #include <roughnessmap_fragment>
+                        {
+                            float rMask  = clamp( texture2D( uHitMask, vUv ).r, 0.0, 1.0 );
+                            float rBoost = pow( rMask, 0.45 ) * ( canInteract ? 1.0 : 0.0 );
+                            roughnessFactor = mix( roughnessFactor, 0.95, rBoost * 0.75 );
+                        }
                         `
                     );
 
@@ -279,7 +311,8 @@ export default class Statue extends ThreeModelBase {
         const clampedRadius = Math.max(1, radius);
 
         const grd = ctx.createRadialGradient(x, y, 0, x, y, clampedRadius);
-        grd.addColorStop(0, "rgba(255,255,255,0.12)");
+        grd.addColorStop(0, "rgba(255,255,255,0.35)");
+        grd.addColorStop(0.6, "rgba(255,255,255,0.18)");
         grd.addColorStop(1, "rgba(255,255,255,0.0)");
 
         ctx.fillStyle = grd;
