@@ -42,7 +42,7 @@ const onClick = (): void => {
                 </div>
 
                 <div class="menu-button" @click="onClick">
-                    <p>Commencer l'expérience</p>
+                    <p>Commencer</p>
                 </div>
             </div>
         </div>
@@ -73,7 +73,7 @@ const onClick = (): void => {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 40px;
+        gap: 8px;
 
         .menu-button {
             position: relative;

@@ -13,7 +13,6 @@ const onClickSound = (): void => {
 const onClickCamera = (): void => {
     toggleWebcam();
 };
-
 </script>
 
 <template>
@@ -82,7 +81,7 @@ const onClickCamera = (): void => {
 .menu-burger-container {
     position: absolute;
     top: 0;
-    right: 20px;
+    right: 40px;
     z-index: 99990;
 }
 
@@ -97,8 +96,6 @@ const onClickCamera = (): void => {
     position: absolute;
     top: 0;
     right: 0;
-    padding-top: 20px;
-    padding-right: 20px;
     box-sizing: border-box;
 }
 
@@ -111,7 +108,7 @@ const onClickCamera = (): void => {
     width: 40px;
     height: 40px;
     position: absolute;
-    top: 20px;
+    top: 40px;
     right: 0;
     color: white;
     display: flex;

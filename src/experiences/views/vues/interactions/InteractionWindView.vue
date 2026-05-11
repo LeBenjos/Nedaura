@@ -36,7 +36,7 @@ onMounted(() => {
 <style lang="scss" scoped>
 .jauge {
     position: fixed;
-    right: 20px;
+    right: 40px;
     top: 50%;
     transform: translateY(-50%);
     width: 12px;
