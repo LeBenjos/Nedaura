@@ -1,98 +1,90 @@
 <script lang="ts" setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { lerp, mod } from '@/experiences/views/vues/utils';
-
+import { mod } from '@/experiences/views/vues/utils';
 import Date from '../Date';
 
-// Odd number guarantees exactly one line at center
+// ─── Props ────────────────────────────────────────────────────────────────────
+const props = withDefaults(
+    defineProps<{
+        duration?: number;
+        initialValue: number;
+        endValue: number;
+    }>(),
+    {
+        duration: 900,
+    }
+);
+
+// ─── Config ───────────────────────────────────────────────────────────────────
 const totalLines = 40;
 const lineHeight = 2;
-const centerIndex = Math.floor(totalLines / 2); // 20
+const centerIndex = Math.floor(totalLines / 2);
 const centerY = window.innerHeight / 2;
 
 const stepSize = computed(() => (window.innerHeight - lineHeight * totalLines) / totalLines + lineHeight + 1);
-
 const totalSpan = computed(() => totalLines * stepSize.value);
 
-const targetYears = [-3600, -2000, -500, 0, 1492, 2026];
-let currentYearIndex = 0;
+// ─── Easing ───────────────────────────────────────────────────────────────────
+const easeInOutCubic = (t: number): number => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
-// Scroll state — only one value drives everything
-let rawOffset = 0;
-let targetOffset = 0;
+// ─── Animation state ──────────────────────────────────────────────────────────
+let startOffset = 0;
+let currentOffset = 0;
+let targetOffset = 30 * stepSize.value; // une transition = 30 steps
+
+let startYear = props.initialValue;
+let currentYear = props.initialValue;
+let targetYear = props.endValue;
+
 const lerpedOffset = ref(0);
+const lerpedYear = ref(props.initialValue);
 
-let rawYear = targetYears[currentYearIndex];
-let targetYear = targetYears[currentYearIndex];
-const lerpedYear = ref(rawYear); // This is what we pass to the template
-
+let animStartTime: number | null = null;
 let raf: number | null = null;
 
-const onKeyDown = (e: KeyboardEvent) => {
-    if (e.key !== 'g') return;
+// ─── Animation loop ───────────────────────────────────────────────────────────
+const animate = (now: number) => {
+    if (animStartTime === null) animStartTime = now;
 
-    currentYearIndex = (currentYearIndex + 1) % targetYears.length;
-    targetYear = targetYears[currentYearIndex];
+    const elapsed = now - animStartTime;
+    const t = Math.min(elapsed / props.duration, 1);
+    const eased = easeInOutCubic(t);
 
-    targetOffset += 30 * stepSize.value;
-    if (!raf) raf = requestAnimationFrame(animate);
+    currentOffset = startOffset + (targetOffset - startOffset) * eased;
+    currentYear = startYear + (targetYear - startYear) * eased;
+
+    lerpedOffset.value = currentOffset;
+    lerpedYear.value = Math.round(currentYear);
+
+    if (t < 1) {
+        raf = requestAnimationFrame(animate);
+    } else {
+        currentOffset = targetOffset;
+        currentYear = targetYear;
+        lerpedOffset.value = targetOffset;
+        lerpedYear.value = Math.round(targetYear);
+        raf = null;
+    }
 };
 
-/* const animate = () => {
-    if (Math.abs(targetOffset - rawOffset) < 0.1) {
-        rawOffset = targetOffset;
-        lerpedOffset.value = rawOffset;
-        cancelAnimationFrame(raf!);
-        raf = null;
-        return;
-    }
-    rawOffset = lerp(rawOffset, targetOffset, 0.02);
-    lerpedOffset.value = rawOffset;
+// ─── Lifecycle — lance l'anim au mount ───────────────────────────────────────
+onMounted(() => {
     raf = requestAnimationFrame(animate);
-}; */
-
-const animate = () => {
-    const offsetDiff = Math.abs(targetOffset - rawOffset);
-
-    // If BOTH animations are close enough to their targets, snap and stop
-    if (offsetDiff < 0.1) {
-        rawOffset = targetOffset;
-        lerpedOffset.value = rawOffset;
-
-        cancelAnimationFrame(raf!);
-        raf = null;
-        return;
-    }
-
-    // Lerp timeline offset
-    rawOffset = lerp(rawOffset, targetOffset, 0.06);
-    lerpedOffset.value = rawOffset;
-
-    // Lerp the year (using the exact same 0.02 factor ensures perfectly synced timing)
-    rawYear = lerp(rawYear, targetYear, 0.06);
-    // Math.round ensures the counter only shows whole numbers as it counts up/down
-    lerpedYear.value = Math.round(rawYear);
-
-    raf = requestAnimationFrame(animate);
-};
-
-onMounted(() => window.addEventListener('keydown', onKeyDown));
-onUnmounted(() => {
-    window.removeEventListener('keydown', onKeyDown);
-    if (raf) cancelAnimationFrame(raf!);
 });
 
-// Where line i should appear on screen, with modular wrapping
+onUnmounted(() => {
+    if (raf) cancelAnimationFrame(raf);
+});
+
+// ─── Geometry ─────────────────────────────────────────────────────────────────
 const getY = (i: number): number => {
     const half = totalSpan.value / 2;
     const raw = (i - centerIndex) * stepSize.value - lerpedOffset.value;
     return centerY + mod(raw + half, totalSpan.value) - half;
 };
 
-// How many full steps we've scrolled (integer) — used to derive tick identity
 const scrollSteps = computed(() => Math.round(lerpedOffset.value / stepSize.value));
 
-// Which tick this line currently represents (survives wrapping)
 const getTick = (i: number): number => {
     const slot = Math.round((getY(i) - centerY) / stepSize.value);
     return mod(centerIndex + scrollSteps.value + slot, totalLines);
@@ -149,36 +141,6 @@ const isMajor = (i: number) => getTick(i) % 5 === 0;
         rgba(0, 0, 0, 0.3) 80%,
         transparent 100%
     );
-
-    /*  // The fixed crosshair line
-    &:before {
-        content: '';
-        position: absolute;
-        top: 50%;
-        left: 0;
-        width: calc(100% - 5px);
-        height: 2px;
-        background-color: white;
-        transform: translateY(-50%);
-        box-shadow: 0 0 5px 1px rgba(255, 255, 255, 0.7);
-        z-index: 2;
-        pointer-events: none;
-    }
-
-    &:after {
-        content: '';
-        position: absolute;
-        top: 50%;
-        right: 5px;
-        width: 10px;
-        height: 10px;
-        border-radius: 50%;
-        background-color: white;
-        transform: translateY(-50%);
-        box-shadow: 0 0 5px 1px rgba(255, 255, 255, 0.7);
-        z-index: 2;
-        pointer-events: none;
-    } */
 }
 
 .date-container {
