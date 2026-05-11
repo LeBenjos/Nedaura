@@ -7,6 +7,7 @@ import LoaderManager from '@/managers/LoaderManager';
 import { onMounted, ref } from 'vue';
 import MenuView from '@/views/Menu';
 import MenuBurgerView from '@/views/MenuBurgerView';
+import InteractionWindView from '@/experiences/views/vues/interactions/InteractionWindView.vue';
 
 const isVisible = ref(false);
 
