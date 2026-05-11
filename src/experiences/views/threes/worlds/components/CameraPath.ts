@@ -5,6 +5,7 @@ import { CameraId } from '../../../../constants/experiences/CameraId';
 import { Object3DId } from '../../../../constants/experiences/Object3dId';
 import { TimelineExperienceState } from '../../../../constants/experiences/TimelineExperienceState';
 import DebugManager from '../../../../managers/DebugManager';
+import ThreeAssetsManager from '../../../../managers/threes/ThreeAssetsManager';
 import TimelineExperienceManager from '../../../../managers/TimelineExperienceManager';
 import ThreeCameraControllerManager from '../../../../managers/threes/ThreeCameraControllerManager';
 import ThreeModelBase from '../../bases/components/ThreeModelBase';
@@ -37,10 +38,24 @@ export default class CameraPath extends ThreeModelBase {
     }
 
     private _onEnterPathIntro = (): void => {
-        this._getCamera().playPath(this._curve, CameraPath._INTRO_DURATION_S, () =>
-            TimelineExperienceManager.setState(TimelineExperienceState.VERSE_1)
+        this._getCamera().playPath(
+            this._curve,
+            CameraPath._INTRO_DURATION_S,
+            () => TimelineExperienceManager.setState(TimelineExperienceState.VERSE_1),
+            this._resolveStatueWorldPosition(),
         );
     };
+
+    // Read the statue's position from the shared GLTF (same source the curve
+    // is extracted from) so we have a stable fallback look-at when the curve
+    // look-ahead collapses near t = 1.
+    private _resolveStatueWorldPosition(): Vector3 | undefined {
+        const gltf = ThreeAssetsManager.getModel(AssetId.THREE_GLTF_DUNES);
+        const statueNode = gltf?.scene.getObjectByName(Object3DId.STATUE);
+        if (!statueNode) return undefined;
+        statueNode.updateMatrixWorld(true);
+        return new Vector3().setFromMatrixPosition(statueNode.matrixWorld);
+    }
 
     private _buildCurveFromMesh(): CatmullRomCurve3 {
         if (!(this._model instanceof Mesh) && !(this._model instanceof Line)) {

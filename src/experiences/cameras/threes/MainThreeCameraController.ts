@@ -19,6 +19,10 @@ interface PathState {
     curve: Curve<Vector3>;
     t: number;
     playback?: PathPlayback;
+    // When set, the look-at target is blended from the curve look-ahead toward
+    // this point over the last segment of the path — avoids the look-ahead
+    // collapsing onto the current position as t → 1 (which causes a snap).
+    fallbackLookAt?: Vector3;
 }
 
 interface IdleTransitionState {
@@ -44,14 +48,25 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
     private static readonly _DEFAULT_FRICTION: number = 3;
     private static readonly _VELOCITY_SMOOTHING: number = 0.4;
     private static readonly _IDLE_TRANSITION_DURATION_S: number = 5;
+    // Forward sample distance on the curve (normalized arc length) used as the
+    // raw look-at target. Larger = more anticipative, less reactive to local
+    // curvature; smaller = follows the path more literally but jitters in tight turns.
+    private static readonly _PATH_LOOK_AHEAD: number = 0.015;
+    // Critical-damping rate (1/s) for the look-at filter. Higher = snappier,
+    // lower = smoother but with more lag behind the curve.
+    private static readonly _PATH_LOOKAT_DAMPING: number = 4;
+    // Fraction of t over which the look-at blends from the curve toward the
+    // optional fallback target at the end of the run.
+    private static readonly _PATH_FALLBACK_BLEND_RANGE: number = 0.08;
 
     private readonly _target: Vector3 = new Vector3(...THREE_WORLD_CONFIG.camera.target);
     private readonly _spherical: Spherical = new Spherical();
     private readonly _sphericalTarget: Spherical = new Spherical();
     private readonly _tmpPos: Vector3 = new Vector3();
     private readonly _tmpToPos: Vector3 = new Vector3();
-    private readonly _tmpTangent: Vector3 = new Vector3();
+    private readonly _tmpLookAheadPos: Vector3 = new Vector3();
     private readonly _tmpLookAt: Vector3 = new Vector3();
+    private readonly _pathLookAt: Vector3 = new Vector3();
 
     private _friction: number = MainThreeCameraController._DEFAULT_FRICTION;
     private _previousFistX: number | null = null;
@@ -136,6 +151,7 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
             return;
         }
 
+
         if (this._idleTransition) {
             this._updateIdleTransition(dt);
             return;
@@ -150,14 +166,50 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
         this._resetHandInputState();
         this._idleTransition = null;
         this._pathState = { curve, t: MathUtils.clamp(t, 0, 1) };
-        this._applyPathStateToCamera();
+        this._primePathLookAt();
+        this._applyPathStateToCamera(0);
     }
 
-    public playPath(curve: Curve<Vector3>, duration: number, onComplete?: () => void): void {
+    public playPath(
+        curve: Curve<Vector3>,
+        duration: number,
+        onComplete?: () => void,
+        fallbackLookAt?: Vector3,
+    ): void {
         if (duration <= 0) throw new Error('MainThreeCameraController.playPath: duration must be > 0');
         this._resetHandInputState();
         this._idleTransition = null;
-        this._pathState = { curve, t: 0, playback: { duration, elapsed: 0, onComplete } };
+        this._pathState = {
+            curve,
+            t: 0,
+            playback: { duration, elapsed: 0, onComplete },
+            fallbackLookAt: fallbackLookAt?.clone(),
+        };
+        this._primePathLookAt();
+    }
+
+    // Seed the damped look-at with the first frame's target so the camera does
+    // not snap from a stale orientation when path mode starts.
+    private _primePathLookAt(): void {
+        const state = this._pathState!;
+        this._computeRawPathLookAt(state, this._tmpLookAheadPos);
+        this._pathLookAt.copy(this._tmpLookAheadPos);
+    }
+
+    // Raw, un-damped look-at target for the current t: curve look-ahead point,
+    // blended toward the fallback target on the final segment if one is set.
+    // Writes into `out` and returns it.
+    private _computeRawPathLookAt(state: PathState, out: Vector3): Vector3 {
+        const lookT = Math.min(state.t + MainThreeCameraController._PATH_LOOK_AHEAD, 1);
+        state.curve.getPointAt(lookT, out);
+
+        const fallback = state.fallbackLookAt;
+        if (fallback) {
+            const start = 1 - MainThreeCameraController._PATH_FALLBACK_BLEND_RANGE;
+            const k = MathUtils.smoothstep(state.t, start, 1);
+            if (k > 0) out.lerp(fallback, k);
+        }
+        return out;
     }
 
     private _resetHandInputState(): void {
@@ -174,19 +226,35 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
             state.t = Math.min(state.playback.elapsed / state.playback.duration, 1);
         }
 
-        this._applyPathStateToCamera();
+        this._applyPathStateToCamera(dt);
 
         if (state.playback && state.t >= 1) this._endPathPlayback();
     }
 
-    private _applyPathStateToCamera(): void {
+    private _applyPathStateToCamera(dt: number): void {
         const state = this._pathState!;
         state.curve.getPointAt(state.t, this._tmpPos);
         this._container.position.copy(this._tmpPos);
 
-        state.curve.getTangentAt(state.t, this._tmpTangent);
-        this._tmpLookAt.copy(this._tmpPos).add(this._tmpTangent);
-        this._camera.lookAt(this._tmpLookAt);
+        // Look-ahead point on the curve averages local curvature, giving a far
+        // smoother look-at than the raw tangent at sharp turns. Near the end
+        // of the run, the look-ahead collapses onto the position; the fallback
+        // blend preserves a stable target.
+        this._computeRawPathLookAt(state, this._tmpLookAheadPos);
+
+        if (dt > 0) {
+            const damping = MainThreeCameraController._PATH_LOOKAT_DAMPING;
+            this._pathLookAt.x = MathUtils.damp(this._pathLookAt.x, this._tmpLookAheadPos.x, damping, dt);
+            this._pathLookAt.y = MathUtils.damp(this._pathLookAt.y, this._tmpLookAheadPos.y, damping, dt);
+            this._pathLookAt.z = MathUtils.damp(this._pathLookAt.z, this._tmpLookAheadPos.z, damping, dt);
+        } else {
+            this._pathLookAt.copy(this._tmpLookAheadPos);
+        }
+
+        // Mirror into _tmpLookAt so _endPathPlayback hands off the actual
+        // (damped) orientation to the idle transition, not the raw curve target.
+        this._tmpLookAt.copy(this._pathLookAt);
+        this._camera.lookAt(this._pathLookAt);
     }
 
     private _endPathPlayback(): void {
