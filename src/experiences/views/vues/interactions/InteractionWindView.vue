@@ -40,14 +40,13 @@ onMounted(() => {
     top: 50%;
     transform: translateY(-50%);
     width: 12px;
-    height: 400px;
+    height: 500px;
     border: 2px solid white;
     border-radius: 15px;
     overflow: hidden;
     z-index: 9999;
-    background: radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.1) 100%);
-    background-blend-mode: hard-light;
-    box-shadow: 0 0 8px 0 #fff;
+    box-shadow: 0 0 4px 0 rgba(255, 255, 255, 0.30);
+    backdrop-filter: blur(2px);
 
     .jauge-fill {
         position: absolute;

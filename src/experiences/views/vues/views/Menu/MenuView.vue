@@ -7,6 +7,7 @@ import IntroView from '../Intro/IntroView.vue';
 import { useInterfaceManager } from '@/hooks/useInterfaceManager';
 import SoundManager from '@/managers/SoundManager';
 import { SoundId } from '@/constants/experiences/Sound/SoundId';
+import ButtonComponent from '../../components/ButtonComponent.vue';
 
 const { mount, unmount } = useInterfaceManager();
 
@@ -40,7 +41,7 @@ const onClick = (): void => {
                 </div>
 
                 <div class="menu-button" @click="onClick">
-                    <p>Commencer</p>
+                    <ButtonComponent label="Commencer" :is-icon="true" />
                 </div>
             </div>
         </div>
@@ -72,44 +73,6 @@ const onClick = (): void => {
         align-items: center;
         justify-content: center;
         gap: 8px;
-
-        .menu-button {
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-            width: fit-content;
-
-            display: flex;
-            padding: 8px 32px;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-
-            border-radius: 80px;
-            border: 2px solid #fff;
-            background: radial-gradient(
-                50% 50% at 50% 50%,
-                rgba(255, 255, 255, 0.22) 0%,
-                rgba(153, 153, 153, 0.34) 100%
-            );
-            background-blend-mode: hard-light;
-            box-shadow: 0 0 8px 0 #fff;
-            transition: all 0.3s ease-in-out;
-
-            &:hover {
-                background-blend-mode: hard-light;
-                box-shadow: 0 0 6px 2px #fff;
-            }
-
-            p {
-                color: #fff;
-                text-align: center;
-                font-size: 16px;
-                line-height: 36px;
-                position: relative;
-                z-index: 1;
-            }
-        }
     }
 }
 </style>

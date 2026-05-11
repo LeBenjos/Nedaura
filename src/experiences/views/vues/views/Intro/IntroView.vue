@@ -12,6 +12,7 @@ import DebugManager from '@/managers/DebugManager';
 import { SoundId } from '@/constants/experiences/Sound/SoundId';
 import SoundManager from '@/managers/SoundManager';
 import { setWebcamVisible } from '../../../mediapipe/webcamVisibility';
+import ButtonComponent from '../../components/ButtonComponent.vue';
 
 const showInstruction = ref(true);
 
@@ -119,7 +120,9 @@ onBeforeUnmount(() => {
                     Quand vous êtes prêt, fermez les deux poings.
                 </p>
             </div>
-            <button class="button" id="webcamButton" @click="onClick">Activer la caméra</button>
+            <div id="webcamButton" @click="onClick">
+                <ButtonComponent label="Autoriser la caméra" :is-icon="false" />
+            </div>
         </div>
     </div>
 </template>
