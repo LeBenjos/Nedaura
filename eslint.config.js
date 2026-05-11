@@ -1,6 +1,6 @@
 import eslint from '@eslint/js';
 import eslintPluginPrettier from 'eslint-plugin-prettier/recommended';
-import { defineConfig } from "eslint/config";
+import { defineConfig } from 'eslint/config';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig(
@@ -121,7 +121,7 @@ export default defineConfig(
             ],
 
             // Prettier integration
-            'prettier/prettier': 'warn',
+            'prettier/prettier': 'off',
         },
     },
     {

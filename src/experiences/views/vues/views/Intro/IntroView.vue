@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { useInterfaceManager } from '../hooks/useInterfaceManager';
+import { useInterfaceManager } from '@/hooks/useInterfaceManager';
 import { onBeforeUnmount, onMounted, ref } from 'vue';
-import { TimelineExperienceState } from '../../../constants/experiences/TimelineExperienceState';
-import TimelineExperienceManager from '../../../managers/TimelineExperienceManager';
+import { TimelineExperienceState } from '@/constants/experiences/TimelineExperienceState';
+import TimelineExperienceManager from '@/managers/TimelineExperienceManager';
 import { transition } from 'three/examples/jsm/tsl/display/TransitionNode.js';
-import { TextId } from '../../../constants/experiences/Text/TextId';
+import { TextId } from '@/constants/experiences/Text/TextId';
 import gsap from 'gsap';
-import { MediapipeHandsSnapshot } from '../../../managers/MediapipeManager';
-import { playTextSequence } from '../../../managers/TextManager/TextSequence';
-import DebugManager from '../../../managers/DebugManager';
-import { SoundId } from '../../../constants/experiences/Sound/SoundId';
-import SoundManager from '../../../managers/SoundManager';
-import { setWebcamVisible } from '../../mediapipe/webcamVisibility';
+import { MediapipeHandsSnapshot } from '@/managers/MediapipeManager';
+import { playTextSequence } from '@/managers/TextManager/TextSequence';
+import DebugManager from '@/managers/DebugManager';
+import { SoundId } from '@/constants/experiences/Sound/SoundId';
+import SoundManager from '@/managers/SoundManager';
+import { setWebcamVisible } from '../../../mediapipe/webcamVisibility';
 
 const showInstruction = ref(true);
 

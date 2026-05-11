@@ -3,10 +3,10 @@ import MediapipeView from '../../views/mediapipe/MediapipeView.vue';
 import InterfaceManager from '@/comp/InterfaceManager.vue';
 import { useInterfaceManager } from '@/hooks/useInterfaceManager';
 import LoaderView from '@/views/LoaderView';
-import LoaderManager from '../../managers/LoaderManager';
+import LoaderManager from '@/managers/LoaderManager';
 import { onMounted, ref } from 'vue';
-import MenuView from '../../views/vues/Menu/MenuView.vue';
-import MenuBurgerView from '../../views/vues/MenuBurgerView.vue/MenuBurgerView.vue';
+import MenuView from '@/views/Menu';
+import MenuBurgerView from '@/views/MenuBurgerView';
 
 const isVisible = ref(false);
 

@@ -1,8 +1,20 @@
 {
     "extends": "@vue/tsconfig/tsconfig.dom.json",
     "compilerOptions": {
+        "target": "ES6",
+        "module": "commonjs",
         "verbatimModuleSyntax": false,
-        "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo"
+        "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
+        "paths": {
+            "@/*": ["./src/*"],
+            "~/*": ["./src/*"],
+            "@/utils/*": ["./src/experiences/views/vues/utils/*"],
+            "@/comp/*": ["./src/experiences/views/vues/components/*"],
+            "@/hooks/*": ["./src/experiences/views/vues/hooks/*"],
+            "@/views/*": ["./src/experiences/views/vues/views/*"],
+            "@/managers/*": ["./src/experiences/managers/*"],
+            "@/constants/*": ["./src/experiences/constants/*"]
+        }
     },
-    "include": ["src/**/*.ts", "src/**/*.vue"]
+    "include": ["env.d.ts", "src/**/*.ts", "src/**/*.d.ts", "src/**/*.vue"]
 }
