@@ -7,7 +7,11 @@ import {
     ShaderMaterial,
     UniformsLib,
     UniformsUtils,
+    Vector2,
 } from "three";
+import { DebugGuiTitle } from "../../../../constants/experiences/DebugGuiTitle";
+import { THREE_WORLD_CONFIG } from "../../../../constants/experiences/ThreeWorldConfig";
+import DebugManager from "../../../../managers/DebugManager";
 import ThreeActorBase from "../../bases/components/ThreeActorBase";
 
 export default class Clouds extends ThreeActorBase {
@@ -20,6 +24,7 @@ export default class Clouds extends ThreeActorBase {
     private static readonly _COLOR: string = "#e6d8c4";
     private static readonly _DRIFT: readonly [number, number, number] = [0.7, 0, 0.18];
     private static readonly _FADE_RATE: number = 0.35;
+    private static readonly _DEBUG_INIT_KEY: string = "__cloudsDebugInit";
 
     private declare _geometry: BufferGeometry;
     private declare _material: ShaderMaterial;
@@ -28,12 +33,15 @@ export default class Clouds extends ThreeActorBase {
     private _targetIntensity: number = 0;
     private _intensity: number = 0;
 
+    private readonly _settings = { ...THREE_WORLD_CONFIG.clouds };
+
     constructor() {
         super();
         this._generateGeometry();
         this._generateMaterial();
         this._generateMesh();
         this.visible = false;
+        this._initDebug();
     }
 
     public setIntensity(target: number): void {
@@ -45,6 +53,41 @@ export default class Clouds extends ThreeActorBase {
 
     public setCount(count: number): void {
         this.setIntensity(count > 0 ? 1 : 0);
+    }
+
+    public setEdgeFade(start: number, end: number): void {
+        const s = Math.max(0, Math.min(start, 1));
+        const e = Math.max(s + 1e-4, Math.min(end, 1));
+        this._settings.edgeFadeStart = s;
+        this._settings.edgeFadeEnd = e;
+        this._material.uniforms.uEdgeFade.value.set(s, e);
+    }
+
+    public setGroundFade(start: number, end: number): void {
+        const e = Math.max(start + 1e-4, end);
+        this._settings.groundFadeStart = start;
+        this._settings.groundFadeEnd = e;
+        this._material.uniforms.uGroundFade.value.set(start, e);
+    }
+
+    public setGroundFadeJitter(amount: number): void {
+        const v = Math.max(0, amount);
+        this._settings.groundFadeJitter = v;
+        this._material.uniforms.uGroundFadeJitter.value = v;
+    }
+
+    public setEdgeSizeShrink(amount: number): void {
+        const v = Math.max(0, Math.min(amount, 1));
+        this._settings.edgeSizeShrink = v;
+        this._material.uniforms.uEdgeSizeShrink.value = v;
+    }
+
+    public setNearFade(min: number, max: number): void {
+        const m = Math.max(0, min);
+        const mx = Math.max(m + 1e-4, max);
+        this._settings.nearFadeMin = m;
+        this._settings.nearFadeMax = mx;
+        this._material.uniforms.uNearFade.value.set(m, mx);
     }
 
     public get intensity(): number {
@@ -111,6 +154,11 @@ export default class Clouds extends ThreeActorBase {
                     uColor: { value: new Color(Clouds._COLOR) },
                     uDrift: { value: [...Clouds._DRIFT] },
                     uRadius: { value: Clouds._RADIUS },
+                    uEdgeFade: { value: new Vector2(this._settings.edgeFadeStart, this._settings.edgeFadeEnd) },
+                    uGroundFade: { value: new Vector2(this._settings.groundFadeStart, this._settings.groundFadeEnd) },
+                    uGroundFadeJitter: { value: this._settings.groundFadeJitter },
+                    uEdgeSizeShrink: { value: this._settings.edgeSizeShrink },
+                    uNearFade: { value: new Vector2(this._settings.nearFadeMin, this._settings.nearFadeMax) },
                 },
             ]),
             vertexShader: `
@@ -121,9 +169,15 @@ export default class Clouds extends ThreeActorBase {
                 uniform float uTime;
                 uniform vec3 uDrift;
                 uniform float uRadius;
+                uniform vec2 uEdgeFade;
+                uniform vec2 uGroundFade;
+                uniform float uGroundFadeJitter;
+                uniform float uEdgeSizeShrink;
+                uniform vec2 uNearFade;
 
                 varying vec2 vUv;
                 varying float vSeed;
+                varying float vFade;
 
                 #include <fog_pars_vertex>
 
@@ -138,8 +192,25 @@ export default class Clouds extends ThreeActorBase {
                     wrappedPos.x = horiz.x;
                     wrappedPos.z = horiz.y;
 
+                    vec2 toCam = abs(wrappedPos.xz - cameraPosition.xz);
+                    float boxDist = max(toCam.x, toCam.y);
+                    float edgeFade = 1.0 - smoothstep(uRadius * uEdgeFade.x, uRadius * uEdgeFade.y, boxDist);
+
+                    float radialDist = length(wrappedPos.xz - cameraPosition.xz);
+                    float nearFade = smoothstep(uNearFade.x, uNearFade.y, radialDist);
+
+                    float sizeFactor = mix(uEdgeSizeShrink, 1.0, edgeFade);
+                    float scaledSize = aSize * sizeFactor;
+
                     vec4 mvPosition = modelViewMatrix * vec4(wrappedPos, 1.0);
-                    mvPosition.xy += aCorner * aSize;
+                    mvPosition.xy += aCorner * scaledSize;
+
+                    vec3 camUp = vec3(viewMatrix[0][1], viewMatrix[1][1], viewMatrix[2][1]);
+                    float worldY = wrappedPos.y + aCorner.y * scaledSize * camUp.y;
+                    float jitter = (aSeed - 0.5) * uGroundFadeJitter;
+                    float groundFade = smoothstep(uGroundFade.x + jitter, uGroundFade.y + jitter, worldY);
+
+                    vFade = edgeFade * groundFade * nearFade;
 
                     gl_Position = projectionMatrix * mvPosition;
 
@@ -156,6 +227,7 @@ export default class Clouds extends ThreeActorBase {
 
                 varying vec2 vUv;
                 varying float vSeed;
+                varying float vFade;
 
                 #include <fog_pars_fragment>
 
@@ -194,7 +266,7 @@ export default class Clouds extends ThreeActorBase {
                     float n = fbm(noiseUv);
                     float density = disc * smoothstep(0.15, 0.75, n);
 
-                    float alpha = density * uIntensity;
+                    float alpha = density * uIntensity * vFade;
                     if (alpha < 0.001) discard;
 
                     gl_FragColor = vec4(uColor, alpha);
@@ -230,5 +302,67 @@ export default class Clouds extends ThreeActorBase {
         this._intensity = 0;
         this._material.uniforms.uIntensity.value = 0;
         this.visible = false;
+    }
+
+    private _initDebug(): void {
+        if (!DebugManager.isActive) return;
+
+        const viewsFolder = DebugManager.getGuiFolder(DebugGuiTitle.THREE_VIEWS);
+        const anyFolder = viewsFolder as unknown as Record<string, unknown>;
+        if (anyFolder[Clouds._DEBUG_INIT_KEY]) return;
+        anyFolder[Clouds._DEBUG_INIT_KEY] = true;
+
+        const folder = viewsFolder.addFolder("Clouds");
+
+        type Ctrl = ReturnType<typeof folder.add>;
+        const controllers: Partial<Record<keyof typeof THREE_WORLD_CONFIG.clouds, Ctrl>> = {};
+
+        controllers.edgeFadeStart = folder
+            .add(this._settings, "edgeFadeStart", 0, 1, 0.01)
+            .name("edge fade start")
+            .onChange(() => this.setEdgeFade(this._settings.edgeFadeStart, this._settings.edgeFadeEnd));
+
+        controllers.edgeFadeEnd = folder
+            .add(this._settings, "edgeFadeEnd", 0, 1, 0.01)
+            .name("edge fade end")
+            .onChange(() => this.setEdgeFade(this._settings.edgeFadeStart, this._settings.edgeFadeEnd));
+
+        controllers.edgeSizeShrink = folder
+            .add(this._settings, "edgeSizeShrink", 0, 1, 0.01)
+            .name("edge size shrink")
+            .onChange((v: number) => this.setEdgeSizeShrink(v));
+
+        controllers.groundFadeStart = folder
+            .add(this._settings, "groundFadeStart", -4, 6, 0.05)
+            .name("ground fade start")
+            .onChange(() => this.setGroundFade(this._settings.groundFadeStart, this._settings.groundFadeEnd));
+
+        controllers.groundFadeEnd = folder
+            .add(this._settings, "groundFadeEnd", -4, 10, 0.05)
+            .name("ground fade end")
+            .onChange(() => this.setGroundFade(this._settings.groundFadeStart, this._settings.groundFadeEnd));
+
+        controllers.groundFadeJitter = folder
+            .add(this._settings, "groundFadeJitter", 0, 4, 0.05)
+            .name("ground fade jitter")
+            .onChange((v: number) => this.setGroundFadeJitter(v));
+
+        controllers.nearFadeMin = folder
+            .add(this._settings, "nearFadeMin", 0, 20, 0.1)
+            .name("near fade min")
+            .onChange(() => this.setNearFade(this._settings.nearFadeMin, this._settings.nearFadeMax));
+
+        controllers.nearFadeMax = folder
+            .add(this._settings, "nearFadeMax", 0, 20, 0.1)
+            .name("near fade max")
+            .onChange(() => this.setNearFade(this._settings.nearFadeMin, this._settings.nearFadeMax));
+
+        for (const key of Object.keys(THREE_WORLD_CONFIG.clouds) as (keyof typeof THREE_WORLD_CONFIG.clouds)[]) {
+            DebugManager.registerConfigGetter(`clouds.${key}`, () => this._settings[key]);
+            const ctrl = controllers[key];
+            if (ctrl) {
+                DebugManager.registerConfigSetter(`clouds.${key}`, (v) => ctrl.setValue(v));
+            }
+        }
     }
 }

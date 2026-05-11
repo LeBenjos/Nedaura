@@ -154,18 +154,18 @@ class TimelineExperienceManager {
         console.log("leave path intro");
         this.onLeavePathIntro.execute();
     }
-    
+
     private async _enterVerse1() {
         console.log("enter verse 1");
 
         SoundManager.stopAmbientSound(SoundId.TRAVELLING_MUSIC);
 
         this.onEnterVerse1.execute();
-        
+
         await playTextSequence([
             {
                 id: TextId.VERSE_1_1,
-                
+
                 displayDuration: 2000,
                 sound: SoundId.VERSE_1_1,
                 options: { duration: 0.5, hideDuration: 0.5, anchor: 'center-right', maxWidthPercent: 0.5 },
@@ -206,7 +206,7 @@ class TimelineExperienceManager {
         const view = MainThreeApp.currentView as WorldThreeView;
         view.sand.setCount(50000);
         view.stormWind.setCount(1000);
-        view.clouds.setIntensity(0.1);
+        view.clouds.setIntensity(0.4);
         this.mount({ id: 'interaction-wind', component: InteractionWindView });
         this.mount({ id: 'hand-movement-helper', component: HandMovementHelper });
         this.onEnterInteract1.execute();
@@ -224,7 +224,7 @@ class TimelineExperienceManager {
         const view = MainThreeApp.currentView as WorldThreeView;
         view.sand.setCount(200000);
         view.stormWind.setCount(5000);
-        view.clouds.setIntensity(0.4);
+        view.clouds.setIntensity(0.8);
         await playTextSequence([
             {
                 id: TextId.VERSE_2_1,

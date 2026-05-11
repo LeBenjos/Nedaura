@@ -52,6 +52,16 @@ export interface ThreeWorldConfig {
         normalScaleX: number;
         normalScaleY: number;
     };
+    clouds: {
+        edgeFadeStart: number;
+        edgeFadeEnd: number;
+        edgeSizeShrink: number;
+        groundFadeStart: number;
+        groundFadeEnd: number;
+        groundFadeJitter: number;
+        nearFadeMin: number;
+        nearFadeMax: number;
+    };
     windLines: {
         enabled: boolean;
         handDepth: number;
@@ -130,6 +140,16 @@ export const THREE_WORLD_CONFIG: ThreeWorldConfig = {
         "metalness": 1,
         "normalScaleX": 2.998,
         "normalScaleY": -2.046
+    },
+    "clouds": {
+        "edgeFadeStart": 0.9,
+        "edgeFadeEnd": 1,
+        "edgeSizeShrink": 0.2,
+        "groundFadeStart": 0,
+        "groundFadeEnd": 5,
+        "groundFadeJitter": 1,
+        "nearFadeMin": 1.5,
+        "nearFadeMax": 5
     },
     "windLines": {
         "enabled": true,

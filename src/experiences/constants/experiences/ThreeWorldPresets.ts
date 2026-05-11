@@ -65,6 +65,16 @@ export const THREE_WORLD_PRESETS: Record<ThreeWorldPresetId, ThreeWorldConfig> =
             "normalScaleX": 2.998,
             "normalScaleY": -2.046
         },
+        "clouds": {
+            "edgeFadeStart": 0.9,
+            "edgeFadeEnd": 1,
+            "edgeSizeShrink": 0.2,
+            "groundFadeStart": 0,
+            "groundFadeEnd": 5,
+            "groundFadeJitter": 1,
+            "nearFadeMin": 1.5,
+            "nearFadeMax": 5
+        },
         "windLines": {
             "enabled": true,
             "handDepth": 0,
@@ -142,6 +152,16 @@ export const THREE_WORLD_PRESETS: Record<ThreeWorldPresetId, ThreeWorldConfig> =
             "metalness": 1,
             "normalScaleX": 2.998,
             "normalScaleY": -2.046
+        },
+        "clouds": {
+            "edgeFadeStart": 0.9,
+            "edgeFadeEnd": 1,
+            "edgeSizeShrink": 0.2,
+            "groundFadeStart": 0,
+            "groundFadeEnd": 5,
+            "groundFadeJitter": 1,
+            "nearFadeMin": 1.5,
+            "nearFadeMax": 5
         },
         "windLines": {
             "enabled": true,
@@ -221,6 +241,16 @@ export const THREE_WORLD_PRESETS: Record<ThreeWorldPresetId, ThreeWorldConfig> =
             "normalScaleX": 2.998,
             "normalScaleY": -2.046
         },
+        "clouds": {
+            "edgeFadeStart": 0.9,
+            "edgeFadeEnd": 1,
+            "edgeSizeShrink": 0.2,
+            "groundFadeStart": 0,
+            "groundFadeEnd": 5,
+            "groundFadeJitter": 1,
+            "nearFadeMin": 1.5,
+            "nearFadeMax": 5
+        },
         "windLines": {
             "enabled": true,
             "handDepth": 0,
@@ -298,6 +328,16 @@ export const THREE_WORLD_PRESETS: Record<ThreeWorldPresetId, ThreeWorldConfig> =
             "metalness": 1,
             "normalScaleX": 2.998,
             "normalScaleY": -2.046
+        },
+        "clouds": {
+            "edgeFadeStart": 0.9,
+            "edgeFadeEnd": 1,
+            "edgeSizeShrink": 0.2,
+            "groundFadeStart": 0,
+            "groundFadeEnd": 5,
+            "groundFadeJitter": 1,
+            "nearFadeMin": 1.5,
+            "nearFadeMax": 5
         },
         "windLines": {
             "enabled": true,
