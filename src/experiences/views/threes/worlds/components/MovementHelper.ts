@@ -1,18 +1,21 @@
-import { MathUtils } from 'three';
-import { MeshLineGeometry, MeshLineMaterial } from 'meshline'
-import * as THREE from 'three';
 import gsap from 'gsap';
-import { Mesh } from "three/src/objects/Mesh.js";
-import { Vector2 } from 'three/src/math/Vector2.js';
+import { MeshLineGeometry, MeshLineMaterial } from 'meshline';
+import * as THREE from 'three';
+import { MathUtils } from 'three';
 import { PlaneGeometry } from 'three/src/geometries/PlaneGeometry.js';
 import { MeshBasicMaterial } from 'three/src/materials/Materials.js';
+import { Vector2 } from 'three/src/math/Vector2.js';
+import { Mesh } from "three/src/objects/Mesh.js";
 import { DoubleSide, LinearFilter } from 'three/src/Three.WebGPU.Nodes.js';
 
-import ThreeActorBase from "../../bases/components/ThreeActorBase";
-import { AssetId } from '../../../../constants/experiences/AssetId';
-import ThreeAssetsManager from '../../../../managers/threes/ThreeAssetsManager';
 import MainThreeCameraController from '../../../../cameras/threes/MainThreeCameraController';
+import { AssetId } from '../../../../constants/experiences/AssetId';
+import { CameraId } from '../../../../constants/experiences/CameraId';
+import { LayerId } from '../../../../constants/experiences/LayerId';
+import ThreeAssetsManager from '../../../../managers/threes/ThreeAssetsManager';
+import ThreeCameraControllerManager from '../../../../managers/threes/ThreeCameraControllerManager';
 import TimelineExperienceManager from '../../../../managers/TimelineExperienceManager';
+import ThreeActorBase from "../../bases/components/ThreeActorBase";
 
 export default class MovementHelper extends ThreeActorBase {
     private _material: MeshLineMaterial | undefined;
@@ -59,15 +62,15 @@ export default class MovementHelper extends ThreeActorBase {
             color: '#ffffff',
             resolution: new Vector2(window.innerWidth, window.innerHeight),
             lineWidth: 0.04,
-            toneMapped: false,
-            depthWrite: false,
-            transparent: true,
+            useDash: 1,
             dashArray: 0.01,
             dashRatio: 0.5,
-            dashOffset: 0.
+            dashOffset: 0,
         });
+        this._material.transparent = true;
 
         const mesh = new Mesh(geometry, this._material);
+        mesh.layers.enable(LayerId.NO_KUWAHARA);
         this._mesh = mesh;
         this.add(mesh);
     }
@@ -88,6 +91,7 @@ export default class MovementHelper extends ThreeActorBase {
 
         const mesh = new Mesh(geometry, material);
         mesh.position.set(Math.cos(Math.PI / 2), this._height, Math.sin(Math.PI / 2));
+        mesh.layers.enable(LayerId.NO_KUWAHARA);
         this._icon = mesh;
         this.add(mesh);
     }
@@ -134,7 +138,7 @@ export default class MovementHelper extends ThreeActorBase {
             }
 
             const dx = x - this._lastX;
-            this._rotationYTarget -= dx * MainThreeCameraController._ROTATE_SPEED;
+            this._rotationYTarget -= dx * (ThreeCameraControllerManager.get(CameraId.THREE_MAIN) as MainThreeCameraController).rotateSpeed;
             this._lastX = x;
         });
 
@@ -165,8 +169,8 @@ export default class MovementHelper extends ThreeActorBase {
     public override init(): void {
         super.init();
 
-        TimelineExperienceManager.onEnterInteract1.add(this._show, this);
-        TimelineExperienceManager.onLeaveInteract1.add(this._hide, this);
+        TimelineExperienceManager.onEnterInteract1.add(this._show);
+        TimelineExperienceManager.onLeaveInteract1.add(this._hide);
     }
 
     public override dispose(): void {
@@ -174,8 +178,8 @@ export default class MovementHelper extends ThreeActorBase {
             clearTimeout(this._hideTimeout);
             this._hideTimeout = null;
         }
-        TimelineExperienceManager.onEnterInteract1.remove(this._show, this);
-        TimelineExperienceManager.onLeaveInteract1.remove(this._hide, this);
+        TimelineExperienceManager.onEnterInteract1.remove(this._show);
+        TimelineExperienceManager.onLeaveInteract1.remove(this._hide);
         super.dispose();
     }
 

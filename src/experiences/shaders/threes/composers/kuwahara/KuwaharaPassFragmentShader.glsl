@@ -1,4 +1,5 @@
 uniform sampler2D tDiffuse;
+uniform sampler2D uMask;
 uniform vec2 uTexelSize;
 
 varying vec2 vUv;
@@ -7,6 +8,12 @@ varying vec2 vUv;
 // Splits the neighborhood into 4 quadrants, keeps the mean of the
 // one with the lowest variance — producing a painterly, edge-preserving result.
 void main() {
+    // Bypass the filter where objects on the NO_KUWAHARA layer are visible.
+    if (texture2D(uMask, vUv).a > 0.01) {
+        gl_FragColor = texture2D(tDiffuse, vUv);
+        return;
+    }
+
     const int R = 3;
 
     vec3 mean[4];

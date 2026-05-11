@@ -8,6 +8,8 @@ export default abstract class ThreeEffectComposerBase extends EffectComposer {
     protected static readonly _DEFAULT_RENDER_TARGET_TYPE = HalfFloatType;
 
     protected readonly _passes: Pass[];
+    protected readonly _mainScene: Scene;
+    protected _mainCamera: Camera;
     private declare _renderPass: RenderPass;
 
     constructor(renderer: WebGLRenderer, scene: Scene, camera: Camera, options: { samples?: number, type?: TextureDataType } = {}) {
@@ -15,6 +17,8 @@ export default abstract class ThreeEffectComposerBase extends EffectComposer {
         const type = options.type ?? ThreeEffectComposerBase._DEFAULT_RENDER_TARGET_TYPE;
         super(renderer, new WebGLRenderTarget(DomResizeManager.width, DomResizeManager.height, { samples, type }));
 
+        this._mainScene = scene;
+        this._mainCamera = camera;
         this._createRenderPass(scene, camera);
         this._passes = [];
         this._addPasses();
@@ -23,7 +27,11 @@ export default abstract class ThreeEffectComposerBase extends EffectComposer {
     }
 
     public setCamera(camera: Camera): void {
+        this._mainCamera = camera;
         this._renderPass.camera = camera;
+        for (const pass of this._passes) {
+            if (pass instanceof ThreePassBase) pass.setCamera(camera);
+        }
     }
 
     public resize(): void {

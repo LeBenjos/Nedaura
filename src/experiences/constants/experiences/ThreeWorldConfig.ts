@@ -57,16 +57,17 @@ export interface ThreeWorldConfig {
         handDepth: number;
         handSpread: number;
         smoothing: number;
-        numTrails: number;
         lineWidth: number;
         trailSpread: number;
         amplitudeXY: number;
         amplitudeZ: number;
         minHeight: number;
+        trailLength: number;
         color0: string;
         color1: string;
         color2: string;
         color3: string;
+        numTrails: number;
     };
 }
 
@@ -133,17 +134,18 @@ export const THREE_WORLD_CONFIG: ThreeWorldConfig = {
     "windLines": {
         "enabled": true,
         "handDepth": 0,
-        "handSpread": 8.9,
-        "smoothing": 0.41,
-        "numTrails": 5,
-        "lineWidth": 0.35,
+        "handSpread": 9,
+        "smoothing": 0.45,
+        "lineWidth": 0.3,
         "trailSpread": 0.3,
         "amplitudeXY": 0.2,
-        "amplitudeZ": 0.1,
+        "amplitudeZ": 0.3,
         "minHeight": 0,
+        "trailLength": 25,
         "color0": "#ffffff",
         "color1": "#ffffff",
         "color2": "#ffffff",
-        "color3": "#ffffff"
+        "color3": "#ffffff",
+        "numTrails": 5
     }
 } as const;

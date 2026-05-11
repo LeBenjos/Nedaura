@@ -43,10 +43,9 @@ interface Trail {
 
 // ─── Class ────────────────────────────────────────────────────────────────────
 export default class WindLines extends ThreeActorBase {
-    private static readonly _NUM_TRAILS = 6;
-    private static readonly _TRAIL_LEN = 200;
-
     private static readonly _DEBUG_INIT_KEY: string = '__windLinesDebugInit';
+
+    private _sharedAlphaTexture: Texture | null = null;
 
     private _trails: Trail[] = [];
     private _time = 0;
@@ -70,6 +69,7 @@ export default class WindLines extends ThreeActorBase {
     private readonly _right = new Vector3();
     private readonly _up = new Vector3();
     private readonly _forward = new Vector3();
+    private readonly _tmpWave = new Vector3();
 
     private readonly _canInteract: boolean = false;
 
@@ -124,9 +124,17 @@ export default class WindLines extends ThreeActorBase {
             .name('lineWidth')
             .onChange(() => this._applyLineWidth());
 
-        controllers.trailSpread = folder.add(this._settings, 'trailSpread', 0, 1, 0.01).name('trailSpread');
+        controllers.trailSpread = folder
+            .add(this._settings, 'trailSpread', 0, 1, 0.01)
+            .name('trailSpread')
+            .onChange(() => this._applyTrailSpread());
         controllers.amplitudeXY = folder.add(this._settings, 'amplitudeXY', 0, 1, 0.01).name('amplitudeXY');
         controllers.amplitudeZ = folder.add(this._settings, 'amplitudeZ', 0, 1, 0.01).name('amplitudeZ');
+        controllers.minHeight = folder.add(this._settings, 'minHeight', -5, 5, 0.01).name('minHeight');
+        controllers.trailLength = folder
+            .add(this._settings, 'trailLength', 5, 300, 1)
+            .name('trailLength')
+            .onChange(() => this._applyTrailLength());
 
         controllers.color0 = folder
             .addColor(this._settings, 'color0')
@@ -191,16 +199,44 @@ export default class WindLines extends ThreeActorBase {
         }
     }
 
+    private _applyTrailSpread(): void {
+        const spread = this._settings.trailSpread;
+        for (const tr of this._trails) {
+            tr.offset.set(
+                (Math.random() - 0.5) * spread,
+                (Math.random() - 0.5) * spread,
+                (Math.random() - 0.5) * spread
+            );
+        }
+    }
+
+    private _applyTrailLength(): void {
+        const target = this._settings.trailLength;
+        for (const tr of this._trails) {
+            const current = tr.points.length;
+            if (current === target) continue;
+
+            if (current < target) {
+                // Grow: clone the current tail so new slots don't introduce a (0,0,0) line back to origin.
+                const tail = tr.points[current - 1] ?? tr.smoothedTarget;
+                for (let i = current; i < target; i++) tr.points.push(tail.clone());
+            } else {
+                // Shrink: drop oldest points from the tail.
+                tr.points.length = target;
+            }
+        }
+    }
+
     // ── Setup ─────────────────────────────────────────────────────────────────
 
     private _initMesh(): void {
-        for (let t = 0; t < WindLines._NUM_TRAILS; t++) {
+        for (let t = 0; t < this._settings.numTrails; t++) {
             this._generateMesh(t);
         }
     }
 
     private _generateMesh(t: number): void {
-        const points: Vector3[] = Array(WindLines._TRAIL_LEN)
+        const points: Vector3[] = Array(this._settings.trailLength)
             .fill(0)
             .map(() => new Vector3());
 
@@ -214,7 +250,7 @@ export default class WindLines extends ThreeActorBase {
             lineWidth: this._settings.lineWidth,
             useAlphaMap: 1,
             alphaTest: 0.1,
-            alphaMap: this._createAlphaTexture(),
+            alphaMap: this._getSharedAlphaTexture(),
         });
 
         mat.blending = NormalBlending;
@@ -240,7 +276,9 @@ export default class WindLines extends ThreeActorBase {
         });
     }
 
-    private _createAlphaTexture(): Texture {
+    private _getSharedAlphaTexture(): Texture {
+        if (this._sharedAlphaTexture) return this._sharedAlphaTexture;
+
         const canvas = document.createElement('canvas');
         canvas.width = 256;
         canvas.height = 1;
@@ -256,6 +294,7 @@ export default class WindLines extends ThreeActorBase {
 
         const texture = new CanvasTexture(canvas);
         texture.needsUpdate = true;
+        this._sharedAlphaTexture = texture;
         return texture;
     }
 
@@ -267,17 +306,17 @@ export default class WindLines extends ThreeActorBase {
      *   col 0 → right, col 1 → up, col 2 → camera's local +Z (backwards),
      * so we negate col 2 to get the true look-forward direction.
      */
-    private _handToWorld(tip: { x: number; y: number; z: number }): Vector3 {
+    private _handToWorld(x: number, y: number): void {
         const camera = this._cameraController.camera;
 
         // Remap mediapipe [0..1] → [-1..1], mirror x so left = left on screen
-        const nx = (tip.x - 0.5) * -2;
-        const ny = (0.5 - tip.y) * 2;
+        const nx = (x - 0.5) * -2;
+        const ny = (0.5 - y) * 2;
 
         camera.matrixWorld.extractBasis(this._right, this._up, this._forward);
         this._forward.negate(); // col 2 is +Z (behind camera), flip to look direction
 
-        return new Vector3()
+        this._target3D
             .copy(camera.position)
             .addScaledVector(this._forward, this._settings.handDepth)
             .addScaledVector(this._right, nx * this._settings.handSpread)
@@ -353,7 +392,7 @@ export default class WindLines extends ThreeActorBase {
         }
 
         if (!resolved) {
-            this._target3D.copy(this._handToWorld({ ...tip, x: x01, y: y01 }));
+            this._handToWorld(x01, y01);
         }
 
         // Au premier frame visible/main détectée, snap les trails sur la position
@@ -395,37 +434,38 @@ export default class WindLines extends ThreeActorBase {
         if (!this.visible) return;
         this._time += dt;
 
+        // Frame-rate-independent smoothing: at 60fps with smoothing=s we get exactly lerp(target, s).
+        const smoothFactor = 1 - Math.pow(1 - this._settings.smoothing, dt * 60);
+
         this._trails.forEach((tr) => {
-            tr.smoothedTarget.lerp(this._target3D, this._settings.smoothing);
+            tr.smoothedTarget.lerp(this._target3D, smoothFactor);
 
-            tr.points.unshift(this._getWavePoint(tr, this._time));
-            if (tr.points.length > WindLines._TRAIL_LEN) tr.points.pop();
+            // Rotate the ring in place: oldest tail Vector3 is recycled as the new head — no allocation.
+            const recycled = tr.points.pop()!;
+            this._writeWavePoint(tr, this._time, recycled);
+            tr.points.unshift(recycled);
 
-            tr.geometry.setPoints(
-                tr.points.map((p: Vector3) => p.clone()),
-                (p: number) => {
-                    const edge = 0.1;
-                    if (p < edge) return MathUtils.lerp(0.05, tr.material.lineWidth, p / edge);
-                    if (p > 1 - edge) return MathUtils.lerp(0.05, tr.material.lineWidth, (1 - p) / edge);
-                    return tr.material.lineWidth;
-                }
-            );
+            tr.geometry.setPoints(tr.points, (p: number) => {
+                const edge = 0.1;
+                if (p < edge) return MathUtils.lerp(0.05, tr.material.lineWidth, p / edge);
+                if (p > 1 - edge) return MathUtils.lerp(0.05, tr.material.lineWidth, (1 - p) / edge);
+                return tr.material.lineWidth;
+            });
         });
     }
 
-    private _getWavePoint(tr: Trail, t: number): Vector3 {
+    private _writeWavePoint(tr: Trail, t: number, out: Vector3): void {
         const idx = tr.points.length;
         const { amplitudeXY: aXY, amplitudeZ: aZ } = this._settings;
 
-        const wave = new Vector3(
+        this._tmpWave.set(
             Math.sin(t * tr.speed + tr.phase + idx * 0.2) * aXY,
             Math.cos(t * tr.speed * 1.3 + tr.phase + idx * 0.15) * aXY,
             Math.sin(t * tr.speed * 0.7 + tr.phase + idx * 0.1) * aZ
         );
 
-        const p = new Vector3().copy(tr.smoothedTarget).add(tr.offset).add(wave);
-        if (p.y < this._settings.minHeight) p.y = this._settings.minHeight;
-        return p;
+        out.copy(tr.smoothedTarget).add(tr.offset).add(this._tmpWave);
+        if (out.y < this._settings.minHeight) out.y = this._settings.minHeight;
     }
 
     public override reset(): void {}
@@ -442,6 +482,9 @@ export default class WindLines extends ThreeActorBase {
             trail.material.dispose();
         }
         this._trails = [];
+
+        this._sharedAlphaTexture?.dispose();
+        this._sharedAlphaTexture = null;
 
         if (this._debugRaycastPoint) {
             MainThreeApp.scene.remove(this._debugRaycastPoint);

@@ -77,38 +77,14 @@ export default class Dunes extends ThreeModelBase {
                 if (this._model.material.armMap) this._model.material.armMap.rotation = rad;
             });
 
+            const mesh = this._model;
             DebugManager.registerConfigGetter('dunes.textureRepeat', () => repeatProxy.value);
             DebugManager.registerConfigGetter('dunes.textureRotation', () => rotationProxy.value);
-            DebugManager.registerConfigGetter('dunes.color', () => {
-                if (!(this._model instanceof Mesh)) {
-                    throw new Error('Dunes model is expected to be a Mesh');
-                }
-                '#' + this._model.material.color.getHexString();
-            });
-            DebugManager.registerConfigGetter('dunes.roughness', () => {
-                if (!(this._model instanceof Mesh)) {
-                    throw new Error('Dunes model is expected to be a Mesh');
-                }
-                this._model.material.roughness;
-            });
-            DebugManager.registerConfigGetter('dunes.metalness', () => {
-                if (!(this._model instanceof Mesh)) {
-                    throw new Error('Dunes model is expected to be a Mesh');
-                }
-                this._model.material.metalness;
-            });
-            DebugManager.registerConfigGetter('dunes.normalScaleX', () => {
-                if (!(this._model instanceof Mesh)) {
-                    throw new Error('Dunes model is expected to be a Mesh');
-                }
-                this._model.material.normalScale?.x ?? 1;
-            });
-            DebugManager.registerConfigGetter('dunes.normalScaleY', () => {
-                if (!(this._model instanceof Mesh)) {
-                    throw new Error('Dunes model is expected to be a Mesh');
-                }
-                this._model.material.normalScale?.y ?? 1;
-            });
+            DebugManager.registerConfigGetter('dunes.color', () => '#' + mesh.material.color.getHexString());
+            DebugManager.registerConfigGetter('dunes.roughness', () => mesh.material.roughness);
+            DebugManager.registerConfigGetter('dunes.metalness', () => mesh.material.metalness);
+            DebugManager.registerConfigGetter('dunes.normalScaleX', () => mesh.material.normalScale?.x ?? 1);
+            DebugManager.registerConfigGetter('dunes.normalScaleY', () => mesh.material.normalScale?.y ?? 1);
 
             DebugManager.registerConfigSetter('dunes.textureRepeat', (v) => repeatCtrl.setValue(v));
             DebugManager.registerConfigSetter('dunes.textureRotation', (v) => rotationCtrl.setValue(v));

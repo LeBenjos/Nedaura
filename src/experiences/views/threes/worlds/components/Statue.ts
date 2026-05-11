@@ -8,15 +8,15 @@ import {
     Vector3,
     type WebGLProgramParametersWithUniforms,
 } from "three";
-import { AssetId } from "../../../../constants/experiences/AssetId";
-import { Object3DId } from "../../../../constants/experiences/Object3dId";
-import ThreeModelBase from "../../bases/components/ThreeModelBase";
-import ThreeAssetsManager from '../../../../managers/threes/ThreeAssetsManager';
-import TimelineExperienceManager from "../../../../managers/TimelineExperienceManager";
-import { TimelineExperienceState } from "../../../../constants/experiences/TimelineExperienceState";
-import ThreeCameraControllerManager from "../../../../managers/threes/ThreeCameraControllerManager";
 import MainThreeCameraController from "../../../../cameras/threes/MainThreeCameraController";
+import { AssetId } from "../../../../constants/experiences/AssetId";
 import { CameraId } from "../../../../constants/experiences/CameraId";
+import { Object3DId } from "../../../../constants/experiences/Object3dId";
+import { TimelineExperienceState } from "../../../../constants/experiences/TimelineExperienceState";
+import ThreeAssetsManager from '../../../../managers/threes/ThreeAssetsManager';
+import ThreeCameraControllerManager from "../../../../managers/threes/ThreeCameraControllerManager";
+import TimelineExperienceManager from "../../../../managers/TimelineExperienceManager";
+import ThreeModelBase from "../../bases/components/ThreeModelBase";
 
 export interface HitMaskPainter {
     canvas: HTMLCanvasElement;
@@ -70,13 +70,13 @@ export default class Statue extends ThreeModelBase {
 
     public init(): void {
         super.init();
-        TimelineExperienceManager.onEnterInteract1.add(this._updateInteractiveState, this);
-        TimelineExperienceManager.onLeaveInteract1.add(this._updateInteractiveState, this);
+        TimelineExperienceManager.onEnterInteract1.add(this._updateInteractiveState);
+        TimelineExperienceManager.onLeaveInteract1.add(this._updateInteractiveState);
     }
 
     private _getCamera(): MainThreeCameraController {
         return ThreeCameraControllerManager.get(CameraId.THREE_MAIN) as MainThreeCameraController;
-    }   
+    }
 
     private _clearCanvas(): void {
         this._hitMaskCtx.fillStyle = "black";
@@ -136,11 +136,11 @@ export default class Statue extends ThreeModelBase {
 
                 material.onBeforeCompile = (shader: WebGLProgramParametersWithUniforms) => {
                     // Uniforms
-                    shader.uniforms.uHitMask            = { value: this._hitMaskTexture };
-                    shader.uniforms.uBaseTexture         = { value: textureMat };
-                    shader.uniforms.uErodedTexture       = { value: textureErodedWindMat };
-                    shader.uniforms.uBaseNormal          = { value: normalMap };
-                    shader.uniforms.uErodedNormal        = { value: normalErodedWindMat };
+                    shader.uniforms.uHitMask = { value: this._hitMaskTexture };
+                    shader.uniforms.uBaseTexture = { value: textureMat };
+                    shader.uniforms.uErodedTexture = { value: textureErodedWindMat };
+                    shader.uniforms.uBaseNormal = { value: normalMap };
+                    shader.uniforms.uErodedNormal = { value: normalErodedWindMat };
                     shader.uniforms.uDisplacementStrength = { value: 0.5 };
                     shader.uniforms.canInteract = { value: this._canInteract };
 
@@ -270,7 +270,7 @@ export default class Statue extends ThreeModelBase {
         // si nous ne sommes pas en interaction, on n'affiche pas les effets de peinture
         if (!this._canInteract) return;
         if (this._paintedPixels >= Statue._MAX_PAINTED_PIXELS) return;
-        
+
         const { _hitMaskCtx: ctx } = this;
         const size = Statue._HIT_MASK_SIZE;
 

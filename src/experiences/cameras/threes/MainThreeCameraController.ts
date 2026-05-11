@@ -340,4 +340,12 @@ export default class MainThreeCameraController extends ThreeCameraControllerBase
         DebugManager.registerConfigSetter('camera.phiDeg', (v) => phiCtrl.setValue(v));
         DebugManager.registerConfigSetter('camera.thetaDeg', (v) => thetaCtrl.setValue(v));
     }
+
+    //#region getter
+    //
+    public get rotateSpeed(): number {
+        return MainThreeCameraController._ROTATE_SPEED;
+    }
+    //
+    //#endregion
 }

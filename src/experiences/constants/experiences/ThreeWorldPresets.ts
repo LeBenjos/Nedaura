@@ -68,18 +68,19 @@ export const THREE_WORLD_PRESETS: Record<ThreeWorldPresetId, ThreeWorldConfig> =
         "windLines": {
             "enabled": true,
             "handDepth": 0,
-            "handSpread": 8.9,
-            "smoothing": 0.41,
-            "minHeight": 0.2,
-            "numTrails": 5,
-            "lineWidth": 0.35,
+            "handSpread": 9,
+            "smoothing": 0.45,
+            "lineWidth": 0.3,
             "trailSpread": 0.3,
             "amplitudeXY": 0.2,
-            "amplitudeZ": 0.1,
+            "amplitudeZ": 0.3,
+            "minHeight": 0,
+            "trailLength": 25,
             "color0": "#ffffff",
             "color1": "#ffffff",
             "color2": "#ffffff",
-            "color3": "#ffffff"
+            "color3": "#ffffff",
+            "numTrails": 5
         }
     },
     "wind": {
@@ -136,7 +137,7 @@ export const THREE_WORLD_PRESETS: Record<ThreeWorldPresetId, ThreeWorldConfig> =
         "dunes": {
             "textureRepeat": 127.2,
             "textureRotation": 58.6,
-            "color": "#694b4f",
+            "color": "#352628",
             "roughness": 0.702,
             "metalness": 1,
             "normalScaleX": 2.998,
@@ -145,18 +146,19 @@ export const THREE_WORLD_PRESETS: Record<ThreeWorldPresetId, ThreeWorldConfig> =
         "windLines": {
             "enabled": true,
             "handDepth": 0,
-            "handSpread": 8.9,
-            "smoothing": 0.41,
-            "minHeight": 0,
-            "numTrails": 5,
-            "lineWidth": 0.35,
+            "handSpread": 9,
+            "smoothing": 0.45,
+            "lineWidth": 0.3,
             "trailSpread": 0.3,
             "amplitudeXY": 0.2,
-            "amplitudeZ": 0.1,
+            "amplitudeZ": 0.3,
+            "minHeight": 0,
+            "trailLength": 25,
             "color0": "#ffffff",
             "color1": "#ffffff",
             "color2": "#ffffff",
-            "color3": "#ffffff"
+            "color3": "#ffffff",
+            "numTrails": 5
         }
     },
     "rain": {
@@ -203,9 +205,9 @@ export const THREE_WORLD_PRESETS: Record<ThreeWorldPresetId, ThreeWorldConfig> =
         },
         "sky": {
             "turbidity": 0,
-            "rayleigh": 1.151,
-            "mieCoefficient": 0.0942,
-            "mieDirectionalG": 1,
+            "rayleigh": 4,
+            "mieCoefficient": 0.0906,
+            "mieDirectionalG": 0.841,
             "sunElevationDeg": 14.1,
             "sunAzimuthDeg": 180,
             "tintColor": "#fe8ebf"
@@ -222,18 +224,19 @@ export const THREE_WORLD_PRESETS: Record<ThreeWorldPresetId, ThreeWorldConfig> =
         "windLines": {
             "enabled": true,
             "handDepth": 0,
-            "handSpread": 8.9,
-            "smoothing": 0.41,
-            "minHeight": 0,
-            "numTrails": 5,
-            "lineWidth": 0.35,
+            "handSpread": 9,
+            "smoothing": 0.45,
+            "lineWidth": 0.3,
             "trailSpread": 0.3,
             "amplitudeXY": 0.2,
-            "amplitudeZ": 0.1,
+            "amplitudeZ": 0.3,
+            "minHeight": 0,
+            "trailLength": 25,
             "color0": "#ffffff",
             "color1": "#ffffff",
             "color2": "#ffffff",
-            "color3": "#ffffff"
+            "color3": "#ffffff",
+            "numTrails": 5
         }
     },
     "sun": {
@@ -280,9 +283,9 @@ export const THREE_WORLD_PRESETS: Record<ThreeWorldPresetId, ThreeWorldConfig> =
         },
         "sky": {
             "turbidity": 0,
-            "rayleigh": 1.151,
-            "mieCoefficient": 0.0942,
-            "mieDirectionalG": 1,
+            "rayleigh": 0.75,
+            "mieCoefficient": 0.0906,
+            "mieDirectionalG": 0.841,
             "sunElevationDeg": 14.1,
             "sunAzimuthDeg": 180,
             "tintColor": "#eecbff"
@@ -299,18 +302,19 @@ export const THREE_WORLD_PRESETS: Record<ThreeWorldPresetId, ThreeWorldConfig> =
         "windLines": {
             "enabled": true,
             "handDepth": 0,
-            "handSpread": 8.9,
-            "smoothing": 0.41,
-            "minHeight": 0,
-            "numTrails": 5,
-            "lineWidth": 0.35,
+            "handSpread": 9,
+            "smoothing": 0.45,
+            "lineWidth": 0.3,
             "trailSpread": 0.3,
             "amplitudeXY": 0.2,
-            "amplitudeZ": 0.1,
+            "amplitudeZ": 0.3,
+            "minHeight": 0,
+            "trailLength": 25,
             "color0": "#ffffff",
             "color1": "#ffffff",
             "color2": "#ffffff",
-            "color3": "#ffffff"
+            "color3": "#ffffff",
+            "numTrails": 5
         }
     }
 } as const;
