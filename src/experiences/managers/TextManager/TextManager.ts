@@ -7,7 +7,7 @@ import { TextId } from '../../constants/experiences/Text/TextId';
 import { TEXTS } from '../../constants/experiences/Text/Texts';
 import { DebugGuiTitle } from '../../constants/experiences/DebugGuiTitle';
 
-type TextAnchor = 'center' | 'top-left';
+type TextAnchor = 'center' | 'top-left' | 'center-right';
 
 type TextShaderDebugState = {
     enabled: boolean;
@@ -290,6 +290,9 @@ class TextManager {
         const py = instance.yPx ?? h * 0.5;
 
         if (instance.options.anchor === 'top-left') {
+            instance.mesh.position.x = px + instance.widthPx * 0.5;
+            instance.mesh.position.y = h - (py + instance.heightPx * 0.5);
+        } else if(instance.options.anchor === 'center-right') {
             instance.mesh.position.x = px + instance.widthPx * 0.5;
             instance.mesh.position.y = h - (py + instance.heightPx * 0.5);
         } else {
