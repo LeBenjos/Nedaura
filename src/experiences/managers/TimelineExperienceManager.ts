@@ -48,15 +48,22 @@ class TimelineExperienceManager {
             enter: this.onEnterVerse1,
             leave: this.onLeaveVerse1,
             id: 'timeline-verse1',
-            initialValue: -3600,
-            endValue: -2000,
+            initialValue: -3500,
+            endValue: -2600,
+        },
+        {
+            enter: this.onEnterInteract1,
+            leave: this.onLeaveInteract1,
+            id: 'timeline-interact1',
+            initialValue: -2600,
+            endValue: -1279,
         },
         {
             enter: this.onEnterVerse2,
             leave: this.onLeaveVerse2,
             id: 'timeline-verse2',
-            initialValue: -2000,
-            endValue: 0,
+            initialValue: -1279,
+            endValue: -332,
         },
     ];
 
@@ -70,6 +77,7 @@ class TimelineExperienceManager {
             segment.enter.add(() =>
                 this.mount({
                     id: segment.id,
+                    noAnimation: true,
                     component: TimelineView,
                     props: {
                         initialValue: segment.initialValue,

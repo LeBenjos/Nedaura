@@ -26,7 +26,6 @@ const formattedDate = computed(() => {
 
 <style lang="scss" scoped>
 .date {
-    font-family: 'Helvetica Neue', Arial, sans-serif;
     font-size: 1rem;
     font-weight: 700;
     color: #ffffff;
