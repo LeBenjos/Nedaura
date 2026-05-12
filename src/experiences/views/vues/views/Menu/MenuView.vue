@@ -2,18 +2,18 @@
 import gsap from 'gsap';
 import { onMounted } from 'vue';
 
-import LogoNedaura from './LogoNedaura.vue';
-import IntroView from '../Intro/IntroView.vue';
+import { SoundId } from '@/constants/experiences/Sound/SoundId';
 import { useInterfaceManager } from '@/hooks/useInterfaceManager';
 import SoundManager from '@/managers/SoundManager';
-import { SoundId } from '@/constants/experiences/Sound/SoundId';
 import ButtonComponent from '../../components/ButtonComponent.vue';
+import IntroView from '../Intro/IntroView.vue';
+import LogoNedaura from './LogoNedaura.vue';
 
 const { mount, unmount } = useInterfaceManager();
 
 onMounted(() => {
-    SoundManager.playAmbientSound(SoundId.MENU_MUSIC);
-    SoundManager.playAmbientSound(SoundId.MENU_AMBIANCE);
+    SoundManager.playAmbientSound(SoundId.MENU_MUSIC, 800, 0.5);
+    SoundManager.playAmbientSound(SoundId.MENU_AMBIANCE, 800, 0.5);
 });
 
 const onClick = (): void => {
@@ -23,8 +23,6 @@ const onClick = (): void => {
         ease: 'power2.inOut',
 
         onComplete: () => {
-            SoundManager.stopAmbientSound(SoundId.MENU_MUSIC);
-            SoundManager.stopAmbientSound(SoundId.MENU_AMBIANCE);
             unmount('menu');
             mount({ id: 'intro', component: IntroView, noAnimation: true });
         },

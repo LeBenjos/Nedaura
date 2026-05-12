@@ -136,7 +136,9 @@ class TimelineExperienceManager {
     }
 
     private async _enterPathIntro(): Promise<void> {
-        SoundManager.playAmbientSound(SoundId.INTRO_AMBIANCE);
+        SoundManager.stopAmbientSound(SoundId.MENU_MUSIC, 800);
+        SoundManager.stopAmbientSound(SoundId.MENU_AMBIANCE, 800);
+        SoundManager.playAmbientSound(SoundId.INTRO_AMBIANCE, 800, 0.1);
         //SoundManager.playAmbientSound(SoundId.TRAVELLING_MUSIC);
 
         this.onEnterPathIntro.execute();
@@ -191,7 +193,7 @@ class TimelineExperienceManager {
             },
         ]).then(() => {
             SoundManager.stopAmbientSound(SoundId.INTRO_AMBIANCE);
-            SoundManager.playAmbientSound(SoundId.TRAVELLING_MUSIC);
+            SoundManager.playAmbientSound(SoundId.TRAVELLING_MUSIC, 0.5, .35);
         });
 
         const totalDuration = 3100 + 2500 + 8000 + 3500 + 9000 + 3500 + 6000 + 3000; // durée totale des textes + transitions
@@ -206,9 +208,7 @@ class TimelineExperienceManager {
 
     private async _enterVerse1() {
         console.log('enter verse 1');
-
-        SoundManager.stopAmbientSound(SoundId.TRAVELLING_MUSIC);
-
+        SoundManager.playAmbientSound(SoundId.TRAVELLING_MUSIC, 0.5, 0.15);
         this.onEnterVerse1.execute();
         await playTextSequence([
             {
@@ -249,6 +249,8 @@ class TimelineExperienceManager {
 
     private _enterInteract1(): void {
         console.log('enter interact 1');
+        SoundManager.duckAmbient(0.4, 600);
+        SoundManager.playAmbientSound(SoundId.STORM, 1200, 0.75);
         WorldPresetManager.showPreset('wind');
         const view = MainThreeApp.currentView as WorldThreeView;
         view.sand.setCount(50000);
@@ -261,6 +263,7 @@ class TimelineExperienceManager {
 
     private _leaveInteract1(): void {
         console.log('leave interact 1');
+        SoundManager.restoreAmbient(600);
         this.unmount('interaction-wind');
         this.unmount('hand-movement-helper');
         this.onLeaveInteract1.execute();
@@ -304,6 +307,7 @@ class TimelineExperienceManager {
     private _leaveVerse2(): void {
         WorldPresetManager.showPreset('base');
         this.onLeaveVerse2.execute();
+        SoundManager.playAmbientSound(SoundId.STORM, 1200, 1);
     }
 
     //#region Getters

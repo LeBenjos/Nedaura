@@ -13,6 +13,9 @@ export const SoundId = {
     INTRO_6: 'INTRO_6',
     INTRO_7: 'INTRO_7',
 
+    // storm
+    STORM: 'STORM',
+
     // sand interractions
     SAND_1: 'SAND_1',
     SAND_2: 'SAND_2',

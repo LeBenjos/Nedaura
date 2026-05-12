@@ -14,6 +14,9 @@ export const SOUNDS: Record<SoundIdType, string> = {
     [SoundId.INTRO_6]: "/intro/voixoff_intro_ecran6.wav",
     [SoundId.INTRO_7]: "/intro/voixoff_intro_ecran7.wav",
 
+    // storm
+    [SoundId.STORM]: "/storm/storm.mp3",
+
     // sand interractions
     [SoundId.SAND_1]: "/interractions/sand_interaction_01.mp3",
     [SoundId.SAND_2]: "/interractions/sand_interaction_02.mp3",
