@@ -138,7 +138,7 @@ class TimelineExperienceManager {
     private async _enterPathIntro(): Promise<void> {
         SoundManager.stopAmbientSound(SoundId.MENU_MUSIC, 800);
         SoundManager.stopAmbientSound(SoundId.MENU_AMBIANCE, 800);
-        SoundManager.playAmbientSound(SoundId.INTRO_AMBIANCE, 800, 0.1);
+        SoundManager.playAmbientSound(SoundId.INTRO_AMBIANCE, 800, 0.025);
         //SoundManager.playAmbientSound(SoundId.TRAVELLING_MUSIC);
 
         this.onEnterPathIntro.execute();
@@ -193,7 +193,7 @@ class TimelineExperienceManager {
             },
         ]).then(() => {
             SoundManager.stopAmbientSound(SoundId.INTRO_AMBIANCE);
-            SoundManager.playAmbientSound(SoundId.TRAVELLING_MUSIC, 0.5, .35);
+            SoundManager.playAmbientSound(SoundId.TRAVELLING_MUSIC, 800, 0.25);
         });
 
         const totalDuration = 3100 + 2500 + 8000 + 3500 + 9000 + 3500 + 6000 + 3000; // durée totale des textes + transitions
@@ -208,7 +208,7 @@ class TimelineExperienceManager {
 
     private async _enterVerse1() {
         console.log('enter verse 1');
-        SoundManager.playAmbientSound(SoundId.TRAVELLING_MUSIC, 0.5, 0.15);
+        SoundManager.playAmbientSound(SoundId.TRAVELLING_MUSIC, 800, 0.15);
         this.onEnterVerse1.execute();
         await playTextSequence([
             {
