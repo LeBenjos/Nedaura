@@ -1,4 +1,5 @@
 import { Howl, Howler } from 'howler';
+import { AssetUtils } from '@benjos/cookware';
 import { SoundId } from '../constants/experiences/Sound/SoundId';
 import { SOUNDS } from '../constants/experiences/Sound/Sounds';
 
@@ -23,15 +24,19 @@ class SoundManager {
     constructor() {
         for (const id of SAND_INTERACTION_SOUND_IDS) {
             this._sandPool.push(new Howl({
-                src: [`/assets/sounds/${SOUNDS[id]}`],
+                src: [SoundManager._resolvePath(id)],
                 volume: SAND_INTERACTION_VOLUME,
             }));
         }
     }
 
+    private static _resolvePath(soundId: SoundId): string {
+        return AssetUtils.GetPath(`sounds${SOUNDS[soundId]}`);
+    }
+
     playSound(soundId: SoundId): void {
         const sound = new Howl({
-            src: [`/assets/sounds/${SOUNDS[soundId]}`],
+            src: [SoundManager._resolvePath(soundId)],
             volume: 1,
             onend: () => this._activeSounds.delete(soundId),
         });
@@ -55,7 +60,7 @@ class SoundManager {
         this._ambientBaseVolumes.set(soundId, baseVolume);
         const target = baseVolume * this._ambientBus;
         const sound = new Howl({
-            src: [`/assets/sounds/${SOUNDS[soundId]}`],
+            src: [SoundManager._resolvePath(soundId)],
             volume: fadeDuration > 0 ? 0 : target,
             loop: true,
         });
