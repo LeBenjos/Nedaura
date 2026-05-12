@@ -137,7 +137,7 @@ class TimelineExperienceManager {
             {
                 id: TextId.CAMERA_PATH,
                 displayDuration: 2500,
-                options: { duration: 0.8, hideDuration: 0.8 },
+                options: { duration: 0.8, fontFamily: 'Averia Serif Libre, Montserrat Alternates, Arial', hideDuration: 0.8 },
             },
             {
                 id: TextId.INTRO_1,
