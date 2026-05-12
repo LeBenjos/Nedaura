@@ -34,7 +34,6 @@ export const playTextSequence = async (
 ): Promise<void> => {
     for (const step of steps) {
         if (signal?.aborted) break;
-
         
         const showDuration = (step.options?.duration ?? 1.2) * 1000;
         const hideDuration = (step.options?.hideDuration ?? 0.8) * 1000;

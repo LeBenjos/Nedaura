@@ -1,20 +1,21 @@
-import {Howl, Howler} from 'howler';
+import { Howl, Howler } from 'howler';
 import { SoundId } from '../constants/experiences/Sound/SoundId';
 import { SOUNDS } from '../constants/experiences/Sound/Sounds';
 
 class SoundManager {
     private _isPlayingInteraction: boolean = false;
     private _ambientSounds: Map<SoundId, Howl> = new Map();
-    private _isMuted: boolean = false; 
-
-    constructor() {}
+    private _activeSounds: Map<SoundId, Howl> = new Map(); // ← sons ponctuels
+    private _isMuted: boolean = false;
 
     playSound(soundId: SoundId): void {
         const sound = new Howl({
             src: [`/assets/sounds/${SOUNDS[soundId]}`],
-            volume: 0.5,
-        })
+            volume: 2,
+            onend: () => this._activeSounds.delete(soundId),
+        });
 
+        this._activeSounds.set(soundId, sound);
         sound.play();
     }
 
@@ -22,13 +23,8 @@ class SoundManager {
         if (this._isPlayingInteraction) return;
 
         const listSandInterractionsSound = [
-            SoundId.SAND_1,
-            SoundId.SAND_2,
-            SoundId.SAND_3,
-            SoundId.SAND_4,
-            SoundId.SAND_5,
-            SoundId.SAND_6,
-            SoundId.SAND_7
+            SoundId.SAND_1, SoundId.SAND_2, SoundId.SAND_3,
+            SoundId.SAND_4, SoundId.SAND_5, SoundId.SAND_6, SoundId.SAND_7
         ];
         const soundIndex = Math.floor(Math.random() * listSandInterractionsSound.length);
         const sound = new Howl({
@@ -50,9 +46,9 @@ class SoundManager {
             loop: true,
         });
 
+        this._ambientSounds.set(soundId, sound);
         sound.play();
         sound.fade(0, 0.1, fadeDuration);
-        this._ambientSounds.set(soundId, sound);
     }
 
     stopAmbientSound(soundId: SoundId, fadeDuration: number = 1000): void {
@@ -73,17 +69,17 @@ class SoundManager {
     }
 
     stopSound(soundId: SoundId): void {
-        const sound = new Howl({
-            src: [`/assets/sounds/${SOUNDS[soundId]}`],
-            volume: 0.5,
-        });
+        const sound = this._activeSounds.get(soundId);
+        if (!sound) return;
         sound.stop();
+        this._activeSounds.delete(soundId);
     }
 
     clearSounds(): void {
         Howler.stop();
+        this._activeSounds.clear();
+        this._ambientSounds.clear();
     }
-
 
     get isMuted(): boolean {
         return this._isMuted;
