@@ -21,7 +21,26 @@ const props = withDefaults(
 
 <style lang="scss" scoped>
 .timeline-view {
+    position: absolute;
+    top: 0;
+    left: 40px;
     width: 30%;
-    height: auto;
+    height: 100vh;
+    pointer-events: none;
+
+    mask-image: linear-gradient(
+        to bottom,
+        transparent 0%,
+        black 30%,
+        black 70%,
+        transparent 100%
+    );
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        transparent 0%,
+        black 30%,
+        black 70%,
+        transparent 100%
+    );
 }
 </style>

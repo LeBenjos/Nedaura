@@ -147,7 +147,7 @@ const isMajor = (i: number) => getTick(i) % 5 === 0;
     content: '';
     position: absolute;
     top: 50%;
-    left: 8%;
+    left: 25%;
     transform: translate(0, -50%);
 }
 
