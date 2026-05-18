@@ -4,6 +4,7 @@ import InitCommand from './commands/InitCommand';
 import { ViewId } from './constants/experiences/ViewId';
 import MainThree from './engines/threes/MainThree';
 import MainThreeApp from './engines/threes/app/MainThreeApp';
+import MainMediapipe from './engines/mediapipe/MainMediapipe';
 import MainVue from './engines/vues/MainVue';
 import LoaderManager from './managers/LoaderManager';
 
@@ -17,6 +18,7 @@ class Experience {
         InitCommand.init();
         MainVue.init();
         MainThree.init();
+        MainMediapipe.init();
 
         await LoaderManager.loadAssetsWithTransition(this._onReady);
     }

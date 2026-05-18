@@ -4,7 +4,7 @@ import LoaderFragmentShader from '../../../shaders/threes/loaders/LoaderFragment
 import LoaderVertexShader from '../../../shaders/threes/loaders/LoaderVertexShader.glsl';
 
 export default class PlaneLoaderMaterial extends ShaderMaterial {
-    private static readonly _DEFAULT_UNIFORMS_COLOR: number = 0xBF5D5C;
+    private static readonly _DEFAULT_UNIFORMS_COLOR: number = 0x2C2A32;
     private static readonly _GSAP_DURATION_FADE_IN: number = 2.5;
     private static readonly _GSAP_EASE_FADE_IN: string = 'power1.inOut';
     private static readonly _GSAP_DURATION_FADE_OUT: number = 3.5;

@@ -1,6 +1,6 @@
 import { DomKeyboardManager, DomPointerManager } from '@benjos/cookware';
 import { KeyboardConstant } from '@benjos/spices';
-import { Vector3 } from 'three';
+import { Mesh, Vector3 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/Addons.js';
 import { CameraId } from '../../constants/experiences/CameraId';
 import MainThreeApp from '../../engines/threes/app/MainThreeApp';
@@ -19,6 +19,10 @@ export default class DebugThreeCameraController extends ThreeCameraControllerBas
     private static readonly _DEFAULT_CAMERA_POSITION: Vector3 = new Vector3(0, 1.5, 3);
     private static readonly _CONTROLS_DAMPING_FACTOR: number = 0.05;
     private static readonly _CONTROLS_CENTER_KEY: string = KeyboardConstant.CODES.CONTROL_LEFT;
+
+    // Add at class level
+    private _hitPoints: Vector3[] = [];
+    private static readonly _MAX_HIT_POINTS = 64;
 
     constructor() {
         super(CameraId.THREE_DEBUG, DebugThreeCameraController._DEBUG_CAMERA_OPTIONS);
@@ -45,11 +49,38 @@ export default class DebugThreeCameraController extends ThreeCameraControllerBas
 
     private readonly _onMouseDown = (): void => {
         if (DomKeyboardManager.isKeyDown(DebugThreeCameraController._CONTROLS_CENTER_KEY)) {
-            const intersect = ThreeRaycasterManager.castFromCameraToPointer(MainThreeApp.scene.children);
-            if (intersect.length > 0) {
-                this._controls.target.copy(intersect[0].point);
-                this._controls.update();
+            const statue = MainThreeApp.scene.getObjectByName('STATUE001');
+            if (!statue) return;
+
+            const intersect = ThreeRaycasterManager.castFromCameraToPointer([statue]);
+            if (intersect.length === 0) return;
+
+            const hitPoint = intersect[0].point.clone();
+
+            // Cap the array to avoid runaway growth
+            if (this._hitPoints.length < DebugThreeCameraController._MAX_HIT_POINTS) {
+                this._hitPoints.push(hitPoint);
             }
+
+            // Sync all children that have a shader
+            statue.traverse((child) => {
+                if (!(child instanceof Mesh)) return;
+
+                const materials = Array.isArray(child.material) ? child.material : [child.material];
+                for (const material of materials) {
+                    const shader = (material as any).userData?.shader;
+                    if (!shader) continue;
+
+                    const arr = shader.uniforms?.uHitPoints?.value as Vector3[] | undefined;
+                    if (arr) {
+                        this._hitPoints.forEach((p, i) => {
+                            if (arr[i]) arr[i].copy(p);
+                        });
+                    }
+
+                    if (shader.uniforms?.uHitCount) shader.uniforms.uHitCount.value = this._hitPoints.length;
+                }
+            });
         }
     };
 }

@@ -4,7 +4,10 @@ import GUI from 'lil-gui';
 import Stats from 'stats.js';
 import { ThreePerf } from 'three-perf';
 import { DebugGuiTitle } from '../constants/experiences/DebugGuiTitle';
+import { type ThreeWorldPresetId } from '../constants/experiences/ThreeWorldPresets';
 import MainThreeApp from '../engines/threes/app/MainThreeApp';
+import { toggleWebcam } from '../views/mediapipe/webcamVisibility';
+import WorldPresetManager from './WorldPresetManager';
 
 class DebugManager {
     private static readonly _IS_ACTIVE_STRING: string = '#debug';
@@ -24,6 +27,8 @@ class DebugManager {
     ];
 
     private _isDebugVisible: boolean = true;
+    private _configGetters = new Map<string, () => unknown>();
+    private _configSetters = new Map<string, (value: unknown) => void>();
     declare private _gui: GUI;
     declare private _threePerf: ThreePerf;
     declare private _stats: Stats;
@@ -89,6 +94,7 @@ class DebugManager {
         }
 
         container.appendChild(this._buildExportButton());
+        container.appendChild(this._buildPresetButtons());
 
         const titleBar = this._gui.domElement.children[0];
         if (titleBar) this._gui.domElement.insertBefore(container, titleBar.nextSibling);
@@ -117,7 +123,8 @@ class DebugManager {
         };
 
         button.onclick = async () => {
-            const payload = JSON.stringify(this._gui.save(), null, 2);
+            const json = JSON.stringify(this._exportSceneConfig(), null, 2);
+            const payload = '```json\n' + json + '\n```';
             const ok = await DebugManager._copyToClipboard(payload);
             if (ok) {
                 flash('Copied! Send it to the dev', '#2e7d32');
@@ -128,6 +135,59 @@ class DebugManager {
         };
 
         return button;
+    }
+
+    public registerConfigGetter(path: string, getter: () => unknown): void {
+        this._configGetters.set(path, getter);
+    }
+
+    public registerConfigSetter(path: string, setter: (value: unknown) => void): void {
+        this._configSetters.set(path, setter);
+    }
+
+    public hasConfigSetter(path: string): boolean {
+        return this._configSetters.has(path);
+    }
+
+    public getConfigValue(path: string): unknown {
+        return this._configGetters.get(path)?.();
+    }
+
+    public setConfigValue(path: string, value: unknown): void {
+        this._configSetters.get(path)?.(value);
+    }
+
+    private static readonly _PRESET_IDS: readonly ThreeWorldPresetId[] = ['base', 'wind', 'rain', 'sun'];
+
+    private _buildPresetButtons(): HTMLDivElement {
+        const wrap = document.createElement('div');
+        wrap.style.cssText = 'display:flex;gap:4px;margin-top:8px;';
+        for (const id of DebugManager._PRESET_IDS) {
+            const btn = document.createElement('button');
+            btn.textContent = id.charAt(0).toUpperCase() + id.slice(1);
+            btn.style.cssText =
+                'flex:1;padding:6px 4px;font-size:11px;font-weight:600;color:#fff;' +
+                'background:#5a5a5a;border:none;border-radius:3px;cursor:pointer;font-family:inherit;';
+            btn.onmouseenter = () => (btn.style.background = '#777');
+            btn.onmouseleave = () => (btn.style.background = '#5a5a5a');
+            btn.onclick = () => WorldPresetManager.showPreset(id);
+            wrap.appendChild(btn);
+        }
+        return wrap;
+    }
+
+    private _exportSceneConfig(): Record<string, unknown> {
+        const result: Record<string, unknown> = {};
+        for (const [path, getter] of this._configGetters) {
+            const parts = path.split('.');
+            let obj = result;
+            for (let i = 0; i < parts.length - 1; i++) {
+                obj[parts[i]] ??= {};
+                obj = obj[parts[i]] as Record<string, unknown>;
+            }
+            obj[parts[parts.length - 1]] = getter();
+        }
+        return result;
     }
 
     private static async _copyToClipboard(text: string): Promise<boolean> {
@@ -197,6 +257,7 @@ class DebugManager {
             this._gui.show(this._isDebugVisible);
             if (this._threePerf) this._threePerf.visible = this._isDebugVisible;
             if (this._stats) this._stats.dom.style.display = this._isDebugVisible ? 'block' : 'none';
+            toggleWebcam();
             this.onVisibilityChange.execute();
         }
     };
